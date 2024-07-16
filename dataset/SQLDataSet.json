@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "SQLDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_BusinessDataDev",

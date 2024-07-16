@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/ExternalAlertRecipients_@{formatDateTime(utcnow(), 'yyyyMMddHHmmss')}.txt",
+					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/ExternalAlertRecipients@{formatDateTime(utcnow(), 'yyyyMMddHHmmss')}.txt",
 					"type": "Expression"
 				},
 				"container": "development"

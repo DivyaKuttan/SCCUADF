@@ -1,5 +1,5 @@
 {
-	"name": "BlobDataSet",
+	"name": "GetTransactionAlertSubscriptionDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",
@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/ExternalAlerts_@{formatDateTime(utcnow(), 'HH-mm-ss')}.csv",
+					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/TransactionAlert@{formatDateTime(utcnow(), 'MMddyyyyHHmmss')}.txt",
 					"type": "Expression"
 				},
 				"container": "development"
@@ -21,6 +21,19 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "SubscriptionID",
+				"type": "String"
+			},
+			{
+				"name": "EMAIL",
+				"type": "String"
+			},
+			{
+				"name": "PHONE",
+				"type": "String"
+			}
+		]
 	}
 }

@@ -5,6 +5,8 @@
 			{
 				"name": "Exteralalerts_Lookup",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -31,6 +33,8 @@
 			{
 				"name": "ExternalAlerts_Copy data1",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Exteralalerts_Lookup",
@@ -177,6 +181,8 @@
 			{
 				"name": "GetTransactionAlertSubscription_Lookup",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -203,6 +209,8 @@
 			{
 				"name": "GetTransactionAlertSubscription_Copy data",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetTransactionAlertSubscription_Lookup",

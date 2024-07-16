@@ -1,5 +1,5 @@
 {
-	"name": "BlobDataSet",
+	"name": "GetThresholdAlertSubscriptionsDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",

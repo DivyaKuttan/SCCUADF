@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/ExternalAlerts_@{formatDateTime(utcnow(), 'HH-mm-ss')}.csv",
+					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/GetThresholdAlertSubscriptions_@{formatDateTime(utcnow(), 'HH-mm-ss')}.csv",
 					"type": "Expression"
 				},
 				"container": "development"

@@ -293,6 +293,10 @@
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
+					},
+					"body": {
+						"username": "sccu.dev.appforms",
+						"password": "jH6@wC8%yY5{wR7)oV7$"
 					}
 				}
 			}

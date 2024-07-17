@@ -287,9 +287,10 @@
 				"typeProperties": {
 					"method": "POST",
 					"headers": {
-						"Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InNjY3UucWEuYXBwZm9ybXMiLCJuYmYiOjE3MjA2Mjg2MDIsImV4cCI6MTcyMDYyOTIwMiwiaWF0IjoxNzIwNjI4NjAyfQ.wJz8ivBZPtL0Tp7WspSBjBAxy0z2_dUpVb_SEY1ASak"
+						"Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InNjY3UucWEuYXBwZm9ybXMiLCJuYmYiOjE3MjA2Mjg2MDIsImV4cCI6MTcyMDYyOTIwMiwiaWF0IjoxNzIwNjI4NjAyfQ.wJz8ivBZPtL0Tp7WspSBjBAxy0z2_dUpVb_SEY1ASak",
+						"Content-Type": "application/json"
 					},
-					"url": "https://sccu-devqa-aks.cunextgen.net/bbalerts/dev/api/notification/report/text ",
+					"url": "https://sccu-devqa-aks.cunextgen.net/bbalerts/dev/api/authenticate",
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"

@@ -297,6 +297,18 @@
 					"body": {
 						"value": "{\n    \"username\": \"sccu.dev.appforms\",\n    \"password\": \"jH6@wC8%yY5{wR7)oV7$\"\n}",
 						"type": "Expression"
+					},
+					"authentication": {
+						"type": "Basic",
+						"username": "sccu.dev.appforms",
+						"password": {
+							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVaulttest",
+								"type": "LinkedServiceReference"
+							},
+							"secretName": "ADF-TEST"
+						}
 					}
 				}
 			}

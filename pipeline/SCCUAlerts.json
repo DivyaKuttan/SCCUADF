@@ -303,6 +303,10 @@
 						"username": "sccu.dev.appforms",
 						"password": {
 							"type": "AzureKeyVaultSecret",
+							"store": {
+								"referenceName": "AzureKeyVaultest",
+								"type": "LinkedServiceReference"
+							},
 							"secretName": "ADF-TEST"
 						}
 					}

@@ -4,7 +4,11 @@
 		"annotations": [],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://SCCU-KEYVAULT.vault.azure.net/"
+			"baseUrl": "https://SCCU-KEYVAULT.vault.azure.net/",
+			"credential": {
+				"referenceName": "Credentials_BusinessDataDev",
+				"type": "CredentialReference"
+			}
 		}
 	}
 }

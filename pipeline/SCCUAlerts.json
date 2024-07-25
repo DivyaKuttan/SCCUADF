@@ -297,17 +297,13 @@
 					"body": {
 						"value": "{\n\"username\":\"sccu.dev.appforms\",\n\"password\" :@pipeline().parameters.password\n}",
 						"type": "Expression"
-					},
-					"authentication": {
-						"type": "MSI",
-						"resource": "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
 					}
 				}
 			}
 		],
 		"parameters": {
 			"password": {
-				"type": "String",
+				"type": "object",
 				"defaultValue": "jH6@wC8%yY5{wR7)oV7$"
 			}
 		},

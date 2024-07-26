@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/TransactionAlert@{formatDateTime(utcnow(), 'MMddyyyyHHmmss')}.txt",
+					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/TransactionAler@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmmss')}.txt",
 					"type": "Expression"
 				},
 				"folderPath": "TransactionAlertSubscription",

@@ -36,6 +36,12 @@
 			"value": [
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
+		},
+		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
+			"value": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
+			"value": "SCCU_BusinessData_UAT"
 		}
 	}
 }

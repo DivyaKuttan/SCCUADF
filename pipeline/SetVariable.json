@@ -1,5 +1,5 @@
 {
-	"name": "pipeline2",
+	"name": "SetVariable",
 	"properties": {
 		"activities": [
 			{
@@ -12,9 +12,9 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "DateFormat",
+					"variableName": "",
 					"value": {
-						"value": "@utcnow()",
+						"value": "@formatDateTime(addMinutes(utcnow(), -30), 'yyyy-MM-dd HH:mm:ss')",
 						"type": "Expression"
 					}
 				}
@@ -22,6 +22,9 @@
 		],
 		"variables": {
 			"DateFormat": {
+				"type": "String"
+			},
+			"FromDateTime": {
 				"type": "String"
 			}
 		},

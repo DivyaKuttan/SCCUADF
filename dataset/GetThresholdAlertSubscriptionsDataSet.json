@@ -16,10 +16,10 @@
 				},
 				"container": "development"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": "|",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
-			"quoteChar": "\""
+			"quoteChar": ""
 		},
 		"schema": []
 	}

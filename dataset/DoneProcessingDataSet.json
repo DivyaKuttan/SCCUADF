@@ -14,6 +14,7 @@
 					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/DoneProcessing@{formatDateTime(utcnow(), 'MMddyyyyHHmmss')}.txt",
 					"type": "Expression"
 				},
+				"folderPath": "BBAlerts",
 				"container": "development"
 			},
 			"columnDelimiter": "|",

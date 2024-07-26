@@ -176,14 +176,11 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[dbo].[SPS_AlertReferenceFileReport]",
+						"sqlReaderStoredProcedureName": "[alert].[sps_ReferenceFileReport]",
 						"storedProcedureParameters": {
 							"FromDateTime": {
 								"type": "String",
-								"value": {
-									"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
-									"type": "Expression"
-								}
+								"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 							},
 							"IncidentIds": {
 								"type": "String",
@@ -191,10 +188,7 @@
 							},
 							"ToDateTime": {
 								"type": "String",
-								"value": {
-									"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
-									"type": "Expression"
-								}
+								"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 							},
 							"Types": {
 								"type": "String",

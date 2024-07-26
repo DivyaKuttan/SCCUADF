@@ -1,5 +1,5 @@
 {
-	"name": "DelimitedText1",
+	"name": "DoneProcessingDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",
@@ -10,7 +10,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "SampleBBAlerts",
+				"fileName": {
+					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/DoneProcessing@{formatDateTime(utcnow(), 'MMddyyyyHHmmss')}.txt",
+					"type": "Expression"
+				},
 				"container": "development"
 			},
 			"columnDelimiter": "|",

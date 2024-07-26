@@ -124,10 +124,6 @@
 							"type": "String"
 						}
 					}
-				},
-				"linkedServiceName": {
-					"referenceName": "SCCU_BBAlertsDev",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{

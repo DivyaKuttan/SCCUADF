@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmmss')}.txt",
+					"value": "@{formatDateTime(utcnow(), 'yyyy')}/@{formatDateTime(utcnow(), 'MM')}/@{formatDateTime(utcnow(), 'dd')}/DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 					"type": "Expression"
 				},
 				"folderPath": "BBAlerts",

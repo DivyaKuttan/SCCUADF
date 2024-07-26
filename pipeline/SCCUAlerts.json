@@ -428,12 +428,6 @@
 				]
 			}
 		],
-		"parameters": {
-			"password": {
-				"type": "object",
-				"defaultValue": "jH6@wC8%yY5{wR7)oV7$"
-			}
-		},
 		"annotations": []
 	}
 }

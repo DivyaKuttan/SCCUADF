@@ -1,0 +1,39 @@
+{
+	"name": "DatasetForBBAlertsSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_BBAlertsDev",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SettingKey",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SettingValue",
+				"type": "nvarchar"
+			},
+			{
+				"name": "IsActive",
+				"type": "bit"
+			},
+			{
+				"name": "Modified",
+				"type": "datetime2",
+				"scale": 7
+			}
+		],
+		"typeProperties": {
+			"schema": "app",
+			"table": "Setting"
+		}
+	}
+}

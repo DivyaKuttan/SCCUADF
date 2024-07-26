@@ -275,7 +275,28 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC [SPS_AlertReferenceFileReport]\n    @IncidentIds = N'[104, 106, 102]',\n    @Types = N'[\"text\",\"email\"]',\n    @FromDateTime = N'2024-07-23 15:00:00',\n    @ToDateTime = N'2024-07-23 16:00:00'\n",
+						"sqlReaderStoredProcedureName": "[dbo].[SPS_AlertReferenceFileReport]",
+						"storedProcedureParameters": {
+							"FromDateTime": {
+								"type": "String",
+								"value": {
+									"value": "@addminutes(utcnow(), -5)",
+									"type": "Expression"
+								}
+							},
+							"IncidentIds": {
+								"type": "String",
+								"value": "N'[104, 106, 102]'"
+							},
+							"ToDateTime": {
+								"type": "String",
+								"value": "@utcnow()"
+							},
+							"Types": {
+								"type": "String",
+								"value": "N'[\"text\",\"email\"]'"
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -308,7 +329,25 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC [SPS_AlertReferenceFileReport]\r\n    @IncidentIds = N'[104, 106, 102]',\r\n    @Types = N'[\"text\",\"email\"]',\r\n    @FromDateTime = N'2024-07-23 15:00:00',\r\n    @ToDateTime = N'2024-07-23 16:00:00'\r\n",
+						"sqlReaderStoredProcedureName": "[dbo].[SPS_AlertReferenceFileReport]",
+						"storedProcedureParameters": {
+							"FromDateTime": {
+								"type": "String",
+								"value": "@addminutes(utcnow(), -5)"
+							},
+							"IncidentIds": {
+								"type": "String",
+								"value": "N'[104, 106, 102]'"
+							},
+							"ToDateTime": {
+								"type": "String",
+								"value": "@utcnow()"
+							},
+							"Types": {
+								"type": "String",
+								"value": "N'[\"text\",\"email\"]'"
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},

@@ -1,0 +1,29 @@
+{
+	"name": "Trigger_Alert",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipeline": {
+			"pipelineReference": {
+				"referenceName": "SCCUAlerts",
+				"type": "PipelineReference"
+			},
+			"parameters": {
+				"FromDateTime": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+				"ToDateTime": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+			}
+		},
+		"type": "TumblingWindowTrigger",
+		"typeProperties": {
+			"frequency": "Minute",
+			"interval": 5,
+			"startTime": "2024-07-26T18:45:00Z",
+			"delay": "00:00:00",
+			"maxConcurrency": 50,
+			"retryPolicy": {
+				"intervalInSeconds": 30
+			},
+			"dependsOn": []
+		}
+	}
+}

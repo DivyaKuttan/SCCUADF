@@ -83,7 +83,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DelimitedText1",
+						"referenceName": "DoneProcessingDataSet",
 						"type": "DatasetReference"
 					}
 				]

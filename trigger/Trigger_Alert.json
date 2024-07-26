@@ -3,16 +3,6 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Stopped",
-		"pipeline": {
-			"pipelineReference": {
-				"referenceName": "SCCUAlerts",
-				"type": "PipelineReference"
-			},
-			"parameters": {
-				"FromDateTime": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
-				"ToDateTime": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
-			}
-		},
 		"type": "TumblingWindowTrigger",
 		"typeProperties": {
 			"frequency": "Minute",

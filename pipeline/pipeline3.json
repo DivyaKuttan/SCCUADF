@@ -17,7 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC [SPS_AlertReferenceFileReport]",
+						"sqlReaderQuery": {
+							"value": "EXEC [SPS_AlertReferenceFileReport]\n    @IncidentIds = N'[104, 106, 102]',\n    @Types = N'[\"text\",\"email\"]',\n    @FromDateTime = N'2024-07-23 15:00:00',\n    @ToDateTime = N'2024-07-23 16:00:00'",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -50,7 +53,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC [SPS_AlertReferenceFileReport]",
+						"sqlReaderQuery": "EXEC [SPS_AlertReferenceFileReport]\r\n    @IncidentIds = N'[104, 106, 102]',\r\n    @Types = N'[\"text\",\"email\"]',\r\n    @FromDateTime = N'2024-07-23 15:00:00',\r\n    @ToDateTime = N'2024-07-23 16:00:00'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},

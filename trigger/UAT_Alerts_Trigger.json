@@ -1,12 +1,12 @@
 {
-	"name": "Alerts_Trigger",
+	"name": "UAT_Alerts_Trigger",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "SCCUAlerts",
+					"referenceName": "SCCUAlerts_DEV",
 					"type": "PipelineReference"
 				},
 				"parameters": {

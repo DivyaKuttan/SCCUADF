@@ -180,15 +180,21 @@
 						"storedProcedureParameters": {
 							"FromDateTime": {
 								"type": "String",
-								"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
+								"value": {
+									"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+									"type": "Expression"
+								}
 							},
 							"IncidentIds": {
 								"type": "String",
-								"value": "[104, 106, 102]"
+								"value": "[102,104,105,106,107,108,109,110,60,15,9]"
 							},
 							"ToDateTime": {
 								"type": "String",
-								"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+								"value": {
+									"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
+									"type": "Expression"
+								}
 							},
 							"Types": {
 								"type": "String",

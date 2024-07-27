@@ -1,5 +1,5 @@
 {
-	"name": "SCCUAlerts",
+	"name": "SCCUAlerts_DEV",
 	"properties": {
 		"activities": [
 			{
@@ -44,13 +44,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SQLDataSet",
+						"referenceName": "DEV_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "GetExternalAlertRecipientsDataSet",
+						"referenceName": "DEV_GetExternalAlertRecipientsDataSet",
 						"type": "DatasetReference"
 					}
 				]
@@ -97,13 +97,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SQLDataSet",
+						"referenceName": "DEV_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "GetThresholdAlertSubscriptionsDataSet",
+						"referenceName": "DEV_GetThresholdAlertSubscriptionsDataSet",
 						"type": "DatasetReference"
 					}
 				]
@@ -150,13 +150,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SQLDataSet",
+						"referenceName": "DEV_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "GetTransactionAlertSubscriptionDataSet",
+						"referenceName": "DEV_GetTransactionAlertSubscriptionDataSet",
 						"type": "DatasetReference"
 					}
 				]
@@ -265,13 +265,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "BBAlertsDataSet",
+						"referenceName": "DEV_BBAlertsDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DoneProcessingDataSet",
+						"referenceName": "DEV_DoneProcessingDataSet",
 						"type": "DatasetReference"
 					}
 				]

@@ -1,5 +1,5 @@
 {
-	"name": "GetTransactionAlertSubscriptionDataSet",
+	"name": "DEV_GetTransactionAlertSubscriptionDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",

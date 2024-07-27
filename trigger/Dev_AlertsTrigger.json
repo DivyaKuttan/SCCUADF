@@ -1,0 +1,28 @@
+{
+	"name": "Dev_AlertsTrigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "SCCUAlerts_DEV",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FromDateTime": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+					"ToDateTime": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 5,
+				"startTime": "2024-07-28T22:00:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}

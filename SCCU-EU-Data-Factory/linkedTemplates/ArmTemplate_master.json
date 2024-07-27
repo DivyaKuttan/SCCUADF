@@ -23,6 +23,14 @@
 			"type": "string",
 			"defaultValue": "SCCU_BusinessData_Dev"
 		},
+		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCU_BusinessData_UAT"
+		},
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"type": "string",
 			"defaultValue": "https://sccudatafactorystorage.blob.core.windows.net/"
@@ -48,14 +56,6 @@
 			"defaultValue": [
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
-		},
-		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuuatsql01.database.windows.net"
-		},
-		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BusinessData_UAT"
 		},
 		"containerUri": {
 			"type": "string",
@@ -105,14 +105,14 @@
 					"SCCU_BusinessDataDev_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_database')]"
 					},
-					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
-						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
-					},
 					"SCCU_BusinessDataUAT_properties_typeProperties_server": {
 						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_server')]"
 					},
 					"SCCU_BusinessDataUAT_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]"
+					},
+					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
 					},
 					"Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime": {
 						"value": "[parameters('Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime')]"

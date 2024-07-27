@@ -1,5 +1,5 @@
 {
-	"name": "DoneProcessingDataSet",
+	"name": "DEV_DoneProcessingDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",

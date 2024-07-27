@@ -1,5 +1,5 @@
 {
-	"name": "GetExternalAlertRecipientsDataSet",
+	"name": "UAT_GetExternalAlertRecipientsDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",
@@ -15,26 +15,13 @@
 					"type": "Expression"
 				},
 				"folderPath": "Alertsubscriber",
-				"container": "development"
+				"container": "uat"
 			},
 			"columnDelimiter": "|",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": ""
 		},
-		"schema": [
-			{
-				"name": "SubscriptionID",
-				"type": "String"
-			},
-			{
-				"name": "EMAIL",
-				"type": "String"
-			},
-			{
-				"name": "PHONE",
-				"type": "String"
-			}
-		]
+		"schema": []
 	}
 }

@@ -1,0 +1,27 @@
+{
+	"name": "UAT_GetTransactionAlertSubscriptionsDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_DataFactory_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+					"type": "Expression"
+				},
+				"folderPath": "TransactionAlertSubscription",
+				"container": "uat"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": ""
+		},
+		"schema": []
+	}
+}

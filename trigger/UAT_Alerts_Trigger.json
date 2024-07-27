@@ -1,12 +1,22 @@
 {
-	"name": "Alerts_Trigger",
+	"name": "UAT_Alerts_Trigger",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "SCCUAlerts",
+					"referenceName": "SCCUAlerts_DEV",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FromDateTime": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+					"ToDateTime": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+				}
+			},
+			{
+				"pipelineReference": {
+					"referenceName": "SCCUAlerts_UAT",
 					"type": "PipelineReference"
 				},
 				"parameters": {
@@ -20,7 +30,7 @@
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 5,
-				"startTime": "2024-07-27T14:57:00",
+				"startTime": "2024-07-27T22:00:00",
 				"timeZone": "India Standard Time"
 			}
 		}

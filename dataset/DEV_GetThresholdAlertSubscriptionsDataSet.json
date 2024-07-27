@@ -1,0 +1,27 @@
+{
+	"name": "DEV_GetThresholdAlertSubscriptionsDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_DataFactory_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/ThresholdAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+					"type": "Expression"
+				},
+				"folderPath": "ThresholdAlertSubscription",
+				"container": "development"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": ""
+		},
+		"schema": []
+	}
+}

@@ -14,7 +14,7 @@
 					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 					"type": "Expression"
 				},
-				"folderPath": "ExternalAlertRecipents",
+				"folderPath": "Alertsubscriber",
 				"container": "development"
 			},
 			"columnDelimiter": "|",

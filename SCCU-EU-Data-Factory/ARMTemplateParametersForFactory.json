@@ -42,6 +42,12 @@
 			"value": [
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+			"value": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+			"value": "SCCUUAT_BBAlerts"
 		}
 	}
 }

@@ -57,6 +57,14 @@
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
 		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCUUAT_BBAlerts"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -114,6 +122,30 @@
 					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
 					},
+					"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]"
+					},
+					"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "SCCU-EU-Data-Factory_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
 					"Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime": {
 						"value": "[parameters('Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime')]"
 					},
@@ -122,7 +154,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'SCCU-EU-Data-Factory_ArmTemplate_0')]"
+			]
 		}
 	]
 }

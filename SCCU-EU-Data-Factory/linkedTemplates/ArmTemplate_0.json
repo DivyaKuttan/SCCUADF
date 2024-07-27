@@ -49,13 +49,13 @@
 			"type": "string",
 			"defaultValue": "https://sccudatafactorystorage.blob.core.windows.net/"
 		},
-		"Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime": {
+		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
+			"defaultValue": "sccuuatsql01.database.windows.net"
 		},
-		"Alerts_Trigger_properties_SCCUAlerts_parameters_ToDateTime": {
+		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+			"defaultValue": "SCCUUAT_BBAlerts"
 		}
 	},
 	"variables": {
@@ -139,6 +139,18 @@
 			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
 			"apiVersion": "2018-06-01",
 			"properties": {},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCUUAT_BBAlerts')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
 			"dependsOn": []
 		},
 		{
@@ -288,6 +300,34 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
 				"[concat(variables('factoryId'), '/credentials/Credentials_sccudatafactorystorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_BBAlertsUAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]",
+					"database": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "UserAssignedManagedIdentity",
+					"credential": {
+						"referenceName": "Credential_SCCUUAT_BBAlerts",
+						"type": "CredentialReference"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/credentials/Credential_SCCUUAT_BBAlerts')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -521,363 +561,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataDev')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUAlerts')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ExternalAlerts_Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "EXEC sps_GetExternalAlertRecipients",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "SQLDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "GetExternalAlertRecipientsDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "GetThresholdAlertSubscriptions_Copy data",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "EXEC Sps_GetThresholdAlertSubscriptionsToFile",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "SQLDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "GetThresholdAlertSubscriptionsDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "GetTransactionAlertSubscription_Copy data",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "EXEC sps_GetTransactionAlertSubscriptionToFile",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "SQLDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "GetTransactionAlertSubscriptionDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "BBAlerts_Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[alert].[sps_ReferenceFileReport]",
-								"storedProcedureParameters": {
-									"FromDateTime": {
-										"type": "String",
-										"value": {
-											"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
-											"type": "Expression"
-										}
-									},
-									"IncidentIds": {
-										"type": "String",
-										"value": "[[102,104,105,106,107,108,109,110,60,15,9]"
-									},
-									"ToDateTime": {
-										"type": "String",
-										"value": {
-											"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
-											"type": "Expression"
-										}
-									},
-									"Types": {
-										"type": "String",
-										"value": "[[\"text\",\"email\"]"
-									}
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "SubscriptionID",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "SubscriptionID",
-											"type": "String",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "Type",
-											"type": "String",
-											"physicalType": "nvarchar"
-										},
-										"sink": {
-											"name": "Type",
-											"type": "String",
-											"physicalType": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "MessageContent",
-											"type": "String",
-											"physicalType": "nvarchar"
-										},
-										"sink": {
-											"name": "MessageContent",
-											"type": "String",
-											"physicalType": "String"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "BBAlertsDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DoneProcessingDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FromDateTime": {
-						"type": "string",
-						"defaultValue": "@addminutes(utcnow(), -5)"
-					},
-					"ToDateTime": {
-						"type": "string",
-						"defaultValue": "@utcnow()"
-					}
-				},
-				"variables": {
-					"DateFormat": {
-						"type": "String"
-					},
-					"FromDateTime": {
-						"type": "String"
-					},
-					"SampleDate": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SQLDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/GetExternalAlertRecipientsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/GetThresholdAlertSubscriptionsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/GetTransactionAlertSubscriptionDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/BBAlertsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/DoneProcessingDataSet')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Alerts_Trigger')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "SCCUAlerts",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FromDateTime": "[parameters('Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime')]",
-							"ToDateTime": "[parameters('Alerts_Trigger_properties_SCCUAlerts_parameters_ToDateTime')]"
-						}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 5,
-						"startTime": "2024-07-27T14:57:00",
-						"timeZone": "India Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts')]"
 			]
 		}
 	]

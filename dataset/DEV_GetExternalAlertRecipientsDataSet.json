@@ -1,5 +1,5 @@
 {
-	"name": "GetExternalAlertRecipientsDataSet",
+	"name": "DEV_GetExternalAlertRecipientsDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",

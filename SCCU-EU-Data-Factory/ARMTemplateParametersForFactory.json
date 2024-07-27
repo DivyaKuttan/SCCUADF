@@ -11,6 +11,12 @@
 		"SCCU_BBAlertsDev_properties_typeProperties_database": {
 			"value": "SCCUDEV_BBAlerts"
 		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+			"value": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+			"value": "SCCUUAT_BBAlerts"
+		},
 		"SCCU_BusinessDataDev_properties_typeProperties_server": {
 			"value": "sccudevsql01.database.windows.net"
 		},
@@ -26,10 +32,16 @@
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"value": "https://sccudatafactorystorage.blob.core.windows.net/"
 		},
-		"Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime": {
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
 			"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 		},
-		"Alerts_Trigger_properties_SCCUAlerts_parameters_ToDateTime": {
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
+			"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+		},
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
+			"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
+		},
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_ToDateTime": {
 			"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
 		"sccudatafactorystorage_properties_privateLinkResourceId": {
@@ -42,12 +54,6 @@
 			"value": [
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
-		},
-		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
-			"value": "sccuuatsql01.database.windows.net"
-		},
-		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
-			"value": "SCCUUAT_BBAlerts"
 		}
 	}
 }

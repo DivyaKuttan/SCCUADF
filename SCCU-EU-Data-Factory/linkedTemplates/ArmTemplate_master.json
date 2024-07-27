@@ -15,6 +15,14 @@
 			"type": "string",
 			"defaultValue": "SCCUDEV_BBAlerts"
 		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCUUAT_BBAlerts"
+		},
 		"SCCU_BusinessDataDev_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "sccudevsql01.database.windows.net"
@@ -35,11 +43,19 @@
 			"type": "string",
 			"defaultValue": "https://sccudatafactorystorage.blob.core.windows.net/"
 		},
-		"Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime": {
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 		},
-		"Alerts_Trigger_properties_SCCUAlerts_parameters_ToDateTime": {
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
+		},
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
+		},
+		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_ToDateTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
@@ -56,14 +72,6 @@
 			"defaultValue": [
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
-		},
-		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuuatsql01.database.windows.net"
-		},
-		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCUUAT_BBAlerts"
 		},
 		"containerUri": {
 			"type": "string",
@@ -107,6 +115,12 @@
 					"SCCU_BBAlertsDev_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BBAlertsDev_properties_typeProperties_database')]"
 					},
+					"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]"
+					},
+					"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]"
+					},
 					"SCCU_BusinessDataDev_properties_typeProperties_server": {
 						"value": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]"
 					},
@@ -121,12 +135,6 @@
 					},
 					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
-					},
-					"SCCU_BBAlertsUAT_properties_typeProperties_server": {
-						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]"
-					},
-					"SCCU_BBAlertsUAT_properties_typeProperties_database": {
-						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]"
 					}
 				}
 			},
@@ -146,11 +154,17 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime": {
-						"value": "[parameters('Alerts_Trigger_properties_SCCUAlerts_parameters_FromDateTime')]"
+					"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
+						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime')]"
 					},
-					"Alerts_Trigger_properties_SCCUAlerts_parameters_ToDateTime": {
-						"value": "[parameters('Alerts_Trigger_properties_SCCUAlerts_parameters_ToDateTime')]"
+					"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
+						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime')]"
+					},
+					"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
+						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime')]"
+					},
+					"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_ToDateTime": {
+						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_ToDateTime')]"
 					}
 				}
 			},

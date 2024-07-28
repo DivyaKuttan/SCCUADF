@@ -32,10 +32,10 @@
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"value": "https://sccudatafactorystorage.blob.core.windows.net/"
 		},
-		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
+		"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
 			"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 		},
-		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
+		"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
 			"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
 		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {

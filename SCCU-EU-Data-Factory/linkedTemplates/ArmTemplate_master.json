@@ -43,11 +43,11 @@
 			"type": "string",
 			"defaultValue": "https://sccudatafactorystorage.blob.core.windows.net/"
 		},
-		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
+		"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 		},
-		"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
+		"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
@@ -154,11 +154,11 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
-						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime')]"
+					"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime": {
+						"value": "[parameters('Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_FromDateTime')]"
 					},
-					"UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
-						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime')]"
+					"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
+						"value": "[parameters('Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime')]"
 					},
 					"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
 						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime')]"

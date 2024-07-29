@@ -1,6 +1,0 @@
-{
-	"name": "AzureSQLManagedInstance",
-	"properties": {
-		"type": "SelfHosted"
-	}
-}

@@ -15,7 +15,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "ThresholdAlert",
+					"value": "ThresholdAlertSubscription",
 					"type": "Expression"
 				},
 				"container": "production"

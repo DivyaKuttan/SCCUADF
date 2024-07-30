@@ -15,7 +15,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "TransactionAlert\n",
+					"value": "TransactionAlertSubscription",
 					"type": "Expression"
 				},
 				"container": "production"

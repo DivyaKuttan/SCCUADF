@@ -29,6 +29,120 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DEV_BBAlertsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BBAlertsDev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "MigrationId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductVersion",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "__EFMigrationsHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DEV_DoneProcessingDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "DoneProcessing",
+						"container": "development"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": [
+					{
+						"name": "SubscriptionID",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "PHONE",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DEV_GetExternalAlertRecipientsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "Alertsubscriber",
+						"container": "development"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": [
+					{
+						"name": "SubscriptionID",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "PHONE",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DEV_GetThresholdAlertSubscriptionsDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -753,8 +867,11 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DEV_SQLDataSet')]",
+				"[concat(variables('factoryId'), '/datasets/DEV_GetExternalAlertRecipientsDataSet')]",
 				"[concat(variables('factoryId'), '/datasets/DEV_GetThresholdAlertSubscriptionsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/UAT_GetTransactionAlertSubscriptionsDataSet')]"
+				"[concat(variables('factoryId'), '/datasets/UAT_GetTransactionAlertSubscriptionsDataSet')]",
+				"[concat(variables('factoryId'), '/datasets/DEV_BBAlertsDataSet')]",
+				"[concat(variables('factoryId'), '/datasets/DEV_DoneProcessingDataSet')]"
 			]
 		},
 		{

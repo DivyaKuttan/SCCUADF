@@ -10,8 +10,12 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/ThresholdAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+					"type": "Expression"
+				},
 				"folderPath": {
-					"value": "ThresholdAlert",
+					"value": "ThresholdAlertSubscription",
 					"type": "Expression"
 				},
 				"container": "production"

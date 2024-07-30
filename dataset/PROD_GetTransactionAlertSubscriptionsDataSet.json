@@ -10,8 +10,12 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+					"type": "Expression"
+				},
 				"folderPath": {
-					"value": "TransactionAlert\n",
+					"value": "TransactionAlertSubscription",
 					"type": "Expression"
 				},
 				"container": "production"

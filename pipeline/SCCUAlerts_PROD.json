@@ -172,15 +172,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
+						"type": "SqlMISource",
 						"sqlReaderStoredProcedureName": "[alert].[sps_ReferenceFileReport]",
 						"storedProcedureParameters": {
 							"FromDateTime": {
 								"type": "String",
-								"value": {
-									"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
-									"type": "Expression"
-								}
+								"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 							},
 							"IncidentIds": {
 								"type": "String",
@@ -188,17 +185,13 @@
 							},
 							"ToDateTime": {
 								"type": "String",
-								"value": {
-									"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
-									"type": "Expression"
-								}
+								"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 							},
 							"Types": {
 								"type": "String",
 								"value": "[\"text\",\"email\"]"
 							}
 						},
-						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
@@ -262,13 +255,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "UAT_BBAlertsDataSet",
+						"referenceName": "PROD_BBAlertsDataset",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "UAT_DoneProcessingDataSet",
+						"referenceName": "PROD_DoneProcessingDataSet",
 						"type": "DatasetReference"
 					}
 				]

@@ -156,7 +156,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "UAT_GetTransactionAlertSubscriptionsDataSet",
+						"referenceName": "DEV_GetTransactionAlertSubscriptionDataSet",
 						"type": "DatasetReference"
 					}
 				]

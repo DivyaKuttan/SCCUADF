@@ -1,5 +1,5 @@
 {
-	"name": "SCCUAlerts_UAT",
+	"name": "SCCUAlerts_PROD",
 	"properties": {
 		"activities": [
 			{
@@ -16,9 +16,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
+						"type": "SqlMISource",
 						"sqlReaderQuery": "EXEC sps_GetExternalAlertRecipients",
-						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
@@ -44,13 +43,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "UAT_SQLDataSet",
+						"referenceName": "PROD_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "UAT_GetExternalAlertRecipientsDataSet",
+						"referenceName": "PROD_GetExternalAlertRecipientsDataSet",
 						"type": "DatasetReference"
 					}
 				]
@@ -69,9 +68,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
+						"type": "SqlMISource",
 						"sqlReaderQuery": "EXEC Sps_GetThresholdAlertSubscriptionsToFile",
-						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
@@ -97,13 +95,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "UAT_SQLDataSet",
+						"referenceName": "PROD_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "UAT_GetThresholdAlertSubscriptionsDataSet",
+						"referenceName": "PROD_GetThresholdAlertSubscriptionsDataSet",
 						"type": "DatasetReference"
 					}
 				]
@@ -122,9 +120,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "AzureSqlSource",
+						"type": "SqlMISource",
 						"sqlReaderQuery": "EXEC sps_GetTransactionAlertSubscriptionToFile",
-						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
@@ -150,13 +147,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "UAT_SQLDataSet",
+						"referenceName": "PROD_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "UAT_GetTransactionAlertSubscriptionsDataSet",
+						"referenceName": "PROD_GetTransactionAlertSubscriptionsDataSet",
 						"type": "DatasetReference"
 					}
 				]

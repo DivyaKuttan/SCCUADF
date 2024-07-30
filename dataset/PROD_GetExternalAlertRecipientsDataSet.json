@@ -15,7 +15,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "Alertsubscribe",
+					"value": "Alertsubscriber",
 					"type": "Expression"
 				},
 				"container": "production"

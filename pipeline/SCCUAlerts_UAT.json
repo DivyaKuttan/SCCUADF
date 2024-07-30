@@ -150,13 +150,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DEV_SQLDataSet",
+						"referenceName": "UAT_SQLDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DEV_GetTransactionAlertSubscriptionDataSet",
+						"referenceName": "UAT_GetTransactionAlertSubscriptionsDataSet",
 						"type": "DatasetReference"
 					}
 				]

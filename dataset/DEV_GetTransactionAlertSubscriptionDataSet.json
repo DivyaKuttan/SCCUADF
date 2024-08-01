@@ -14,7 +14,7 @@
 					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 					"type": "Expression"
 				},
-				"folderPath": "TransactionAlertSubscription",
+				"folderPath": "dev/TransactionAlertSubscription",
 				"container": "development"
 			},
 			"columnDelimiter": "|",

@@ -3,13 +3,24 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Stopped",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "SCCUDoneProcessing_DEV",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FromDateTime": "@addminutes(utcnow(), -5)",
+					"ToDateTime": "@utcnow()"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 5,
-				"startTime": "2024-08-03T00:15:00",
+				"startTime": "2024-08-03T01:00:00",
 				"timeZone": "India Standard Time"
 			}
 		}

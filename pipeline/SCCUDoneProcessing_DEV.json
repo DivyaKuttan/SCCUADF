@@ -1,9 +1,9 @@
 {
-	"name": "SCCUAlerts_DEV",
+	"name": "SCCUDoneProcessing_DEV",
 	"properties": {
 		"activities": [
 			{
-				"name": "ExternalAlerts_Copy data1",
+				"name": "BBAlerts_Copy data1",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -17,7 +17,31 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC sps_GetExternalAlertRecipients",
+						"sqlReaderStoredProcedureName": "[alert].[sps_ReferenceFileReport]",
+						"storedProcedureParameters": {
+							"FromDateTime": {
+								"type": "String",
+								"value": {
+									"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+									"type": "Expression"
+								}
+							},
+							"IncidentIds": {
+								"type": "String",
+								"value": "[102,104,105,106,107,108,109,110,60,15,9]"
+							},
+							"ToDateTime": {
+								"type": "String",
+								"value": {
+									"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
+									"type": "Expression"
+								}
+							},
+							"Types": {
+								"type": "String",
+								"value": "[\"text\",\"email\"]"
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -50,36 +74,24 @@
 							},
 							{
 								"source": {
-									"name": "AccountID",
+									"name": "Type",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
 								},
 								"sink": {
-									"name": "AccountID",
+									"name": "Type",
 									"type": "String",
 									"physicalType": "String"
 								}
 							},
 							{
 								"source": {
-									"name": "EMAIL",
+									"name": "MessageContent",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
 								},
 								"sink": {
-									"name": "EMAIL",
-									"type": "String",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "PHONE",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "PHONE",
+									"name": "MessageContent",
 									"type": "String",
 									"physicalType": "String"
 								}
@@ -94,124 +106,28 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DEV_SQLDataSet",
+						"referenceName": "DEV_BBAlertsDataSet",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DEV_GetExternalAlertRecipientsDataSet",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
-				"name": "GetThresholdAlertSubscriptions_Copy data",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC Sps_GetThresholdAlertSubscriptionsToFile",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DEV_SQLDataSet",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DEV_GetThresholdAlertSubscriptionsDataSet",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
-				"name": "GetTransactionAlertSubscription_Copy data",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC sps_GetTransactionAlertSubscriptionToFile",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DEV_SQLDataSet",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DEV_GetTransactionAlertSubscriptionDataSet",
+						"referenceName": "DEV_DoneProcessingDataSet",
 						"type": "DatasetReference"
 					}
 				]
 			}
 		],
+		"parameters": {
+			"FromDateTime": {
+				"type": "string",
+				"defaultValue": "@addminutes(utcnow(), -5)"
+			},
+			"ToDateTime": {
+				"type": "string",
+				"defaultValue": "@utcnow()"
+			}
+		},
 		"variables": {
 			"DateFormat": {
 				"type": "String"

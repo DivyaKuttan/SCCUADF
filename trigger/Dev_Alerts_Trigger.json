@@ -3,13 +3,20 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "SCCUAlerts_DEV",
+					"type": "PipelineReference"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
 				"frequency": "Hour",
 				"interval": 1,
-				"startTime": "2024-08-03T00:15:00",
+				"startTime": "2024-08-03T01:00:00",
 				"timeZone": "India Standard Time"
 			}
 		}

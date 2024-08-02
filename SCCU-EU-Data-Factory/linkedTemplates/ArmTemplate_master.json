@@ -71,6 +71,14 @@
 			"type": "string",
 			"defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
+		"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
 		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
@@ -256,6 +264,12 @@
 					},
 					"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
 						"value": "[parameters('Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime')]"
+					},
+					"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_FromDateTime": {
+						"value": "[parameters('Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_FromDateTime')]"
+					},
+					"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_ToDateTime": {
+						"value": "[parameters('Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_ToDateTime')]"
 					},
 					"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
 						"value": "[parameters('UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime')]"

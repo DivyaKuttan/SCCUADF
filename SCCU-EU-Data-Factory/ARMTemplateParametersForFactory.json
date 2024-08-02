@@ -53,6 +53,12 @@
 		"Dev_Alerts_Trigger_properties_SCCUAlerts_DEV_parameters_ToDateTime": {
 			"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
+		"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_FromDateTime": {
+			"value": "@addminutes(utcnow(), -5)"
+		},
+		"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_ToDateTime": {
+			"value": "@utcnow()"
+		},
 		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
 			"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
 		},

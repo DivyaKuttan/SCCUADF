@@ -15,6 +15,14 @@
 			"type": "string",
 			"defaultValue": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 		},
+		"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
 		"UAT_Alerts_Trigger_properties_SCCUAlerts_UAT_parameters_FromDateTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')"
@@ -568,7 +576,7 @@
 							"sink": {
 								"type": "DelimitedTextSink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureFileStorageWriteSettings"
 								},
 								"formatSettings": {
 									"type": "DelimitedTextWriteSettings",
@@ -579,6 +587,56 @@
 							"enableStaging": false,
 							"translator": {
 								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "SubscriptionID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "SubscriptionID",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "AccountID",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EMAIL",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "PHONE",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "PHONE",
+											"type": "String",
+											"physicalType": "String"
+										}
+									}
+								],
 								"typeConversion": true,
 								"typeConversionSettings": {
 									"allowDataTruncation": true,
@@ -622,7 +680,7 @@
 							"sink": {
 								"type": "DelimitedTextSink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureFileStorageWriteSettings"
 								},
 								"formatSettings": {
 									"type": "DelimitedTextWriteSettings",
@@ -676,7 +734,7 @@
 							"sink": {
 								"type": "DelimitedTextSink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureFileStorageWriteSettings"
 								},
 								"formatSettings": {
 									"type": "DelimitedTextWriteSettings",
@@ -754,7 +812,7 @@
 							"sink": {
 								"type": "DelimitedTextSink",
 								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
+									"type": "AzureFileStorageWriteSettings"
 								},
 								"formatSettings": {
 									"type": "DelimitedTextWriteSettings",
@@ -1254,6 +1312,39 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts_DEV')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Prod_Alerts_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUAlerts_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FromDateTime": "[parameters('Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_FromDateTime')]",
+							"ToDateTime": "[parameters('Prod_Alerts_Trigger_properties_SCCUAlerts_PROD_parameters_ToDateTime')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2024-08-02T20:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts_PROD')]"
 			]
 		},
 		{

@@ -16,7 +16,7 @@
 				},
 				"folderPath": "DEV/Alertsubscriber",
 				"container": {
-					"value": "FromNextly",
+					"value": "from-nextly",
 					"type": "Expression"
 				}
 			},

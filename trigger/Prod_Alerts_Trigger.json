@@ -1,0 +1,28 @@
+{
+	"name": "Prod_Alerts_Trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "SCCUAlerts_PROD",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FromDateTime": "@addminutes(utcnow(), -5)",
+					"ToDateTime": "@utcnow()"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 5,
+				"startTime": "2024-08-02T19:55:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}

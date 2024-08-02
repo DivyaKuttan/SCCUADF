@@ -8,6 +8,10 @@
 				"pipelineReference": {
 					"referenceName": "SCCUDoneProcessing_UAT",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FromDateTime": "@addminutes(utcnow(), -5)",
+					"ToDateTime": "@utcnow()"
 				}
 			}
 		],

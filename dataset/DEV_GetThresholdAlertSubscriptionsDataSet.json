@@ -15,7 +15,7 @@
 					"type": "Expression"
 				},
 				"folderPath": "DEV/ThresholdAlert",
-				"container": "fromnextly"
+				"container": "from-nextly"
 			},
 			"columnDelimiter": "|",
 			"escapeChar": "\\",

@@ -7,34 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
-		"SCCU_DataFactory_FileShare_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'SCCU_DataFactory_FileShare'"
-		},
-		"SCCU_BusinessDataDev_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccudevsql01.database.windows.net"
-		},
-		"SCCU_BusinessDataDev_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BusinessData_Dev"
-		},
-		"SCCU_BusinessDataPROD_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_BusinessDataPROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuuatsql01.database.windows.net"
-		},
-		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BusinessData_UAT"
-		},
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"type": "string",
 			"defaultValue": "https://sccudatafactorystorage.blob.core.windows.net/"
@@ -44,103 +16,6 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataDev')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "For DEV SQL Server",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credentials_BusinessDataDev",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataPROD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_BusinessDataPROD",
-						"type": "CredentialReference"
-					},
-					"alwaysEncryptedSettings": {
-						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataUAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_BusinessDataUAT",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_DataFactory_FileShare')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureFileStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('SCCU_DataFactory_FileShare_connectionString')]",
-					"fileShare": "sccudatafactoryfileshare"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SCCU_DataFactory_Storage')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -394,9 +269,7 @@
 					"table": "ActivitylogAdditionalInfo"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataDev')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/GetExternalAlerts')]",
@@ -428,9 +301,7 @@
 				},
 				"schema": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_FileShare')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PROD_BBAlertsDataset')]",
@@ -632,9 +503,7 @@
 					"table": "ActivitylogAdditionalInfo"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/UAT_BBAlertsDataSet')]",
@@ -702,6 +571,248 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_Storage')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetExternalAlertRecipientsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/Alertsubscriber",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetThresholdAlertSubscriptionsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ThresholdAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/ThresholdAlertSubscription",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetTransactionAlertSubscriptionsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/TransactionAlertSubscription",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_SQLDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataUAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "StartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "EndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "ContentType",
+						"type": "varchar"
+					},
+					{
+						"name": "ContentLocation",
+						"type": "varchar"
+					},
+					{
+						"name": "Content",
+						"type": "varchar"
+					},
+					{
+						"name": "Start/Stop",
+						"type": "bit"
+					},
+					{
+						"name": "CampaignViewFor",
+						"type": "varchar"
+					},
+					{
+						"name": "OtherOption",
+						"type": "bit"
+					},
+					{
+						"name": "RedirectPage",
+						"type": "varchar"
+					},
+					{
+						"name": "RedirectURL",
+						"type": "varchar"
+					},
+					{
+						"name": "LaterOption",
+						"type": "varchar"
+					},
+					{
+						"name": "IntegrationWith",
+						"type": "varchar"
+					},
+					{
+						"name": "SocialMediaTitle",
+						"type": "varchar"
+					},
+					{
+						"name": "SocialMediaContent",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "IsDelete",
+						"type": "bit"
+					},
+					{
+						"name": "Priority",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Keywords",
+						"type": "varchar"
+					},
+					{
+						"name": "ExcelGUID",
+						"type": "varchar"
+					},
+					{
+						"name": "Location",
+						"type": "varchar"
+					},
+					{
+						"name": "CampaignType",
+						"type": "varchar"
+					},
+					{
+						"name": "NoTrueExit",
+						"type": "bit"
+					},
+					{
+						"name": "CampaignTypeExit",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "AdminCampaign"
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }

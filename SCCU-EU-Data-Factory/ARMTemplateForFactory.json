@@ -71,6 +71,22 @@
 			"type": "string",
 			"defaultValue": "@utcnow()"
 		},
+		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
+		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
 		"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
@@ -2593,7 +2609,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -2623,7 +2639,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -2656,19 +2672,29 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUAlerts_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
 						"frequency": "Hour",
 						"interval": 1,
-						"startTime": "2024-08-03T00:15:00",
+						"startTime": "2024-08-03T01:00:00",
 						"timeZone": "India Standard Time"
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts_PROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Prod_DoneProcessing_Trigger')]",
@@ -2676,19 +2702,32 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUDoneProcessing_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FromDateTime": "[parameters('Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime')]",
+							"ToDateTime": "[parameters('Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime')]"
+						}
+					}
+				],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
 						"frequency": "Minute",
 						"interval": 5,
-						"startTime": "2024-08-03T00:15:00",
+						"startTime": "2024-08-03T01:00:00",
 						"timeZone": "India Standard Time"
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUDoneProcessing_PROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/UAT_DoneProcessing_Trigger')]",
@@ -2696,19 +2735,32 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUDoneProcessing_UAT",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FromDateTime": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime')]",
+							"ToDateTime": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime')]"
+						}
+					}
+				],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
 						"frequency": "Minute",
 						"interval": 5,
-						"startTime": "2024-08-03T00:15:00",
+						"startTime": "2024-08-03T01:00:00",
 						"timeZone": "India Standard Time"
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUDoneProcessing_UAT')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Uat_Alerts_Trigger')]",
@@ -2716,19 +2768,29 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUAlerts_UAT",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
 						"frequency": "Hour",
 						"interval": 1,
-						"startTime": "2024-08-03T00:15:00",
+						"startTime": "2024-08-03T01:00:00",
 						"timeZone": "India Standard Time"
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts_UAT')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",

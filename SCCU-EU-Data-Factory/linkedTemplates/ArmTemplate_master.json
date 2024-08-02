@@ -71,6 +71,22 @@
 			"type": "string",
 			"defaultValue": "@utcnow()"
 		},
+		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
+		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
 		"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
@@ -136,6 +152,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"SCCU_DataFactory_FileShare_connectionString": {
+						"value": "[parameters('SCCU_DataFactory_FileShare_connectionString')]"
+					},
 					"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 						"value": "[parameters('SCCU_DataFactory_FileShare_properties_privateLinkResourceId')]"
 					},
@@ -180,27 +199,6 @@
 					},
 					"SCCU_BBAlertsUAT_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "SCCU-EU-Data-Factory_ArmTemplate_1",
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2018-02-01",
-			"properties": {
-				"mode": "incremental",
-				"templateLink": {
-					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"factoryName": {
-						"value": "[parameters('factoryName')]"
-					},
-					"SCCU_DataFactory_FileShare_connectionString": {
-						"value": "[parameters('SCCU_DataFactory_FileShare_connectionString')]"
 					},
 					"SCCU_BusinessDataDev_properties_typeProperties_server": {
 						"value": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]"
@@ -219,6 +217,24 @@
 					},
 					"SCCU_BusinessDataUAT_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "SCCU-EU-Data-Factory_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
 					},
 					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
@@ -248,6 +264,18 @@
 					},
 					"Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_ToDateTime": {
 						"value": "[parameters('Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_ToDateTime')]"
+					},
+					"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime": {
+						"value": "[parameters('Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime')]"
+					},
+					"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime": {
+						"value": "[parameters('Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime')]"
+					},
+					"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime": {
+						"value": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime')]"
+					},
+					"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime": {
+						"value": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime')]"
 					}
 				}
 			},

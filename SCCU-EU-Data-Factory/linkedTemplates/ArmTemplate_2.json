@@ -14,248 +14,28 @@
 		"Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_ToDateTime": {
 			"type": "string",
 			"defaultValue": "@utcnow()"
+		},
+		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
+		},
+		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime": {
+			"type": "string",
+			"defaultValue": "@addminutes(utcnow(), -5)"
+		},
+		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime": {
+			"type": "string",
+			"defaultValue": "@utcnow()"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_GetExternalAlertRecipientsDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
-							"type": "Expression"
-						},
-						"folderPath": "UAT/Alertsubscriber",
-						"container": "from-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_GetThresholdAlertSubscriptionsDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "ThresholdAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
-							"type": "Expression"
-						},
-						"folderPath": "UAT/ThresholdAlertSubscription",
-						"container": "from-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_GetTransactionAlertSubscriptionsDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
-							"type": "Expression"
-						},
-						"folderPath": "UAT/TransactionAlertSubscription",
-						"container": "from-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_SQLDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataUAT",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Name",
-						"type": "varchar"
-					},
-					{
-						"name": "StartDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "EndDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "ContentType",
-						"type": "varchar"
-					},
-					{
-						"name": "ContentLocation",
-						"type": "varchar"
-					},
-					{
-						"name": "Content",
-						"type": "varchar"
-					},
-					{
-						"name": "Start/Stop",
-						"type": "bit"
-					},
-					{
-						"name": "CampaignViewFor",
-						"type": "varchar"
-					},
-					{
-						"name": "OtherOption",
-						"type": "bit"
-					},
-					{
-						"name": "RedirectPage",
-						"type": "varchar"
-					},
-					{
-						"name": "RedirectURL",
-						"type": "varchar"
-					},
-					{
-						"name": "LaterOption",
-						"type": "varchar"
-					},
-					{
-						"name": "IntegrationWith",
-						"type": "varchar"
-					},
-					{
-						"name": "SocialMediaTitle",
-						"type": "varchar"
-					},
-					{
-						"name": "SocialMediaContent",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "IsDelete",
-						"type": "bit"
-					},
-					{
-						"name": "Priority",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "Keywords",
-						"type": "varchar"
-					},
-					{
-						"name": "ExcelGUID",
-						"type": "varchar"
-					},
-					{
-						"name": "Location",
-						"type": "varchar"
-					},
-					{
-						"name": "CampaignType",
-						"type": "varchar"
-					},
-					{
-						"name": "NoTrueExit",
-						"type": "bit"
-					},
-					{
-						"name": "CampaignTypeExit",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "AdminCampaign"
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SCCUAlerts_DEV')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -1241,12 +1021,7 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/UAT_SQLDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/UAT_GetExternalAlertRecipientsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/UAT_GetThresholdAlertSubscriptionsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/UAT_GetTransactionAlertSubscriptionsDataSet')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SCCUDoneProcessing_DEV')]",
@@ -1709,7 +1484,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -1739,7 +1514,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Stopped",
+				"runtimeState": "Started",
 				"pipelines": [
 					{
 						"pipelineReference": {
@@ -1764,6 +1539,132 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/SCCUDoneProcessing_DEV')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Prod_Alerts_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUAlerts_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 1,
+						"startTime": "2024-08-03T01:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts_PROD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Prod_DoneProcessing_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUDoneProcessing_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FromDateTime": "[parameters('Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime')]",
+							"ToDateTime": "[parameters('Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2024-08-03T01:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUDoneProcessing_PROD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_DoneProcessing_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUDoneProcessing_UAT",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FromDateTime": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime')]",
+							"ToDateTime": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2024-08-03T01:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUDoneProcessing_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Uat_Alerts_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "SCCUAlerts_UAT",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 1,
+						"startTime": "2024-08-03T01:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SCCUAlerts_UAT')]"
 			]
 		}
 	]

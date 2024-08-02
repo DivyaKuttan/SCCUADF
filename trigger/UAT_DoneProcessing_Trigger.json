@@ -1,12 +1,12 @@
 {
-	"name": "UAT_Alerts_Trigger",
+	"name": "UAT_DoneProcessing_Trigger",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "SCCUAlerts_UAT",
+					"referenceName": "SCCUDoneProcessing_UAT",
 					"type": "PipelineReference"
 				},
 				"parameters": {
@@ -20,7 +20,7 @@
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 5,
-				"startTime": "2024-08-02T19:25:00",
+				"startTime": "2024-08-02T23:30:00",
 				"timeZone": "India Standard Time"
 			}
 		}

@@ -1,21 +1,25 @@
 {
-	"name": "Prod_Alerts_Trigger",
+	"name": "Dev_DoneProcessing_Trigger",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "SCCUAlerts_PROD",
+					"referenceName": "SCCUDoneProcessing_DEV",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FromDateTime": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+					"ToDateTime": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')"
 				}
 			}
 		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
-				"frequency": "Hour",
-				"interval": 1,
+				"frequency": "Minute",
+				"interval": 5,
 				"startTime": "2024-08-02T23:30:00",
 				"timeZone": "India Standard Time"
 			}

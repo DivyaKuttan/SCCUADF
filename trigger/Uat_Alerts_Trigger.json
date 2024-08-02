@@ -1,12 +1,12 @@
 {
-	"name": "Prod_Alerts_Trigger",
+	"name": "Uat_Alerts_Trigger",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "SCCUAlerts_PROD",
+					"referenceName": "SCCUAlerts_UAT",
 					"type": "PipelineReference"
 				}
 			}

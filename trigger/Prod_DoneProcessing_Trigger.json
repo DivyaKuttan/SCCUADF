@@ -1,12 +1,12 @@
 {
-	"name": "Prod_Alerts_Trigger",
+	"name": "Prod_DoneProcessing_Trigger",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "SCCUAlerts_PROD",
+					"referenceName": "SCCUDoneProcessing_PROD",
 					"type": "PipelineReference"
 				},
 				"parameters": {
@@ -20,7 +20,7 @@
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 5,
-				"startTime": "2024-08-02T20:00:00",
+				"startTime": "2024-08-02T23:30:00",
 				"timeZone": "India Standard Time"
 			}
 		}

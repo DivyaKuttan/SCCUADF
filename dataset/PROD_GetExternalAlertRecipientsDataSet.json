@@ -2,23 +2,19 @@
 	"name": "PROD_GetExternalAlertRecipientsDataSet",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCU_DataFactory_Storage",
+			"referenceName": "SCCU_DataFactory_FileShare",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
+				"type": "AzureFileStorageLocation",
 				"fileName": {
 					"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 					"type": "Expression"
 				},
-				"folderPath": {
-					"value": "Alertsubscriber",
-					"type": "Expression"
-				},
-				"container": "production"
+				"folderPath": "prod/Alertsubscriber"
 			},
 			"columnDelimiter": "|",
 			"escapeChar": "\\",

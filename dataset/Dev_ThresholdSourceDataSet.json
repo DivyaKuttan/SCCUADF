@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "ThresholdFileToProcess.txt",
 				"folderPath": "ThresholdAlert",
 				"container": "to-nextly"
 			},

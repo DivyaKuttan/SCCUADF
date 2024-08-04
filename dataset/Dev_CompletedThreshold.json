@@ -1,0 +1,23 @@
+{
+	"name": "Dev_CompletedThreshold",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_DataFactory_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "CompletedThreshold",
+				"container": "to-nextly"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": ""
+		},
+		"schema": []
+	}
+}

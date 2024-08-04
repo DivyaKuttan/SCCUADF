@@ -5,6 +5,8 @@
 			{
 				"name": "GetMetadataActivity",
 				"type": "GetMetadata",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -19,9 +21,7 @@
 						"referenceName": "DEV_ThresholdBlobDataset",
 						"type": "DatasetReference"
 					},
-					"fieldList": [
-						"childItems"
-					],
+					"fieldList": [],
 					"storeSettings": {
 						"type": "AzureBlobStorageReadSettings",
 						"enablePartitionDiscovery": false
@@ -264,14 +264,7 @@
 			{
 				"name": "Copy data2",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "GetMetadataActivity",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -286,11 +279,6 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": {
-								"value": "ThresholdAlert",
-								"type": "Expression"
-							},
-							"wildcardFileName": "*",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {

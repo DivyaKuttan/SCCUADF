@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "Processing_ThresholdAlert_080120241430 1.txt",
+				"fileName": "ThresholdFileToProcess.txt",
 				"container": "to-nextly"
 			},
 			"columnDelimiter": "|",

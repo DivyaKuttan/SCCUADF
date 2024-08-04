@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
+				"fileName": "Process_TransactionAlert_080120241632 1.txt",
 				"folderPath": "TransactionAlert",
 				"container": "to-nextly"
 			},

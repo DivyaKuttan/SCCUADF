@@ -1,5 +1,5 @@
 {
-	"name": "Dev_Processing_ThresholdAlertDataSet",
+	"name": "Dev_Processing_TransactionAlertDataSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_BusinessDataDev",

@@ -182,7 +182,10 @@
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": "ThresholdAlert",
-							"wildcardFileName": "@activity('Get Metadata1').output.childItems[0].name",
+							"wildcardFileName": {
+								"value": "@activity('Get Metadata1').output.childItems[0].name",
+								"type": "Expression"
+							},
 							"deleteFilesAfterCompletion": true
 						},
 						"formatSettings": {
@@ -231,6 +234,14 @@
 				}
 			}
 		],
+		"parameters": {
+			"FileName": {
+				"type": "string"
+			},
+			"FilePath": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }

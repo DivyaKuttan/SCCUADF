@@ -8,6 +8,10 @@
 				"pipelineReference": {
 					"referenceName": "Nextly_ThresholdAlert_DEV",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FileName": "@triggerBody().folderPath",
+					"FilePath": "@triggerBody().fileName"
 				}
 			}
 		],

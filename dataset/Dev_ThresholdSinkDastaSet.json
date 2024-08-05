@@ -1,5 +1,5 @@
 {
-	"name": "Dev_Processing_ThresholdAlertDastaSet",
+	"name": "Dev_ThresholdSinkDastaSet",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_BusinessDataDev",

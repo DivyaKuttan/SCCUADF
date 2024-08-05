@@ -5,8 +5,6 @@
 			{
 				"name": "ExternalAlert_ThresholdStaging_Copy data",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get Metadata1",
@@ -49,18 +47,6 @@
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
-							{
-								"source": {
-									"name": "ID",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "ID",
-									"type": "Int32",
-									"physicalType": "int"
-								}
-							},
 							{
 								"source": {
 									"name": "SubscriptionID",
@@ -109,8 +95,6 @@
 			{
 				"name": "Stored procedure1",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ExternalAlert_ThresholdStaging_Copy data",
@@ -138,8 +122,6 @@
 			{
 				"name": "Get Metadata1",
 				"type": "GetMetadata",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -170,8 +152,6 @@
 			{
 				"name": "Copy data1",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Stored procedure1",

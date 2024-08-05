@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "ThresholdAlert",
 							"wildcardFileName": {
-								"value": "@activity('Get Metadata1').output.childItems[0].name",
+								"value": "*",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -122,7 +122,14 @@
 			{
 				"name": "Get Metadata1",
 				"type": "GetMetadata",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Stored procedure2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -273,6 +280,28 @@
 						"referenceName": "Dev_Processing_ThresholdAlertDastaSet",
 						"type": "DatasetReference"
 					}
+				}
+			},
+			{
+				"name": "Stored procedure2",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_Truncate_ExternalAlert_ThresholdStaging]"
+				},
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataDev",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],

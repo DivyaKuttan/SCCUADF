@@ -165,60 +165,6 @@
 								"referenceName": "SCCU_BusinessDataDev",
 								"type": "LinkedServiceReference"
 							}
-						},
-						{
-							"name": "AfterCompletionCopyAndDeleteBinary",
-							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "Stored procedure1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "BinarySource",
-									"storeSettings": {
-										"type": "AzureBlobStorageReadSettings",
-										"recursive": true,
-										"wildcardFolderPath": "ThresholdAlert",
-										"wildcardFileName": "*",
-										"deleteFilesAfterCompletion": true
-									},
-									"formatSettings": {
-										"type": "BinaryReadSettings"
-									}
-								},
-								"sink": {
-									"type": "BinarySink",
-									"storeSettings": {
-										"type": "AzureBlobStorageWriteSettings"
-									}
-								},
-								"enableStaging": false
-							},
-							"inputs": [
-								{
-									"referenceName": "Dev_CompletedThresholdSource",
-									"type": "DatasetReference"
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DEV_CompletedThresholdDestination",
-									"type": "DatasetReference"
-								}
-							]
 						}
 					]
 				}
@@ -226,6 +172,8 @@
 			{
 				"name": "Stored procedure2",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -242,6 +190,60 @@
 					"referenceName": "SCCU_BusinessDataDev",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "AfterCompletionCopyAndDeleteBinary_copy1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "ThresholdAlert",
+							"wildcardFileName": "*",
+							"deleteFilesAfterCompletion": true
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "Dev_CompletedThresholdSource",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DEV_CompletedThresholdDestination",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"annotations": []

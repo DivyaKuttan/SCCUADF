@@ -185,9 +185,12 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "ThresholdAlert",
+									"wildcardFolderPath": {
+										"value": "ThresholdAlert",
+										"type": "Expression"
+									},
 									"wildcardFileName": {
-										"value": "@activity('Get Metadata1').output.childItems[0].name",
+										"value": "@pipeline().parameters.FileName\n",
 										"type": "Expression"
 									},
 									"enablePartitionDiscovery": false
@@ -344,7 +347,7 @@
 									"recursive": true,
 									"wildcardFolderPath": "ThresholdAlert",
 									"wildcardFileName": {
-										"value": "@activity('Get Metadata1').output.childItems[0].name",
+										"value": "@pipeline().parameters.FileName",
 										"type": "Expression"
 									},
 									"deleteFilesAfterCompletion": true

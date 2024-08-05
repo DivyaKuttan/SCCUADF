@@ -454,7 +454,7 @@
 									"recursive": true,
 									"wildcardFolderPath": "TransactionAlert",
 									"wildcardFileName": {
-										"value": "@activity('Get Metadata1').output.childItems[0].name",
+										"value": "@pipeline().parameters.FileName",
 										"type": "Expression"
 									},
 									"enablePartitionDiscovery": false
@@ -623,7 +623,7 @@
 									"recursive": true,
 									"wildcardFolderPath": "TransactionAlert",
 									"wildcardFileName": {
-										"value": "@activity('Get Metadata1').output.childItems[0].name",
+										"value": "@pipeline().parameters.FileName",
 										"type": "Expression"
 									},
 									"deleteFilesAfterCompletion": true

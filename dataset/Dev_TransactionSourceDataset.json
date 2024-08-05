@@ -13,10 +13,10 @@
 				"folderPath": "TransactionAlert",
 				"container": "to-nextly"
 			},
-			"columnDelimiter": ",",
+			"columnDelimiter": "|",
 			"escapeChar": "\\",
 			"firstRowAsHeader": false,
-			"quoteChar": "\""
+			"quoteChar": ""
 		},
 		"schema": []
 	}

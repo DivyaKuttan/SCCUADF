@@ -1,5 +1,5 @@
 {
-	"name": "CompletedBlob",
+	"name": "DEV_CompletedThresholdSink",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",

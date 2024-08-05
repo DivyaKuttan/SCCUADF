@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "ThresholdAlert",
 							"wildcardFileName": {
-								"value": "*",
+								"value": "@activity('Get Metadata1').output.childItems[0].name",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -124,7 +124,7 @@
 				"type": "GetMetadata",
 				"dependsOn": [
 					{
-						"activity": "Stored procedure2",
+						"activity": "Truncate Threshold staging",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -182,7 +182,7 @@
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": "ThresholdAlert",
-							"wildcardFileName": "*",
+							"wildcardFileName": "@activity('Get Metadata1').output.childItems[0].name",
 							"deleteFilesAfterCompletion": true
 						},
 						"formatSettings": {
@@ -211,7 +211,7 @@
 				]
 			},
 			{
-				"name": "Stored procedure2",
+				"name": "Truncate Threshold staging",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {

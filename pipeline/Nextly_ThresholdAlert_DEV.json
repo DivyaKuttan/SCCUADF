@@ -28,7 +28,7 @@
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": {
-								"value": "ThresholdAlert",
+								"value": "DEV/ThresholdAlerts",
 								"type": "Expression"
 							},
 							"wildcardFileName": {
@@ -85,7 +85,13 @@
 				"inputs": [
 					{
 						"referenceName": "Dev_ThresholdSourceDataSet",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ThresholdFilename": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -144,7 +150,13 @@
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "Dev_ThresholdSourceDataSet",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ThresholdFilename": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
 					},
 					"fieldList": [
 						"childItems"

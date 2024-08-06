@@ -2414,7 +2414,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/ThresholdAlert/",
+					"blobPathBeginsWith": "/to-nextly/blobs/DEV/ThresholdAlerts/",
 					"blobPathEndsWith": ".txt",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('DEV_ThresholdAlert_properties_typeProperties_scope')]",
@@ -2448,7 +2448,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/TransactionAlert/",
+					"blobPathBeginsWith": "/to-nextly/blobs/DEV/TransactionAlerts/",
 					"blobPathEndsWith": ".txt",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('DEV_TransactionAlert_properties_typeProperties_scope')]",

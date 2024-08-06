@@ -73,12 +73,12 @@
 							},
 							{
 								"source": {
-									"name": "TextContent",
+									"name": "SMSContent",
 									"type": "String",
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "TextContent",
+									"name": "SMSContent",
 									"type": "String",
 									"physicalType": "varchar"
 								}

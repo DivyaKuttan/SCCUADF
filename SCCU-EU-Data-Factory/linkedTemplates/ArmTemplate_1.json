@@ -406,12 +406,21 @@
 					"referenceName": "SCCU_DataFactory_Storage",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"ThresholdFilename": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "ThresholdAlert",
+						"fileName": {
+							"value": "@dataset().ThresholdFilename",
+							"type": "Expression"
+						},
+						"folderPath": "DEV/ThresholdAlerts",
 						"container": "to-nextly"
 					},
 					"columnDelimiter": "|",
@@ -477,12 +486,17 @@
 					"referenceName": "SCCU_DataFactory_Storage",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"TransactionFileName": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "TransactionAlert",
+						"folderPath": "DEV/TransactionAlerts",
 						"container": "to-nextly"
 					},
 					"columnDelimiter": "|",

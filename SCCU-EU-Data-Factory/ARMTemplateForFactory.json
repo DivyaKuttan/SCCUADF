@@ -186,7 +186,7 @@
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
 									"wildcardFolderPath": {
-										"value": "ThresholdAlert",
+										"value": "DEV/ThresholdAlerts",
 										"type": "Expression"
 									},
 									"wildcardFileName": {
@@ -244,7 +244,12 @@
 							{
 								"referenceName": "Dev_ThresholdSourceDataSet",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"ThresholdFilename": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									}
+								}
 							}
 						],
 						"outputs": [
@@ -305,7 +310,12 @@
 							"dataset": {
 								"referenceName": "Dev_ThresholdSourceDataSet",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"ThresholdFilename": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									}
+								}
 							},
 							"fieldList": [
 								"childItems"
@@ -452,7 +462,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "TransactionAlert",
+									"wildcardFolderPath": "DEV/TransactionAlerts",
 									"wildcardFileName": {
 										"value": "@pipeline().parameters.FileName",
 										"type": "Expression"
@@ -520,7 +530,12 @@
 							{
 								"referenceName": "Dev_TransactionSourceDataset",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"TransactionFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									}
+								}
 							}
 						],
 						"outputs": [
@@ -581,7 +596,12 @@
 							"dataset": {
 								"referenceName": "Dev_TransactionSourceDataset",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"TransactionFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									}
+								}
 							},
 							"fieldList": [
 								"childItems"
@@ -2536,12 +2556,21 @@
 					"referenceName": "SCCU_DataFactory_Storage",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"ThresholdFilename": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "ThresholdAlert",
+						"fileName": {
+							"value": "@dataset().ThresholdFilename",
+							"type": "Expression"
+						},
+						"folderPath": "DEV/ThresholdAlerts",
 						"container": "to-nextly"
 					},
 					"columnDelimiter": "|",
@@ -2609,12 +2638,17 @@
 					"referenceName": "SCCU_DataFactory_Storage",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"TransactionFileName": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "TransactionAlert",
+						"folderPath": "DEV/TransactionAlerts",
 						"container": "to-nextly"
 					},
 					"columnDelimiter": "|",

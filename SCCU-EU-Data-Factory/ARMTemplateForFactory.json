@@ -355,7 +355,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "ThresholdAlert",
+									"wildcardFolderPath": "DEV/ThresholdAlerts",
 									"wildcardFileName": {
 										"value": "@pipeline().parameters.FileName",
 										"type": "Expression"
@@ -641,7 +641,7 @@
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
 									"recursive": true,
-									"wildcardFolderPath": "TransactionAlert",
+									"wildcardFolderPath": "DEV/TransactionAlerts",
 									"wildcardFileName": {
 										"value": "@pipeline().parameters.FileName",
 										"type": "Expression"

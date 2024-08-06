@@ -5,12 +5,17 @@
 			"referenceName": "SCCU_DataFactory_Storage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"ThresholdFilename": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "ThresholdAlert",
+				"folderPath": "DEV/ThresholdAlerts",
 				"container": "to-nextly"
 			},
 			"columnDelimiter": "|",

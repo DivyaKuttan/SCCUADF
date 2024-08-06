@@ -27,7 +27,7 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "TransactionAlert",
+							"wildcardFolderPath": "DEV/TransactionAlerts",
 							"wildcardFileName": {
 								"value": "@pipeline().parameters.FileName",
 								"type": "Expression"
@@ -94,7 +94,13 @@
 				"inputs": [
 					{
 						"referenceName": "Dev_TransactionSourceDataset",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"TransactionFileName": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -153,7 +159,13 @@
 				"typeProperties": {
 					"dataset": {
 						"referenceName": "Dev_TransactionSourceDataset",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"TransactionFileName": {
+								"value": "@pipeline().parameters.FileName",
+								"type": "Expression"
+							}
+						}
 					},
 					"fieldList": [
 						"childItems"

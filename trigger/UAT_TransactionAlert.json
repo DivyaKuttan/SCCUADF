@@ -8,6 +8,10 @@
 				"pipelineReference": {
 					"referenceName": "Nextly_TransactionAlert_UAT",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"FileName": "@triggerBody().fileName",
+					"FilePath": "@triggerBody().folderPath"
 				}
 			}
 		],

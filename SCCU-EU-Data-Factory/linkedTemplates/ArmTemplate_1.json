@@ -68,29 +68,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DEV_Compled_ThresholdSource')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "ThresholdAlert",
-						"container": "to-nextly"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_Storage')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DEV_CompletedThresholdSink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -105,6 +82,29 @@
 					"location": {
 						"type": "AzureBlobStorageLocation",
 						"folderPath": "DEV/CompletedThreshold",
+						"container": "to-nextly"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_DataFactory_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DEV_CompletedThresholdSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "DEV/ThresholdAlerts",
 						"container": "to-nextly"
 					}
 				}
@@ -150,7 +150,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "TransactionAlert",
+						"folderPath": "DEV/TransactionAlerts",
 						"container": "to-nextly"
 					}
 				}

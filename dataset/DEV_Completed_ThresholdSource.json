@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "ThresholdAlert",
+				"folderPath": "DEV/ThresholdAlert",
 				"container": "to-nextly"
 			}
 		}

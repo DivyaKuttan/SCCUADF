@@ -1,5 +1,5 @@
 {
-	"name": "DEV_Completed_ThresholdSource",
+	"name": "DEV_CompletedThresholdSource",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",

@@ -1,5 +1,5 @@
 {
-	"name": "DEV_CompletedTransactionSource",
+	"name": "UAT_CompletedTransactionSink",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_DataFactory_Storage",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/TransactionAlerts",
+				"folderPath": "UAT/CompletedTransaction",
 				"container": "to-nextly"
 			}
 		}

@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "TransactionAlert",
+				"folderPath": "DEV/TransactionAlerts",
 				"container": "to-nextly"
 			}
 		}

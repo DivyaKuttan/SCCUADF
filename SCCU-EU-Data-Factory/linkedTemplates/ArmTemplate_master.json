@@ -111,9 +111,25 @@
 			"type": "string",
 			"defaultValue": "@utcnow()"
 		},
+		"UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FilePath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
 		"UAT_TransactionAlert_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
+		},
+		"UAT_thresholdAlert_properties_Nextly_ThresholdAlert_UAT_parameters_FileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"UAT_thresholdAlert_properties_Nextly_ThresholdAlert_UAT_parameters_FilePath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
 		},
 		"UAT_thresholdAlert_properties_typeProperties_scope": {
 			"type": "string",
@@ -347,8 +363,20 @@
 					"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime": {
 						"value": "[parameters('UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime')]"
 					},
+					"UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FileName": {
+						"value": "[parameters('UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FileName')]"
+					},
+					"UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FilePath": {
+						"value": "[parameters('UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FilePath')]"
+					},
 					"UAT_TransactionAlert_properties_typeProperties_scope": {
 						"value": "[parameters('UAT_TransactionAlert_properties_typeProperties_scope')]"
+					},
+					"UAT_thresholdAlert_properties_Nextly_ThresholdAlert_UAT_parameters_FileName": {
+						"value": "[parameters('UAT_thresholdAlert_properties_Nextly_ThresholdAlert_UAT_parameters_FileName')]"
+					},
+					"UAT_thresholdAlert_properties_Nextly_ThresholdAlert_UAT_parameters_FilePath": {
+						"value": "[parameters('UAT_thresholdAlert_properties_Nextly_ThresholdAlert_UAT_parameters_FilePath')]"
 					},
 					"UAT_thresholdAlert_properties_typeProperties_scope": {
 						"value": "[parameters('UAT_thresholdAlert_properties_typeProperties_scope')]"

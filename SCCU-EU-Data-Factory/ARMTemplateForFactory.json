@@ -87,14 +87,6 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
 		},
-		"Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_FromDateTime": {
-			"type": "string",
-			"defaultValue": "@addminutes(utcnow(), -5)"
-		},
-		"Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_ToDateTime": {
-			"type": "string",
-			"defaultValue": "@utcnow()"
-		},
 		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_FromDateTime": {
 			"type": "string",
 			"defaultValue": "@addminutes(utcnow(), -5)"
@@ -2303,7 +2295,20 @@
 					{
 						"name": "BBAlerts_Copy data1",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "SetStartingTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "SetCurrentTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2320,7 +2325,7 @@
 									"FromDateTime": {
 										"type": "String",
 										"value": {
-											"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+											"value": "@variables('StartingTime')",
 											"type": "Expression"
 										}
 									},
@@ -2331,7 +2336,7 @@
 									"ToDateTime": {
 										"type": "String",
 										"value": {
-											"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
+											"value": "@variables('EndingTime')",
 											"type": "Expression"
 										}
 									},
@@ -2416,29 +2421,119 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "GetLastProcessedDateTime",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT LastProcessedDateTime\nFROM ExternalAlertImportLog\n",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DEV_SQLDataSet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "SetStartingTime",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetLastProcessedDateTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "StartingTime",
+							"value": {
+								"value": "@formatDateTime(activity('GetLastProcessedDateTime').output.firstRow.LastProcessedDateTime, 'yyyy-MM-dd HH:mm:ss')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SetCurrentTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "EndingTime",
+							"value": {
+								"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "UpdateLastProcessedDateTime",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "BBAlerts_Copy data1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataDev",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "UPDATE ExternalAlertImportLog\nSET LastProcessedDateTime = '@{variables('EndingTime')}'",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"parameters": {
-					"FromDateTime": {
-						"type": "string",
-						"defaultValue": "@addminutes(utcnow(), -5)"
-					},
-					"ToDateTime": {
-						"type": "string",
-						"defaultValue": "@utcnow()"
-					}
-				},
 				"variables": {
-					"DateFormat": {
+					"StartingTime": {
 						"type": "String"
 					},
-					"FromDateTime": {
-						"type": "String"
-					},
-					"SampleDate": {
+					"EndingTime": {
 						"type": "String"
 					}
 				},
@@ -2446,7 +2541,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DEV_BBAlertsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/DEV_DoneProcessingDataSet')]"
+				"[concat(variables('factoryId'), '/datasets/DEV_DoneProcessingDataSet')]",
+				"[concat(variables('factoryId'), '/datasets/DEV_SQLDataSet')]",
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataDev')]"
 			]
 		},
 		{
@@ -4362,10 +4459,7 @@
 							"referenceName": "SCCUDoneProcessing_DEV",
 							"type": "PipelineReference"
 						},
-						"parameters": {
-							"FromDateTime": "[parameters('Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_FromDateTime')]",
-							"ToDateTime": "[parameters('Dev_DoneProcessing_Trigger_properties_SCCUDoneProcessing_DEV_parameters_ToDateTime')]"
-						}
+						"parameters": {}
 					}
 				],
 				"type": "ScheduleTrigger",

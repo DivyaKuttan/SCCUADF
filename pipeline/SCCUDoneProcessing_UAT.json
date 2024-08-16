@@ -233,6 +233,7 @@
 				}
 			}
 		],
+		"concurrency": 1,
 		"variables": {
 			"StartingTime": {
 				"type": "String"

@@ -223,13 +223,17 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "UPDATE ExternalAlertImportLog\nSET LastProcessedDateTime = '@{variables('EndingTime')}'"
+							"text": {
+								"value": "UPDATE ExternalAlertImportLog\nSET LastProcessedDateTime = '@{variables('EndingTime')}'",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
+		"concurrency": 1,
 		"variables": {
 			"StartingTime": {
 				"type": "String"

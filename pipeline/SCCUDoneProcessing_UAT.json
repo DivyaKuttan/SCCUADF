@@ -5,7 +5,20 @@
 			{
 				"name": "BBAlerts_Copy data1",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "SetStartingTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "SetCurrentTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -22,7 +35,7 @@
 							"FromDateTime": {
 								"type": "String",
 								"value": {
-									"value": "@formatDateTime(addMinutes(utcnow(), -5), 'yyyy-MM-dd HH:mm:ss')",
+									"value": "@variables('StartingTime')",
 									"type": "Expression"
 								}
 							},
@@ -33,7 +46,7 @@
 							"ToDateTime": {
 								"type": "String",
 								"value": {
-									"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
+									"value": "@variables('EndingTime')",
 									"type": "Expression"
 								}
 							},
@@ -116,26 +129,116 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "GetLastProcessedDateTime",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT LastProcessedDateTime\nFROM ExternalAlertImportLog\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "UAT_SQLDataSet",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "SetStartingTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetLastProcessedDateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "StartingTime",
+					"value": {
+						"value": "@formatDateTime(activity('GetLastProcessedDateTime').output.firstRow.LastProcessedDateTime, 'yyyy-MM-dd HH:mm:ss')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "SetCurrentTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "EndingTime",
+					"value": {
+						"value": "@formatDateTime(utcnow(), 'yyyy-MM-dd HH:mm:ss')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "UpdateLastProcessedDateTime",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "BBAlerts_Copy data1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataUAT",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "UPDATE ExternalAlertImportLog\nSET LastProcessedDateTime = '@{variables('EndingTime')}'",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
-		"parameters": {
-			"FromDateTime": {
-				"type": "string",
-				"defaultValue": "@addminutes(utcnow(), -5)"
-			},
-			"ToDateTime": {
-				"type": "string",
-				"defaultValue": "@utcnow()"
-			}
-		},
+		"concurrency": 1,
 		"variables": {
-			"DateFormat": {
+			"StartingTime": {
 				"type": "String"
 			},
-			"FromDateTime": {
-				"type": "String"
-			},
-			"SampleDate": {
+			"EndingTime": {
 				"type": "String"
 			}
 		},

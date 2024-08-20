@@ -1,5 +1,5 @@
 {
-	"name": "PRODThresholAlert",
+	"name": "PROD_ThresholAlert",
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Stopped",

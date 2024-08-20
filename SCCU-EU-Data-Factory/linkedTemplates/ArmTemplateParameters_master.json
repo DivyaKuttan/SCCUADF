@@ -71,12 +71,6 @@
 		"Prod_DoneProcessing_Trigger_properties_SCCUDoneProcessing_PROD_parameters_ToDateTime": {
 			"value": "@utcnow()"
 		},
-		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_FromDateTime": {
-			"value": "@addminutes(utcnow(), -5)"
-		},
-		"UAT_DoneProcessing_Trigger_properties_SCCUDoneProcessing_UAT_parameters_ToDateTime": {
-			"value": "@utcnow()"
-		},
 		"UAT_TransactionAlert_properties_Nextly_TransactionAlert_UAT_parameters_FileName": {
 			"value": "@triggerBody().fileName"
 		},

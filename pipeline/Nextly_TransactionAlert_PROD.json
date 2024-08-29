@@ -229,7 +229,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "UAT_CompletedTransactionSink",
+						"referenceName": "PROD_CompletedTransactionSink",
 						"type": "DatasetReference"
 					}
 				]

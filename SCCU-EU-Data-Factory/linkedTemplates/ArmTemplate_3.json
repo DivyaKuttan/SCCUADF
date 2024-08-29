@@ -413,7 +413,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "UAT_CompletedThresholdSink",
+								"referenceName": "PROD_CompletedThresholdSink",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -693,7 +693,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "UAT_CompletedTransactionSink",
+								"referenceName": "PROD_CompletedTransactionSink",
 								"type": "DatasetReference",
 								"parameters": {}
 							}

@@ -364,7 +364,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "UAT_CompletedThresholdSink",
+								"referenceName": "PROD_CompletedThresholdSink",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -411,7 +411,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
 				"[concat(variables('factoryId'), '/datasets/UAT_ThresholdSourceDataSet')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_CompletedThresholdSource')]",
-				"[concat(variables('factoryId'), '/datasets/UAT_CompletedThresholdSink')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_CompletedThresholdSink')]"
 			]
 		},
 		{
@@ -649,7 +649,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "UAT_CompletedTransactionSink",
+								"referenceName": "PROD_CompletedTransactionSink",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -695,7 +695,7 @@
 				"[concat(variables('factoryId'), '/datasets/PRODTransactionSinkDataSet')]",
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_CompletedTransactionSource')]",
-				"[concat(variables('factoryId'), '/datasets/UAT_CompletedTransactionSink')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_CompletedTransactionSink')]"
 			]
 		},
 		{

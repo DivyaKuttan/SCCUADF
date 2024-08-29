@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "UAT/CompletedTransaction",
+				"folderPath": "PROD/CompletedTransaction",
 				"container": "to-nextly"
 			}
 		}

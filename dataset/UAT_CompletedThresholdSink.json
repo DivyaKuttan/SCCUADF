@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "UAT/CompletedThreshold",
+				"folderPath": "PROD/CompletedThreshold",
 				"container": "to-nextly"
 			}
 		}

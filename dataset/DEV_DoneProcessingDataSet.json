@@ -14,7 +14,7 @@
 					"value": "DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 					"type": "Expression"
 				},
-				"folderPath": "DEV/DoneProcessing",
+				"folderPath": "DEV/sample",
 				"container": "from-nextly"
 			},
 			"columnDelimiter": "|",

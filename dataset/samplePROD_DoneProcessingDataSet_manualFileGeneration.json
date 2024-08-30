@@ -11,7 +11,7 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "DoneProcessing083020240135.txt",
+					"value": "DoneProcessing083020240410.txt",
 					"type": "Expression"
 				},
 				"folderPath": "PROD/DoneProcessing",

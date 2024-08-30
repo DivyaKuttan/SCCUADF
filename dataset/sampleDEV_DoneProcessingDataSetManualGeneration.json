@@ -1,0 +1,40 @@
+{
+	"name": "sampleDEV_DoneProcessingDataSetManualGeneration",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_DataFactory_Storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "DoneProcessing082920241855.txt",
+					"type": "Expression"
+				},
+				"folderPath": "DEV/sample",
+				"container": "from-nextly"
+			},
+			"columnDelimiter": "|",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": ""
+		},
+		"schema": [
+			{
+				"name": "SubscriptionID",
+				"type": "String"
+			},
+			{
+				"name": "EMAIL",
+				"type": "String"
+			},
+			{
+				"name": "PHONE",
+				"type": "String"
+			}
+		]
+	}
+}

@@ -5,8 +5,6 @@
 			{
 				"name": "BBAlerts_Copy data1_copy1",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "SetStartingTime",

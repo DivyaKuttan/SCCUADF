@@ -55,8 +55,8 @@
 								},
 								"sink": {
 									"name": "SubscriptionID",
-									"type": "Int32",
-									"physicalType": "int"
+									"type": "Int64",
+									"physicalType": "bigint"
 								}
 							},
 							{
@@ -256,11 +256,11 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "LoanDueAlert09192024.txt"
+				"defaultValue": "LoanDueAlerts10102024.txt"
 			},
 			"FilePath": {
 				"type": "string",
-				"defaultValue": "to-nextly/DEV/LoanDueAlerts"
+				"defaultValue": "to-nextly/PROD/LoanDueAlerts"
 			}
 		},
 		"annotations": []

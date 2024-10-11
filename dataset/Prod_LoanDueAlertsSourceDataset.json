@@ -15,7 +15,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/LoanDueAlerts",
+				"folderPath": "PROD/LoanDueAlerts",
 				"container": "to-nextly"
 			},
 			"columnDelimiter": "|",

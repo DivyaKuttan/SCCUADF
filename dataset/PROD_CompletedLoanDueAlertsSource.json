@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/CompletedLoanDueAlerts",
+				"folderPath": "PROD/CompletedLoanDueAlerts",
 				"container": "to-nextly"
 			}
 		}

@@ -1,5 +1,5 @@
 {
-	"name": "SCCUQA_LogDB_DynamicRetention",
+	"name": "SCCUPROD_LogDB_DynamicRetention",
 	"properties": {
 		"activities": [
 			{
@@ -69,10 +69,6 @@
 								"secureInput": false
 							},
 							"userProperties": [],
-							"linkedServiceName": {
-								"referenceName": "SCCUQA_LogDB",
-								"type": "LinkedServiceReference"
-							},
 							"typeProperties": {
 								"scripts": [
 									{
@@ -113,15 +109,7 @@
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false
 								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
+								"enableStaging": false
 							},
 							"inputs": [
 								{
@@ -131,16 +119,6 @@
 										"SourceDB": "@item().SourceDBName",
 										"SourceTable": "@item().SourceTableName",
 										"SourceSchema": "@item().SourceSchemaName"
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "QA_Archive_Destination",
-									"type": "DatasetReference",
-									"parameters": {
-										"DestinationTable": "@item().DestinationTable",
-										"DestinationSchema": "@item().DestinationSchema"
 									}
 								}
 							]
@@ -215,10 +193,6 @@
 								"secureInput": false
 							},
 							"userProperties": [],
-							"linkedServiceName": {
-								"referenceName": "SCCUQA_ArchiveDB",
-								"type": "LinkedServiceReference"
-							},
 							"typeProperties": {
 								"scripts": [
 									{

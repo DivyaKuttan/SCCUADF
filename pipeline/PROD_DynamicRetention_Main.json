@@ -1,5 +1,5 @@
 {
-	"name": "QA_DynamicRetention_Main",
+	"name": "PROD_DynamicRetention_Main",
 	"properties": {
 		"description": "This pipeline has activities which archive/purge data from souce DB's to Archive DB ",
 		"activities": [
@@ -73,7 +73,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_MetaDB_DynamicRetention",
+														"referenceName": "SCCUPROD_MetaDB_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -94,7 +94,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_LogDB_DynamicRetention",
+														"referenceName": "SCCUPROD_LogDB_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -115,7 +115,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_BusinessData_DynamicRetention",
+														"referenceName": "SCCUPROD_BusinessData_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -136,7 +136,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_BBAlerts_DynamicRetention",
+														"referenceName": "SCCUPROD_BBAlerts_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -157,7 +157,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_Admin_LogDB_DynamicRetention",
+														"referenceName": "SCCUPROD_Admin_LogDB_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -178,7 +178,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_Admin_MetaDB_DynamicRetention",
+														"referenceName": "SCCUPROD_Admin_MetaDB_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -199,7 +199,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_Anonymous_LogDB_DynamicRetention",
+														"referenceName": "SCCUPROD_Anonymous_LogDB_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false
@@ -220,7 +220,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "SCCUQA_Anonymous_MetaDB_DynamicRetention",
+														"referenceName": "SCCUPROD_Anonymous_MetaDB_DynamicRetention",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": false

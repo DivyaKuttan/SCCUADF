@@ -2,7 +2,7 @@
 	"name": "SCCUQA_Admin_MetaDB_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCUQA_Admin_MetaDB",
+			"referenceName": "SCCU_AdminMetadb_PROD",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

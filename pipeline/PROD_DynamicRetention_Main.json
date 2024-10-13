@@ -23,7 +23,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "SCCUQA_ArchiveSqlDataset",
+						"referenceName": "SCCUPROD_ArchiveSqlDataset",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false

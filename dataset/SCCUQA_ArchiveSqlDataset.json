@@ -2,7 +2,7 @@
 	"name": "SCCUQA_ArchiveSqlDataset",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCUQA_ArchiveDB",
+			"referenceName": "SCCU_Archivedb_PROD_DTU",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {

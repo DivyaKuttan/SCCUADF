@@ -1,8 +1,8 @@
 {
-	"name": "SCCUQA_BusinessData_Source",
+	"name": "SCCUPROD_BusinessData_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCU_BusinessDataQA",
+			"referenceName": "SCCU_Businessdata_PROD",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

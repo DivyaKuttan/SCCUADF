@@ -25,7 +25,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "SCCUQA_ArchiveSqlDataset",
+						"referenceName": "SCCUPROD_ArchiveSqlDataset",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -69,6 +69,10 @@
 								"secureInput": false
 							},
 							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "SCCU_AdminMetadb_PROD",
+								"type": "LinkedServiceReference"
+							},
 							"typeProperties": {
 								"scripts": [
 									{
@@ -109,7 +113,15 @@
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false
 								},
-								"enableStaging": false
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
@@ -119,6 +131,16 @@
 										"SourceDB": "@item().SourceDBName",
 										"SourceTable": "@item().SourceTableName",
 										"SourceSchema": "@item().SourceSchemaName"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Archive_Destination",
+									"type": "DatasetReference",
+									"parameters": {
+										"DestinationTable": "@item().DestinationTableName",
+										"DestinationSchema": "@item().DestinationSchemaName"
 									}
 								}
 							]
@@ -156,7 +178,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "SCCUQA_ArchiveSqlDataset",
+						"referenceName": "SCCUPROD_ArchiveSqlDataset",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -193,6 +215,10 @@
 								"secureInput": false
 							},
 							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "SCCU_Archivedb_PROD_DTU",
+								"type": "LinkedServiceReference"
+							},
 							"typeProperties": {
 								"scripts": [
 									{

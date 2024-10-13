@@ -1,8 +1,8 @@
 {
-	"name": "SCCUQA_Anonymous_LogDB_Source",
+	"name": "SCCUPROD_Anonymous_LogDB_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCUQa_Anonymous_LogDB",
+			"referenceName": "SCCU_AnonymousLogdb_PROD",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

@@ -1,8 +1,8 @@
 {
-	"name": "SCCUQA_BBAlerts_Source",
+	"name": "SCCUPROD_BBAlerts_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCUQA_LogDB",
+			"referenceName": "SCCU_Logdb_PROD_DTU",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

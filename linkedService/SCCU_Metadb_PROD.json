@@ -2,7 +2,7 @@
 	"name": "SCCU_Metadb_PROD",
 	"properties": {
 		"annotations": [],
-		"type": "AzureSqlDatabase",
+		"type": "AzureSqlMI",
 		"typeProperties": {
 			"server": "sccusqlmi.247d28acc382.database.windows.net",
 			"database": "SCCU_Metadb_PROD",

@@ -216,7 +216,7 @@
 							},
 							"userProperties": [],
 							"linkedServiceName": {
-								"referenceName": "SCCU_AnonymousLogdb_PROD",
+								"referenceName": "SCCU_Archivedb_PROD_DTU",
 								"type": "LinkedServiceReference"
 							},
 							"typeProperties": {

@@ -20,7 +20,7 @@
 			"name": "DataRetentionDatasets/Dynamic"
 		},
 		"annotations": [],
-		"type": "AzureSqlTable",
+		"type": "AzureSqlMITable",
 		"schema": [
 			{
 				"name": "ErrorID",

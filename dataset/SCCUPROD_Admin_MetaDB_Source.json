@@ -1,5 +1,5 @@
 {
-	"name": "SCCUQA_Admin_MetaDB_Source",
+	"name": "SCCUPROD_Admin_MetaDB_Source",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_AdminMetadb_PROD",

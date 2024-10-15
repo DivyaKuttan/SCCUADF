@@ -2,7 +2,7 @@
 	"name": "SCCUPROD_LogDBMI_Source",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCU_Logdb_PROD_DTU",
+			"referenceName": "SCCU_Logdb_PROD",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

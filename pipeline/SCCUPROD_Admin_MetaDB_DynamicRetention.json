@@ -100,12 +100,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
+									"type": "SqlMISource",
 									"partitionOption": "None"
 								},
 								"sink": {
@@ -125,7 +120,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "SCCUQA_Admin_MetaDB_Source",
+									"referenceName": "SCCUPROD_Admin_MetaDB_Source",
 									"type": "DatasetReference",
 									"parameters": {
 										"SourceDB": "@item().SourceDBName",

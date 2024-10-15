@@ -87,6 +87,8 @@
 											{
 												"name": "Log DB",
 												"type": "ExecutePipeline",
+												"state": "Inactive",
+												"onInactiveMarkAs": "Succeeded",
 												"dependsOn": [],
 												"policy": {
 													"secureInput": false
@@ -108,6 +110,8 @@
 											{
 												"name": "BusinessData",
 												"type": "ExecutePipeline",
+												"state": "Inactive",
+												"onInactiveMarkAs": "Succeeded",
 												"dependsOn": [],
 												"policy": {
 													"secureInput": false

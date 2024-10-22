@@ -227,6 +227,27 @@
 												}
 											}
 										]
+									},
+									{
+										"value": "LogDBMI",
+										"activities": [
+											{
+												"name": "SCCUPROD_LogDBMI_DynamicRetention",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SCCUPROD_LogDBMI_DynamicRetention",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": false
+												}
+											}
+										]
 									}
 								]
 							}

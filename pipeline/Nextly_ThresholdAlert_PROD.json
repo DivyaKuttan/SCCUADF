@@ -58,8 +58,8 @@
 								},
 								"sink": {
 									"name": "SubscriptionID",
-									"type": "Int32",
-									"physicalType": "int"
+									"type": "Int64",
+									"physicalType": "bigint"
 								}
 							},
 							{

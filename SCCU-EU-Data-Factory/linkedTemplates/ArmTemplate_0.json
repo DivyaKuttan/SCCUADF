@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
-		"SCCU_DataFactory_FileShare_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'SCCU_DataFactory_FileShare'"
-		},
 		"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
@@ -32,70 +28,6 @@
 			"defaultValue": [
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
-		},
-		"sccudrsql01_properties_privateLinkResourceId": {
-			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-CU-DR-SRV-RG/providers/Microsoft.Sql/managedInstances/sccudrsql01"
-		},
-		"sccudrsql01_properties_groupId": {
-			"type": "string",
-			"defaultValue": "managedInstance"
-		},
-		"sccuprodsql01_properties_privateLinkResourceId": {
-			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Sql/managedInstances/sccuprodsql01"
-		},
-		"sccuprodsql01_properties_groupId": {
-			"type": "string",
-			"defaultValue": "managedInstance"
-		},
-		"SCCU_BBAlertsDev_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccudevsql01.database.windows.net"
-		},
-		"SCCU_BBAlertsDev_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCUDEV_BBAlerts"
-		},
-		"SCCU_BBAlertsPROD_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_BBAlertsPROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BBAlerts_PROD"
-		},
-		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuuatsql01.database.windows.net"
-		},
-		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCUUAT_BBAlerts"
-		},
-		"SCCU_BusinessDataDev_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccudevsql01.database.windows.net"
-		},
-		"SCCU_BusinessDataDev_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BusinessData_Dev"
-		},
-		"SCCU_BusinessDataPROD_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_BusinessDataPROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuuatsql01.database.windows.net"
-		},
-		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BusinessData_UAT"
 		}
 	},
 	"variables": {
@@ -103,7 +35,79 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Credential_Prod_DTU')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_Prod_SQL_MI')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Credential_SCCUUAT_BBAlerts')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_AdminLogdb_PROD')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_AdminMetadb_PROD')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_AnonymousLogdb_PROD')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_AnonymousMetadb_PROD')]",
 			"type": "Microsoft.DataFactory/factories/credentials",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -140,6 +144,42 @@
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_BusinessDataUAT')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_Businessdata_PROD')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_LogsMonitorMetadb_PROD')]",
+			"type": "Microsoft.DataFactory/factories/credentials",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {
+					"resourceId": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourcegroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.ManagedIdentity/userAssignedIdentities/SCCU-EU-ADF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Credential_SCCU_Metadb_PROD')]",
 			"type": "Microsoft.DataFactory/factories/credentials",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -243,222 +283,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/default/sccudrsql01')]",
-			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"privateLinkResourceId": "[parameters('sccudrsql01_properties_privateLinkResourceId')]",
-				"groupId": "[parameters('sccudrsql01_properties_groupId')]"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/default/sccuprodsql01')]",
-			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"privateLinkResourceId": "[parameters('sccuprodsql01_properties_privateLinkResourceId')]",
-				"groupId": "[parameters('sccuprodsql01_properties_groupId')]"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BBAlertsDev')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BBAlertsDev_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BBAlertsDev_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "credential_SCCU_BBAlertsDev",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/credentials/credential_SCCU_BBAlertsDev')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BBAlertsPROD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_BBAlertsPROD",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/credentials/Credential_SCCU_BBAlertsPROD')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BBAlertsUAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCUUAT_BBAlerts",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/credentials/Credential_SCCUUAT_BBAlerts')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataDev')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "For DEV SQL Server",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credentials_BusinessDataDev",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/credentials/Credentials_BusinessDataDev')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataPROD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_BusinessDataPROD",
-						"type": "CredentialReference"
-					},
-					"alwaysEncryptedSettings": {
-						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/credentials/Credential_SCCU_BusinessDataPROD')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataUAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_BusinessDataUAT",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/credentials/Credential_SCCU_BusinessDataUAT')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_DataFactory_FileShare')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureFileStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('SCCU_DataFactory_FileShare_connectionString')]",
-					"fileShare": "sccudatafactoryfileshare"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		}
 	]

@@ -13,7 +13,119 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_CompletedThresholdSink')]",
+			"name": "[concat(parameters('factoryName'), '/Archive_Destination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_Archivedb_PROD_DTU",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DestinationTable": {
+						"type": "string"
+					},
+					"DestinationSchema": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetentionDatasets/Dynamic"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ErrorID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TenantID",
+						"type": "varchar"
+					},
+					{
+						"name": "FormID",
+						"type": "varchar"
+					},
+					{
+						"name": "SystemIP",
+						"type": "varchar"
+					},
+					{
+						"name": "SiteURL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Type",
+						"type": "varchar"
+					},
+					{
+						"name": "Message",
+						"type": "nvarchar"
+					},
+					{
+						"name": "InnerException",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Comments",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().DestinationSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().DestinationTable",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DEV_BBAlertsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BBAlertsDev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "MigrationId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductVersion",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "__EFMigrationsHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DEV_CompletedThresholdSink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -26,7 +138,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/CompletedThreshold",
+						"folderPath": "DEV/CompletedThreshold",
 						"container": "to-nextly"
 					}
 				}
@@ -34,7 +146,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_CompletedThresholdSource')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_CompletedThresholdSource')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -47,7 +159,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/ThresholdAlerts",
+						"folderPath": "DEV/ThresholdAlerts",
 						"container": "to-nextly"
 					}
 				}
@@ -55,7 +167,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_CompletedTransactionSink')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_CompletedTransactionSink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -68,7 +180,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/CompletedTransaction",
+						"folderPath": "DEV/CompletedTransaction",
 						"container": "to-nextly"
 					}
 				}
@@ -76,7 +188,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_CompletedTransactionSource')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_CompletedTransactionSource')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -89,7 +201,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/TransactionAlerts",
+						"folderPath": "DEV/TransactionAlerts",
 						"container": "to-nextly"
 					}
 				}
@@ -97,7 +209,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_DoneProcessingDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_DoneProcessingDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -114,7 +226,7 @@
 							"value": "DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 							"type": "Expression"
 						},
-						"folderPath": "PROD/DoneProcessing",
+						"folderPath": "DEV/DoneProcessing",
 						"container": "from-nextly"
 					},
 					"columnDelimiter": "|",
@@ -122,12 +234,25 @@
 					"firstRowAsHeader": true,
 					"quoteChar": ""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "SubscriptionID",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "PHONE",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_GetExternalAlertRecipientsDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_GetExternalAlertRecipientsDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -144,20 +269,36 @@
 							"value": "Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 							"type": "Expression"
 						},
-						"folderPath": "PROD/Alertsubscriber",
-						"container": "from-nextly"
+						"folderPath": "DEV/Alertsubscriber",
+						"container": {
+							"value": "from-nextly",
+							"type": "Expression"
+						}
 					},
 					"columnDelimiter": "|",
 					"escapeChar": "\\",
 					"firstRowAsHeader": true,
 					"quoteChar": ""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "SubscriptionID",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "PHONE",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_GetThresholdAlertSubscriptionsDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_GetThresholdAlertSubscriptionsDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -174,7 +315,7 @@
 							"value": "ThresholdAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 							"type": "Expression"
 						},
-						"folderPath": "PROD/ThresholdAlertSubscription",
+						"folderPath": "DEV/ThresholdAlert",
 						"container": "from-nextly"
 					},
 					"columnDelimiter": "|",
@@ -187,7 +328,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_GetTransactionAlertSubscriptionsDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_GetTransactionAlertSubscriptionDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -204,7 +345,7 @@
 							"value": "TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
 							"type": "Expression"
 						},
-						"folderPath": "PROD/TransactionAlertSubscription",
+						"folderPath": "DEV/TransactionAlertSubscription",
 						"container": "from-nextly"
 					},
 					"columnDelimiter": "|",
@@ -212,51 +353,34 @@
 					"firstRowAsHeader": true,
 					"quoteChar": ""
 				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_LoanDue_DataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "LoanDueAlerts@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
-							"type": "Expression"
-						},
-						"folderPath": "PROD/LoanDueAlerts",
-						"container": "from-nextly"
+				"schema": [
+					{
+						"name": "SubscriptionID",
+						"type": "String"
 					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "PHONE",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_SQLDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_SQLDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataPROD",
+					"referenceName": "SCCU_BusinessDataDev",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzureSqlMITable",
+				"type": "AzureSqlTable",
 				"schema": [
 					{
 						"name": "Id",
@@ -281,16 +405,16 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_ThresholSinkDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/Dev_ThresholdSinkDastaSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataPROD",
+					"referenceName": "SCCU_BusinessDataDev",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzureSqlMITable",
+				"type": "AzureSqlTable",
 				"schema": [
 					{
 						"name": "ID",
@@ -315,7 +439,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_ThresholdSourceDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/Dev_ThresholdSourceDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -337,7 +461,7 @@
 							"value": "@dataset().ThresholdFilename",
 							"type": "Expression"
 						},
-						"folderPath": "PROD/ThresholdAlerts",
+						"folderPath": "DEV/ThresholdAlerts",
 						"container": "to-nextly"
 					},
 					"columnDelimiter": "|",
@@ -355,7 +479,45 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_TransactionSourceDataset')]",
+			"name": "[concat(parameters('factoryName'), '/Dev_TransactionSinkDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataDev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SubscriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EmailContent",
+						"type": "varchar"
+					},
+					{
+						"name": "TextContent",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ExternalAlert_TransactionStaging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dev_TransactionSourceDataset')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -373,7 +535,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/TransactionAlerts",
+						"folderPath": "DEV/TransactionAlerts",
 						"container": "to-nextly"
 					},
 					"columnDelimiter": "|",
@@ -386,7 +548,39 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Prod_LoanDueAlertsSinkDataSet')]",
+			"name": "[concat(parameters('factoryName'), '/GetExternalAlerts')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_FileShare",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureFileStorageLocation",
+						"fileName": {
+							"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "dev/GetExternalAlerts",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PRODTransactionSinkDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -408,63 +602,32 @@
 						"precision": 19
 					},
 					{
-						"name": "DueDate",
-						"type": "date"
+						"name": "EmailContent",
+						"type": "varchar"
 					},
 					{
-						"name": "AmountDue",
+						"name": "SMSContent",
 						"type": "varchar"
 					}
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "External_LoanDueAlertStaging"
+					"table": "ExternalAlert_TransactionStaging"
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Prod_LoanDueAlertsSourceDataset')]",
+			"name": "[concat(parameters('factoryName'), '/PROD_BBAlertsDataset')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TransactionFileName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/LoanDueAlerts",
-						"container": "to-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_BBAlertsDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_BBAlertsUAT",
+					"referenceName": "SCCU_BBAlertsPROD",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzureSqlTable",
+				"type": "AzureSqlMITable",
 				"schema": [
 					{
 						"name": "Key",
@@ -472,25 +635,30 @@
 					},
 					{
 						"name": "Value",
-						"type": "bigint",
-						"precision": 19
+						"type": "int",
+						"precision": 10
 					},
 					{
 						"name": "ExpireAt",
 						"type": "datetime",
 						"precision": 23,
 						"scale": 3
+					},
+					{
+						"name": "Id",
+						"type": "bigint",
+						"precision": 19
 					}
 				],
 				"typeProperties": {
 					"schema": "schedule",
-					"table": "AggregatedCounter"
+					"table": "Counter"
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/UAT_CompletedThresholdSink')]",
+			"name": "[concat(parameters('factoryName'), '/PROD_CompletedLoanDueAlertsSink')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -503,7 +671,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "UAT/CompletedThreshold",
+						"folderPath": "PROD/CompletedLoanDueAlerts",
 						"container": "to-nextly"
 					}
 				}
@@ -511,7 +679,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/UAT_CompletedThresholdSource')]",
+			"name": "[concat(parameters('factoryName'), '/PROD_CompletedLoanDueAlertsSource')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -524,49 +692,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"folderPath": "UAT/ThresholdAlerts",
-						"container": "to-nextly"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_CompletedTransactionSink')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "UAT/CompletedTransaction",
-						"container": "to-nextly"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UAT_CompletedTransactionSource')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "UAT/TransactionAlerts",
+						"folderPath": "PROD/CompletedLoanDueAlerts",
 						"container": "to-nextly"
 					}
 				}

@@ -8,6 +8,36 @@
 		"SCCU_DataFactory_FileShare_connectionString": {
 			"value": ""
 		},
+		"SCCU_AdminLogdb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_AdminLogdb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_AdminLogdb_PROD"
+		},
+		"SCCU_AdminMetadb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_AdminMetadb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_AdminMetadb_PROD"
+		},
+		"SCCU_AnonymousLogdb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_AnonymousLogdb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_AnonymousLogdb_PROD"
+		},
+		"SCCU_AnonymousMetadb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_AnonymousMetadb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_AnonymousMetadb_PROD"
+		},
+		"SCCU_Archivedb_PROD_DTU_properties_typeProperties_server": {
+			"value": "sccuprodsql02.database.windows.net"
+		},
+		"SCCU_Archivedb_PROD_DTU_properties_typeProperties_database": {
+			"value": "SCCU_Archivedb_PROD"
+		},
 		"SCCU_BBAlertsDev_properties_typeProperties_server": {
 			"value": "sccudevsql01.database.windows.net"
 		},
@@ -44,8 +74,38 @@
 		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
 			"value": "SCCU_BusinessData_UAT"
 		},
+		"SCCU_Businessdata_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_Businessdata_PROD_properties_typeProperties_database": {
+			"value": "SCCU_Businessdata_PROD"
+		},
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"value": "https://sccudatafactorystorage.blob.core.windows.net/"
+		},
+		"SCCU_Logdb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_Logdb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_Logdb_PROD"
+		},
+		"SCCU_Logdb_PROD_DTU_properties_typeProperties_server": {
+			"value": "sccuprodsql02.database.windows.net"
+		},
+		"SCCU_Logdb_PROD_DTU_properties_typeProperties_database": {
+			"value": "SCCU_Logdb_PROD"
+		},
+		"SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_LogsMonitorMetadb_PROD"
+		},
+		"SCCU_Metadb_PROD_properties_typeProperties_server": {
+			"value": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_Metadb_PROD_properties_typeProperties_database": {
+			"value": "SCCU_Metadb_PROD"
 		},
 		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
 			"value": "@triggerBody().fileName"

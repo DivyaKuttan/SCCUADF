@@ -10,13 +10,13 @@
 		"schema": [
 			{
 				"name": "ID",
-				"type": "int",
-				"precision": 10
+				"type": "bigint",
+				"precision": 19
 			},
 			{
 				"name": "SubscriptionID",
-				"type": "int",
-				"precision": 10
+				"type": "bigint",
+				"precision": 19
 			},
 			{
 				"name": "BalanceAmount",

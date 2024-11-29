@@ -1,5 +1,5 @@
 {
-	"name": "SCCUPROD_BusinessDataActivityLogs_DynamicRetention",
+	"name": "SCCUPROD_ActivityLogs_Main",
 	"properties": {
 		"activities": [
 			{

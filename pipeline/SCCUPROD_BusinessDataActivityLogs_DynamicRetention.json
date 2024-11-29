@@ -53,6 +53,8 @@
 						{
 							"name": "BusinessData_Script",
 							"type": "Script",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "BusinessData_Copy data",
@@ -151,6 +153,8 @@
 			{
 				"name": "BusinessData_Purge",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Archive_ForEach",
@@ -187,6 +191,8 @@
 			{
 				"name": "Purge_ForEach",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BusinessData_Purge",

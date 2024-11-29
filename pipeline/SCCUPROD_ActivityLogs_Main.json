@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "BusinessData_Archive",
+				"name": "ActivityLog_Archive",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND SourceTableName='ActivityLogs' ",
+							"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND SourceTableName='ActivityLogs' AND ArchiveDays > 0",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -36,7 +36,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_Archive",
+						"activity": "ActivityLog_Archive",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -149,7 +149,7 @@
 				}
 			},
 			{
-				"name": "BusinessData_Purge",
+				"name": "ActivityLog_Purge",
 				"type": "Lookup",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -173,7 +173,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND IsPurgeEnabled=1 AND PurgeDays > 0",
+							"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND AND SourceTableName='ActivityLogs' AND PurgeDays > 0",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -193,7 +193,7 @@
 				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_Purge",
+						"activity": "ActivityLog_Purge",
 						"dependencyConditions": [
 							"Succeeded"
 						]

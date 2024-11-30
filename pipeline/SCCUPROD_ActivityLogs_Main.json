@@ -78,7 +78,7 @@
 									{
 										"type": "Query",
 										"text": {
-											"value": "SET NOCOUNT ON;\n\nDECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\n\n-- Repeat until no rows are affected\nWHILE 1 = 1\nBEGIN\n    DELETE  TOP (@BatchSize) FROM @{item().SourceSchemaName}.@{item().SourceTableName} with (rowlock) WHERE CAST(@{item().KeyColumn} AS DATE) = DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n    SET @RowsAffected = @@ROWCOUNT; \n    WAITFOR DELAY '00:00:01'\n    IF @RowsAffected = 0\n        BREAK; -- Exit the loop when no more rows are deleted\nEND\n",
+											"value": "SET NOCOUNT ON;\n\nDECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\n\n-- Repeat until no rows are affected\nWHILE 1 = 1\nBEGIN\n    DELETE  TOP (@BatchSize) FROM @{item().SourceSchemaName}.@{item().SourceTableName} with (rowlock) WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n    SET @RowsAffected = @@ROWCOUNT; \n    WAITFOR DELAY '00:00:01'\n    IF @RowsAffected = 0\n        BREAK; -- Exit the loop when no more rows are deleted\nEND\n",
 											"type": "Expression"
 										}
 									}
@@ -102,7 +102,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) = DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} with (NOLOCK) WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",

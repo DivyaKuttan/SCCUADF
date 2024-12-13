@@ -249,15 +249,6 @@
 					},
 					"SCCU_DataFactory_FileShare_properties_groupId": {
 						"value": "[parameters('SCCU_DataFactory_FileShare_properties_groupId')]"
-					},
-					"sccudatafactorystorage_properties_privateLinkResourceId": {
-						"value": "[parameters('sccudatafactorystorage_properties_privateLinkResourceId')]"
-					},
-					"sccudatafactorystorage_properties_groupId": {
-						"value": "[parameters('sccudatafactorystorage_properties_groupId')]"
-					},
-					"sccudatafactorystorage_properties_fqdns": {
-						"value": "[parameters('sccudatafactorystorage_properties_fqdns')]"
 					}
 				}
 			},
@@ -279,6 +270,15 @@
 					},
 					"SCCU_DataFactory_FileShare_connectionString": {
 						"value": "[parameters('SCCU_DataFactory_FileShare_connectionString')]"
+					},
+					"sccudatafactorystorage_properties_privateLinkResourceId": {
+						"value": "[parameters('sccudatafactorystorage_properties_privateLinkResourceId')]"
+					},
+					"sccudatafactorystorage_properties_groupId": {
+						"value": "[parameters('sccudatafactorystorage_properties_groupId')]"
+					},
+					"sccudatafactorystorage_properties_fqdns": {
+						"value": "[parameters('sccudatafactorystorage_properties_fqdns')]"
 					},
 					"sccudrsql01_properties_privateLinkResourceId": {
 						"value": "[parameters('sccudrsql01_properties_privateLinkResourceId')]"
@@ -384,12 +384,6 @@
 					},
 					"SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_database')]"
-					},
-					"SCCU_Metadb_PROD_properties_typeProperties_server": {
-						"value": "[parameters('SCCU_Metadb_PROD_properties_typeProperties_server')]"
-					},
-					"SCCU_Metadb_PROD_properties_typeProperties_database": {
-						"value": "[parameters('SCCU_Metadb_PROD_properties_typeProperties_database')]"
 					}
 				}
 			},
@@ -410,6 +404,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"SCCU_Metadb_PROD_properties_typeProperties_server": {
+						"value": "[parameters('SCCU_Metadb_PROD_properties_typeProperties_server')]"
+					},
+					"SCCU_Metadb_PROD_properties_typeProperties_database": {
+						"value": "[parameters('SCCU_Metadb_PROD_properties_typeProperties_database')]"
 					}
 				}
 			},
@@ -488,15 +488,6 @@
 					},
 					"PROD_ThresholAlert_properties_typeProperties_scope": {
 						"value": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]"
-					},
-					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
-						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]"
-					},
-					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
-						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
-					},
-					"PROD_TransactionAlert_properties_typeProperties_scope": {
-						"value": "[parameters('PROD_TransactionAlert_properties_typeProperties_scope')]"
 					}
 				}
 			},
@@ -517,6 +508,15 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
+						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]"
+					},
+					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
+						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
+					},
+					"PROD_TransactionAlert_properties_typeProperties_scope": {
+						"value": "[parameters('PROD_TransactionAlert_properties_typeProperties_scope')]"
 					}
 				}
 			},

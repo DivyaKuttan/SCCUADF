@@ -101,7 +101,10 @@
 							"typeProperties": {
 								"source": {
 									"type": "SqlMISource",
-									"sqlReaderQuery": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+									"sqlReaderQuery": {
+										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+										"type": "Expression"
+									},
 									"partitionOption": "None"
 								},
 								"sink": {
@@ -229,6 +232,42 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "LogDBMI_RebuildIndex",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Archive_ForEach",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "SCCU_Logdb_PROD",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "IF OBJECT_ID('tempdb..#tmpFragmentList') IS NOT NULL\n\t\tDROP TABLE #tmpFragmentList\n \n\tCREATE TABLE #tmpFragmentList\n\t(\n\t\tID INT IDENTITY(1,1) NOT NULL,\n\t\tSchemaName VARCHAR(20),\n\t\tTableName VARCHAR(100),\n\t\tIndexName VARCHAR(100),\n\t\tFragmentation VARCHAR(30),\n\t\tFragmentPageCount INT,\n\t\tAlterQuery VARCHAR(500)\n\t)\n \n\tINSERT INTO #tmpFragmentList\n \n\tSELECT S.name as 'Schema',T.name as 'Table',I.name as 'Index',DDIPS.avg_fragmentation_in_percent,DDIPS.page_count\n\t,'ALTER INDEX ['+ I.name +'] ON [' +S.name +'].[' + T.name +'] REBUILD WITH (ONLINE = ON); ' AS AlterQuery\n\tFROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, NULL) AS DDIPS\n\tINNER JOIN sys.tables T on T.object_id = DDIPS.object_id\n\tINNER JOIN sys.schemas S on T.schema_id = S.schema_id\n\tINNER JOIN sys.indexes I ON I.object_id = DDIPS.object_id\n\tAND DDIPS.index_id = I.index_id\n\tWHERE DDIPS.database_id = DB_ID()\n\tand I.name is not null\n\tand T.name NOT LIKE '%staging%' and T.name NOT LIKE '%archi%' and T.name NOT LIKE '%exceptio%' \n\tand t.name not in( 'ActivityLogs','RefreshTokens','CheckfreeApiSerilog','NextlyThirdPartyLog','ACISeriLogs2','VerafinSeriLogs', 'PayrailzApiSerilog','SccuBeta_ErrorLog')\n\t--and t.name = 'LoginHistory'\n\tAND DDIPS.avg_fragmentation_in_percent > 30\n\tAND DDIPS.page_count<100000\n\tORDER  by \n\tDDIPS.page_count desc\n\t--DDIPS.avg_fragmentation_in_percent  desc\n \n\tDECLARE @QueryID INT = 1\n\tDECLARE @SQLQuery NVARCHAR(500)\n \n\tWHILE EXISTS (SELECT 1 FROM #tmpFragmentList WHERE ID = @QueryID)\n\tBEGIN\n\t\tSELECT @SQLQuery = AlterQuery FROM #tmpFragmentList WHERE ID = @QueryID\n \n\t\t-- Print and execute the query\n\t\tPRINT 'Executing: ' + @SQLQuery\n\t\tEXEC sp_executesql @SQLQuery\n\t\tPRINT CONVERT(VARCHAR(100), SYSDATETIME(), 121)\n\t\t-- Move to the next query\n\t\tSET @QueryID = @QueryID + 1\n\tEND\n \n\tDROP TABLE #tmpFragmentList",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],

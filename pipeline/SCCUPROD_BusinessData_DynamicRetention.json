@@ -238,6 +238,8 @@
 			{
 				"name": "BusinessData_RebuildIndex_LT50K",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Archive_ForEach",
@@ -274,6 +276,8 @@
 			{
 				"name": "BusinessData_RebuildIndex_LT1Lakh",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BusinessData_RebuildIndex_LT50K",

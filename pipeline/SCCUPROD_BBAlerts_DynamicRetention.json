@@ -5,8 +5,6 @@
 			{
 				"name": "BBAlerts_Archive",
 				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -36,8 +34,6 @@
 			{
 				"name": "Archive_ForEach",
 				"type": "ForEach",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BBAlerts_Archive",
@@ -155,8 +151,6 @@
 			{
 				"name": "BBAlerts_Purge",
 				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Archive_ForEach",
@@ -193,8 +187,6 @@
 			{
 				"name": "Purge_ForEach",
 				"type": "ForEach",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BBAlerts_Purge",

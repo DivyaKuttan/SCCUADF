@@ -1,5 +1,13 @@
 {
 	"name": "SCCU-EU-Data-Factory",
+	"properties": {
+		"globalParameters": {
+			"global_sendmail_api_url": {
+				"type": "string",
+				"value": "test URL"
+			}
+		}
+	},
 	"location": "eastus",
 	"identity": {
 		"type": "SystemAssigned,UserAssigned",

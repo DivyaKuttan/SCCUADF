@@ -51,48 +51,12 @@
 					"batchCount": 1,
 					"activities": [
 						{
-							"name": "MetaDB_Script",
-							"type": "Script",
-							"dependsOn": [
-								{
-									"activity": "MetaDB_Copy data",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"linkedServiceName": {
-								"referenceName": "SCCU_AdminMetadb_PROD",
-								"type": "LinkedServiceReference"
-							},
-							"typeProperties": {
-								"scripts": [
-									{
-										"type": "Query",
-										"text": {
-											"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-											"type": "Expression"
-										}
-									}
-								],
-								"scriptBlockExecutionTimeout": "02:00:00"
-							}
-						},
-						{
-							"name": "MetaDB_Copy data",
-							"type": "Copy",
+							"name": "CheckRowCount",
+							"type": "Lookup",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
-								"retry": 3,
+								"retry": 0,
 								"retryIntervalInSeconds": 30,
 								"secureOutput": false,
 								"secureInput": false
@@ -102,47 +66,131 @@
 								"source": {
 									"type": "SqlMISource",
 									"sqlReaderQuery": {
-										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+										"value": "SELECT count(1) as 'RecordCount' FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
 										"type": "Expression"
 									},
 									"partitionOption": "None"
 								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
+								"dataset": {
 									"referenceName": "SCCUPROD_Admin_MetaDB_Source",
-									"type": "DatasetReference",
-									"parameters": {
-										"SourceDB": "@item().SourceDBName",
-										"SourceTable": "@item().SourceTableName",
-										"SourceSchema": "@item().SourceSchemaName"
-									}
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "If record exists",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "CheckRowCount",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
 							],
-							"outputs": [
-								{
-									"referenceName": "Archive_Destination",
-									"type": "DatasetReference",
-									"parameters": {
-										"DestinationTable": "@item().DestinationTableName",
-										"DestinationSchema": "@item().DestinationSchemaName"
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "MetaDB_Script",
+										"type": "Script",
+										"dependsOn": [
+											{
+												"activity": "MetaDB_Copy data",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"linkedServiceName": {
+											"referenceName": "SCCU_AdminMetadb_PROD",
+											"type": "LinkedServiceReference"
+										},
+										"typeProperties": {
+											"scripts": [
+												{
+													"type": "Query",
+													"text": {
+														"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
+														"type": "Expression"
+													}
+												}
+											],
+											"scriptBlockExecutionTimeout": "02:00:00"
+										}
+									},
+									{
+										"name": "MetaDB_Copy data",
+										"type": "Copy",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 3,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"source": {
+												"type": "SqlMISource",
+												"sqlReaderQuery": {
+													"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+													"type": "Expression"
+												},
+												"partitionOption": "None"
+											},
+											"sink": {
+												"type": "AzureSqlSink",
+												"writeBehavior": "insert",
+												"sqlWriterUseTableLock": false
+											},
+											"enableStaging": false,
+											"translator": {
+												"type": "TabularTranslator",
+												"typeConversion": true,
+												"typeConversionSettings": {
+													"allowDataTruncation": true,
+													"treatBooleanAsNumber": false
+												}
+											}
+										},
+										"inputs": [
+											{
+												"referenceName": "SCCUPROD_Admin_MetaDB_Source",
+												"type": "DatasetReference",
+												"parameters": {
+													"SourceDB": "@item().SourceDBName",
+													"SourceTable": "@item().SourceTableName",
+													"SourceSchema": "@item().SourceSchemaName"
+												}
+											}
+										],
+										"outputs": [
+											{
+												"referenceName": "Archive_Destination",
+												"type": "DatasetReference",
+												"parameters": {
+													"DestinationTable": "@item().DestinationTableName",
+													"DestinationSchema": "@item().DestinationSchemaName"
+												}
+											}
+										]
 									}
-								}
-							]
+								]
+							}
 						}
 					]
 				}

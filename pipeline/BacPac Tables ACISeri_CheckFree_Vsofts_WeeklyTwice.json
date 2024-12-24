@@ -36,7 +36,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_Bacpac_Delete_NextlyCoreLog]"
+					"storedProcedureName": "[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
 				},
 				"linkedServiceName": {
 					"referenceName": "SCCU_Logdb_PROD_DTU",

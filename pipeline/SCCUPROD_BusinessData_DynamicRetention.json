@@ -238,11 +238,9 @@
 			{
 				"name": "BusinessData_RebuildIndex_LT50K",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Archive_ForEach",
+						"activity": "BusinessData_RebuildIndex_50Kto100K",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -267,11 +265,9 @@
 			{
 				"name": "BusinessData_RebuildIndex_50Kto100K",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_RebuildIndex_LT50K",
+						"activity": "BusinessData_RebuildIndex_GT100K",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -296,11 +292,9 @@
 			{
 				"name": "BusinessData_RebuildIndex_GT100K",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_RebuildIndex_50Kto100K",
+						"activity": "Archive_ForEach",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -325,11 +319,9 @@
 			{
 				"name": "Update Statistics",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_RebuildIndex_GT100K",
+						"activity": "BusinessData_RebuildIndex_LT50K",
 						"dependencyConditions": [
 							"Completed"
 						]

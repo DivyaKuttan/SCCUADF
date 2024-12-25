@@ -319,6 +319,8 @@
 			{
 				"name": "Update Statistics",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BusinessData_RebuildIndex_LT50K",

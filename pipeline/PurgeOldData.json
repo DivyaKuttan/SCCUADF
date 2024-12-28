@@ -23,7 +23,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "DELETE FROM activityLogs with (RowLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-50 as date)\n\n",
+								"value": "DELETE FROM activityLogs with (RowLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-47 as date)\n\n",
 								"type": "Expression"
 							}
 						}

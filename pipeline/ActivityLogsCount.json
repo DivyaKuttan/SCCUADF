@@ -1,0 +1,40 @@
+{
+	"name": "ActivityLogsCount",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlMISource",
+						"sqlReaderQuery": "Select count(1) from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-47 as date)",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SCCUPROD_BusinessData_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"SourceDB": "SCCU_Businessdata_PROD",
+							"SourceTable": "activityLogs",
+							"SourceSchema": "dbo"
+						}
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "DataRetention/MISC"
+		},
+		"annotations": []
+	}
+}

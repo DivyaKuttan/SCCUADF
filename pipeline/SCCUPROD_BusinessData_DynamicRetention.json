@@ -305,7 +305,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "BusinessData_Rebuild_Index_Stat",
+						"referenceName": "BusinessData_Rebuild_Index",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

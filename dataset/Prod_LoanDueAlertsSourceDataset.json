@@ -2,7 +2,7 @@
 	"name": "Prod_LoanDueAlertsSourceDataset",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCU_DataFactory_Storage_V2",
+			"referenceName": "SCCU_DataFactory_Storage",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {

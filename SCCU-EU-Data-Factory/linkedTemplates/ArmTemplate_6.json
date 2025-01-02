@@ -7,41 +7,41 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
-		"ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
+		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
 			"type": "string",
 			"defaultValue": "@triggerBody().fileName"
 		},
-		"ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
+		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
 			"type": "string",
 			"defaultValue": "@triggerBody().folderPath"
 		},
-		"ToNextlyLoanDueAlert_Prod_properties_typeProperties_scope": {
+		"PROD_LoanDueTrigger_properties_typeProperties_scope": {
 			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
 		},
-		"ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
+		"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
 			"type": "string",
 			"defaultValue": "@triggerBody().fileName"
 		},
-		"ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
+		"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
 			"type": "string",
 			"defaultValue": "@triggerBody().folderPath"
 		},
-		"ToNextlyThresholdAlert_Prod_properties_typeProperties_scope": {
+		"PROD_ThresholAlert_properties_typeProperties_scope": {
 			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
 		},
-		"ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
+		"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
 			"type": "string",
 			"defaultValue": "@triggerBody().fileName"
 		},
-		"ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
+		"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
 			"type": "string",
 			"defaultValue": "@triggerBody().folderPath"
 		},
-		"ToNextlyTransactionAlert_Prod_properties_typeProperties_scope": {
+		"PROD_TransactionAlert_properties_typeProperties_scope": {
 			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
 		}
 	},
 	"variables": {
@@ -3732,6 +3732,102 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PROD_LoanDueTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Nextly_LoanDueAlerts_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FileName": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]",
+							"FilePath": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/to-nextly/blobs/PROD/LoanDueAlerts",
+					"blobPathEndsWith": ".txt",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_ThresholAlert')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Nextly_ThresholdAlert_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FileName": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]",
+							"FilePath": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/to-nextly/blobs/PROD/ThresholdAlerts",
+					"blobPathEndsWith": ".txt",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_TransactionAlert')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Nextly_TransactionAlert_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FileName": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]",
+							"FilePath": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/to-nextly/blobs/PROD/TransactionAlerts",
+					"blobPathEndsWith": ".txt",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('PROD_TransactionAlert_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/PROD_sccu_loanDueTrigger')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -3813,102 +3909,6 @@
 						"startTime": "2024-08-03T01:00:00",
 						"timeZone": "India Standard Time"
 					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ToNextlyLoanDueAlert_Prod')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Nextly_LoanDueAlerts_PROD",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FileName": "[parameters('ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]",
-							"FilePath": "[parameters('ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/PROD/LoanDueAlerts",
-					"blobPathEndsWith": ".txt",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('ToNextlyLoanDueAlert_Prod_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ToNextlyThresholdAlert_Prod')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Nextly_ThresholdAlert_PROD",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FileName": "[parameters('ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]",
-							"FilePath": "[parameters('ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/PROD/ThresholdAlerts",
-					"blobPathEndsWith": ".txt",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('ToNextlyThresholdAlert_Prod_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ToNextlyTransactionAlert_Prod')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Nextly_TransactionAlert_PROD",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FileName": "[parameters('ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]",
-							"FilePath": "[parameters('ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/PROD/TransactionAlerts",
-					"blobPathEndsWith": ".txt",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('ToNextlyTransactionAlert_Prod_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
 				}
 			},
 			"dependsOn": []

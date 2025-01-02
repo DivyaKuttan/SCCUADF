@@ -5,14 +5,7 @@
 			{
 				"name": "BusinessData_RebuildIndex_LT50K",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "BusinessData_RebuildIndex_50Kto100K",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -34,7 +27,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_RebuildIndex_GT100K",
+						"activity": "BusinessData_RebuildIndex_LT50K",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -59,9 +52,14 @@
 			{
 				"name": "BusinessData_RebuildIndex_GT100K",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "BusinessData_RebuildIndex_50Kto100K",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,

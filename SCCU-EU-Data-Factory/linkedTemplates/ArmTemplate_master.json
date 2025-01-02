@@ -147,31 +147,39 @@
 			"type": "string",
 			"defaultValue": "SCCU_Metadb_PROD"
 		},
-		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
 		"PROD_LoanDueTrigger_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
-		},
-		"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
 		},
 		"PROD_ThresholAlert_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
 		},
 		"PROD_TransactionAlert_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+		},
+		"ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"ToNextlyLoanDueAlert_Prod_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+		},
+		"ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"ToNextlyThresholdAlert_Prod_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
 		},
@@ -266,6 +274,12 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"PROD_LoanDueTrigger_properties_typeProperties_scope": {
+						"value": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]"
+					},
+					"PROD_ThresholAlert_properties_typeProperties_scope": {
+						"value": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]"
+					},
 					"PROD_TransactionAlert_properties_typeProperties_scope": {
 						"value": "[parameters('PROD_TransactionAlert_properties_typeProperties_scope')]"
 					}
@@ -286,9 +300,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"SCCU_DataFactory_FileShare_connectionString": {
-						"value": "[parameters('SCCU_DataFactory_FileShare_connectionString')]"
 					},
 					"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 						"value": "[parameters('SCCU_DataFactory_FileShare_properties_privateLinkResourceId')]"
@@ -397,9 +408,6 @@
 					},
 					"SCCU_Businessdata_PROD_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_Businessdata_PROD_properties_typeProperties_database')]"
-					},
-					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
-						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
 					}
 				}
 			},
@@ -420,6 +428,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"SCCU_DataFactory_FileShare_connectionString": {
+						"value": "[parameters('SCCU_DataFactory_FileShare_connectionString')]"
+					},
+					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
 					},
 					"SCCU_DataFactory_Storage_V2_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('SCCU_DataFactory_Storage_V2_properties_typeProperties_serviceEndpoint')]"
@@ -528,23 +542,23 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
-						"value": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]"
+					"ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
+						"value": "[parameters('ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]"
 					},
-					"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
-						"value": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
+					"ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
+						"value": "[parameters('ToNextlyLoanDueAlert_Prod_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
 					},
-					"PROD_LoanDueTrigger_properties_typeProperties_scope": {
-						"value": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]"
+					"ToNextlyLoanDueAlert_Prod_properties_typeProperties_scope": {
+						"value": "[parameters('ToNextlyLoanDueAlert_Prod_properties_typeProperties_scope')]"
 					},
-					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
-						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]"
+					"ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
+						"value": "[parameters('ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]"
 					},
-					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
-						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
+					"ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
+						"value": "[parameters('ToNextlyThresholdAlert_Prod_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
 					},
-					"PROD_ThresholAlert_properties_typeProperties_scope": {
-						"value": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]"
+					"ToNextlyThresholdAlert_Prod_properties_typeProperties_scope": {
+						"value": "[parameters('ToNextlyThresholdAlert_Prod_properties_typeProperties_scope')]"
 					},
 					"ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
 						"value": "[parameters('ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]"

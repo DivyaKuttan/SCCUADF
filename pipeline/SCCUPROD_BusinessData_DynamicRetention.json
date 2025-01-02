@@ -291,8 +291,6 @@
 			{
 				"name": "BusinessData_Rebuild_Index_Stat",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Archive_ForEach",

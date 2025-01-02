@@ -171,15 +171,19 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
 		},
-		"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
+		"PROD_TransactionAlert_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+		},
+		"ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
 			"type": "string",
 			"defaultValue": "@triggerBody().fileName"
 		},
-		"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
+		"ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
 			"type": "string",
 			"defaultValue": "@triggerBody().folderPath"
 		},
-		"PROD_TransactionAlert_properties_typeProperties_scope": {
+		"ToNextlyTransactionAlert_Prod_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
 		},
@@ -9548,19 +9552,8 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Nextly_TransactionAlert_PROD",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FileName": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]",
-							"FilePath": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
-						}
-					}
-				],
+				"runtimeState": "Stopped",
+				"pipelines": [],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
 					"blobPathBeginsWith": "/to-nextly/blobs/PROD/TransactionAlerts",
@@ -9572,9 +9565,7 @@
 					]
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Nextly_TransactionAlert_PROD')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PROD_sccu_loanDueTrigger')]",
@@ -9664,6 +9655,40 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/SCCUDoneProcessing_PROD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ToNextlyTransactionAlert_Prod')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Nextly_TransactionAlert_PROD",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"FileName": "[parameters('ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]",
+							"FilePath": "[parameters('ToNextlyTransactionAlert_Prod_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/to-nextly/blobs/PROD/TransactionAlerts",
+					"blobPathEndsWith": ".txt",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('ToNextlyTransactionAlert_Prod_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Nextly_TransactionAlert_PROD')]"
 			]
 		},
 		{

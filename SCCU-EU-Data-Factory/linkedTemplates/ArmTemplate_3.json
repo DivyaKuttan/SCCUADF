@@ -13,12 +13,320 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/PROD_CompletedLoanDueAlertsSource')]",
+			"name": "[concat(parameters('factoryName'), '/DEV_SQLDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataDev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ActivitylogId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AdditionalInfo",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "Adaptive",
+					"table": "ActivitylogAdditionalInfo"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dev_ThresholdSinkDastaSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataDev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SubscriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BalanceAmount",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ExternalAlert_ThresholdStaging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dev_ThresholdSourceDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ThresholdFilename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().ThresholdFilename",
+							"type": "Expression"
+						},
+						"folderPath": "DEV/ThresholdAlerts",
+						"container": "to-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": [
+					{
+						"name": "SubscriptionID|BalanceAmount",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dev_TransactionSinkDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataDev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SubscriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EmailContent",
+						"type": "varchar"
+					},
+					{
+						"name": "TextContent",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ExternalAlert_TransactionStaging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dev_TransactionSourceDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TransactionFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "DEV/TransactionAlerts",
+						"container": "to-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GetExternalAlerts')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_FileShare",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureFileStorageLocation",
+						"fileName": {
+							"value": "@{formatDateTime(addHours(utcnow(), -4), 'yyyy')}/@{formatDateTime(addHours(utcnow(), -4), 'MM')}/@{formatDateTime(addHours(utcnow(), -4), 'dd')}/Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "dev/GetExternalAlerts",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PRODTransactionSinkDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataPROD",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlMITable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SubscriptionID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "EmailContent",
+						"type": "varchar"
+					},
+					{
+						"name": "SMSContent",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ExternalAlert_TransactionStaging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_BBAlertsDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BBAlertsPROD",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlMITable",
+				"schema": [
+					{
+						"name": "Key",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Value",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ExpireAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Id",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "schedule",
+					"table": "Counter"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_CompletedLoanDueAlertsSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage_V2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "PROD/CompletedLoanDueAlerts",
+						"container": "to-nextly"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_CompletedLoanDueAlertsSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -39,7 +347,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -60,7 +368,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -81,7 +389,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -102,7 +410,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -123,7 +431,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -153,7 +461,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -183,7 +491,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -213,7 +521,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -243,7 +551,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
+					"referenceName": "SCCU_DataFactory_Storage_V2",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -297,528 +605,6 @@
 				"typeProperties": {
 					"schema": "Adaptive",
 					"table": "ActivitylogAdditionalInfo"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_ThresholSinkDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataPROD",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "ID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "SubscriptionID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "BalanceAmount",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ExternalAlert_ThresholdStaging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_ThresholdSourceDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"ThresholdFilename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": {
-							"value": "@dataset().ThresholdFilename",
-							"type": "Expression"
-						},
-						"folderPath": "PROD/ThresholdAlerts",
-						"container": "to-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": [
-					{
-						"name": "SubscriptionID|BalanceAmount",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_TransactionSourceDataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TransactionFileName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/TransactionAlerts",
-						"container": "to-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Prod_LoanDueAlertsSinkDataSet')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataPROD",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "ID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "SubscriptionID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "DueDate",
-						"type": "date"
-					},
-					{
-						"name": "AmountDue",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "External_LoanDueAlertStaging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Prod_LoanDueAlertsSourceDataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_DataFactory_Storage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"TransactionFileName": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"folderPath": "PROD/LoanDueAlerts",
-						"container": "to-nextly"
-					},
-					"columnDelimiter": "|",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": ""
-				},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Admin_LogDB_Source')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_AdminLogdb_PROD",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SourceDB": {
-						"type": "string"
-					},
-					"SourceTable": {
-						"type": "string"
-					},
-					"SourceSchema": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "DataRetentionDatasets/Dynamic"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "ErrorID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TenantID",
-						"type": "varchar"
-					},
-					{
-						"name": "FormID",
-						"type": "varchar"
-					},
-					{
-						"name": "SystemIP",
-						"type": "varchar"
-					},
-					{
-						"name": "SiteURL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Message",
-						"type": "nvarchar"
-					},
-					{
-						"name": "InnerException",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Comments",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SourceSchema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().SourceTable",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Admin_MetaDB_Source')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_AdminMetadb_PROD",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SourceDB": {
-						"type": "string"
-					},
-					"SourceTable": {
-						"type": "string"
-					},
-					"SourceSchema": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "DataRetentionDatasets/Dynamic"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "ErrorID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TenantID",
-						"type": "varchar"
-					},
-					{
-						"name": "FormID",
-						"type": "varchar"
-					},
-					{
-						"name": "SystemIP",
-						"type": "varchar"
-					},
-					{
-						"name": "SiteURL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Message",
-						"type": "nvarchar"
-					},
-					{
-						"name": "InnerException",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Comments",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SourceSchema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().SourceTable",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Anonymous_LogDB_Source')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_AnonymousLogdb_PROD",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SourceDB": {
-						"type": "string"
-					},
-					"SourceTable": {
-						"type": "string"
-					},
-					"SourceSchema": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "DataRetentionDatasets/Dynamic"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "ErrorID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TenantID",
-						"type": "varchar"
-					},
-					{
-						"name": "FormID",
-						"type": "varchar"
-					},
-					{
-						"name": "SystemIP",
-						"type": "varchar"
-					},
-					{
-						"name": "SiteURL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Message",
-						"type": "nvarchar"
-					},
-					{
-						"name": "InnerException",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Comments",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SourceSchema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().SourceTable",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Anonymous_MetaDB_Source')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_AnonymousMetadb_PROD",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"SourceDB": {
-						"type": "string"
-					},
-					"SourceTable": {
-						"type": "string"
-					},
-					"SourceSchema": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "DataRetentionDatasets/Dynamic"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "ErrorID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TenantID",
-						"type": "varchar"
-					},
-					{
-						"name": "FormID",
-						"type": "varchar"
-					},
-					{
-						"name": "SystemIP",
-						"type": "varchar"
-					},
-					{
-						"name": "SiteURL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Message",
-						"type": "nvarchar"
-					},
-					{
-						"name": "InnerException",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Comments",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SourceSchema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().SourceTable",
-						"type": "Expression"
-					}
 				}
 			},
 			"dependsOn": []

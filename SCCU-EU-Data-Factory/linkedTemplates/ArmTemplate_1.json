@@ -25,6 +25,20 @@
 				"sccudatafactorystorage.blob.core.windows.net"
 			]
 		},
+		"sccudatafactorystorage01_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
+		},
+		"sccudatafactorystorage01_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		},
+		"sccudatafactorystorage01_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"sccudatafactorystorage01.blob.core.windows.net"
+			]
+		},
 		"sccudrsql01_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-CU-DR-SRV-RG/providers/Microsoft.Sql/managedInstances/sccudrsql01"
@@ -141,29 +155,9 @@
 			"type": "string",
 			"defaultValue": "https://sccudatafactorystorage.blob.core.windows.net/"
 		},
-		"SCCU_Logdb_PROD_properties_typeProperties_server": {
+		"SCCU_DataFactory_Storage_V2_properties_typeProperties_serviceEndpoint": {
 			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_Logdb_PROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Logdb_PROD"
-		},
-		"SCCU_Logdb_PROD_DTU_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuprodsql02.database.windows.net"
-		},
-		"SCCU_Logdb_PROD_DTU_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Logdb_PROD"
-		},
-		"SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_LogsMonitorMetadb_PROD"
+			"defaultValue": "https://sccudatafactorystorage01.blob.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -178,6 +172,17 @@
 				"privateLinkResourceId": "[parameters('sccudatafactorystorage_properties_privateLinkResourceId')]",
 				"groupId": "[parameters('sccudatafactorystorage_properties_groupId')]",
 				"fqdns": "[parameters('sccudatafactorystorage_properties_fqdns')]"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/sccudatafactorystorage01')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('sccudatafactorystorage01_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('sccudatafactorystorage01_properties_groupId')]",
+				"fqdns": "[parameters('sccudatafactorystorage01_properties_fqdns')]"
 			},
 			"dependsOn": []
 		},
@@ -198,6 +203,84 @@
 			"properties": {
 				"privateLinkResourceId": "[parameters('sccuprodsql01_properties_privateLinkResourceId')]",
 				"groupId": "[parameters('sccuprodsql01_properties_groupId')]"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EmailAlerts')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "Send Email for pipeline",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@pipeline().globalParameters.global_sendmail_api_url",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"DataFactoryName": "@{pipeline().parameters.DataFactoryName}",
+								"PipelineName": "@{pipeline().parameters.PipelineName}",
+								"Activity": "@{pipeline().parameters.Activity}",
+								"PipelineStatus": "@{pipeline().parameters.Status}",
+								"EmailTo": "@{pipeline().parameters.EmailTo}",
+								"Subject": "@{pipeline().parameters.Subject}",
+								"Importance": "@{pipeline().parameters.Importance}",
+								"Message": "@{pipeline().parameters.Message}"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Activity": {
+						"type": "string"
+					},
+					"EmailTo": {
+						"type": "string"
+					},
+					"Subject": {
+						"type": "string"
+					},
+					"Message": {
+						"type": "string"
+					},
+					"Status": {
+						"type": "string"
+					},
+					"Importance": {
+						"type": "string"
+					},
+					"DataFactoryName": {
+						"type": "string"
+					},
+					"Pipelinename": {
+						"type": "string"
+					}
+				},
+				"annotations": []
 			},
 			"dependsOn": []
 		},
@@ -547,70 +630,17 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_Logdb_PROD')]",
+			"name": "[concat(parameters('factoryName'), '/SCCU_DataFactory_Storage_V2')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "AzureSqlMI",
+				"type": "AzureBlobStorage",
 				"typeProperties": {
-					"server": "[parameters('SCCU_Logdb_PROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_Logdb_PROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
+					"serviceEndpoint": "[parameters('SCCU_DataFactory_Storage_V2_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "StorageV2",
 					"credential": {
-						"referenceName": "Credential_Prod_SQL_MI",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_Logdb_PROD_DTU')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_Logdb_PROD_DTU_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_Logdb_PROD_DTU_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_Prod_DTU",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_LogsMonitorMetadb_PROD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_LogsMonitorMetadb_PROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_LogsMonitorMetadb_PROD",
+						"referenceName": "Credentials_sccudatafactorystorage",
 						"type": "CredentialReference"
 					}
 				},

@@ -6,36 +6,496 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
-		},
-		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"PROD_LoanDueTrigger_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
-		},
-		"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
-			"type": "string",
-			"defaultValue": "@triggerBody().fileName"
-		},
-		"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
-			"type": "string",
-			"defaultValue": "@triggerBody().folderPath"
-		},
-		"PROD_ThresholAlert_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_DoneProcessingDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/DoneProcessing",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetExternalAlertRecipientsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/Alertsubscriber",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetThresholdAlertSubscriptionsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "ThresholdAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/ThresholdAlertSubscription",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetTransactionAlertSubscriptionsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "TransactionAlert@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/TransactionAlertSubscription",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_SQLDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataUAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "varchar"
+					},
+					{
+						"name": "StartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "EndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "ContentType",
+						"type": "varchar"
+					},
+					{
+						"name": "ContentLocation",
+						"type": "varchar"
+					},
+					{
+						"name": "Content",
+						"type": "varchar"
+					},
+					{
+						"name": "Start/Stop",
+						"type": "bit"
+					},
+					{
+						"name": "CampaignViewFor",
+						"type": "varchar"
+					},
+					{
+						"name": "OtherOption",
+						"type": "bit"
+					},
+					{
+						"name": "RedirectPage",
+						"type": "varchar"
+					},
+					{
+						"name": "RedirectURL",
+						"type": "varchar"
+					},
+					{
+						"name": "LaterOption",
+						"type": "varchar"
+					},
+					{
+						"name": "IntegrationWith",
+						"type": "varchar"
+					},
+					{
+						"name": "SocialMediaTitle",
+						"type": "varchar"
+					},
+					{
+						"name": "SocialMediaContent",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "IsDelete",
+						"type": "bit"
+					},
+					{
+						"name": "Priority",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Keywords",
+						"type": "varchar"
+					},
+					{
+						"name": "ExcelGUID",
+						"type": "varchar"
+					},
+					{
+						"name": "Location",
+						"type": "varchar"
+					},
+					{
+						"name": "CampaignType",
+						"type": "varchar"
+					},
+					{
+						"name": "NoTrueExit",
+						"type": "bit"
+					},
+					{
+						"name": "CampaignTypeExit",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "AdminCampaign"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_ThresholdSinkDastaSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataUAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SubscriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BalanceAmount",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "",
+					"table": "ExternalAlert_ThresholdStaging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_ThresholdSourceDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"ThresholdFilename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().ThresholdFilename",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/ThresholdAlerts",
+						"container": "to-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": [
+					{
+						"name": "SubscriptionID|BalanceAmount",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_TransactionSinkDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataUAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SubscriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EmailContent",
+						"type": "varchar"
+					},
+					{
+						"name": "TextContent",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ExternalAlert_TransactionStaging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_TransactionSourceDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"TransactionFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "UAT/TransactionAlerts",
+						"container": "to-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ActivityLogsCount')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ActivityLogs count",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlMISource",
+								"sqlReaderQuery": "Select count(1) from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-47 as date)",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_BusinessData_Source",
+								"type": "DatasetReference",
+								"parameters": {
+									"SourceDB": "SCCU_Businessdata_PROD",
+									"SourceTable": "activityLogs",
+									"SourceSchema": "dbo"
+								}
+							}
+						}
+					},
+					{
+						"name": "Pending Index count",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlMISource",
+								"sqlReaderQuery": "SELECT count(1)\nFROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, NULL) AS DDIPS\nINNER JOIN sys.tables T on T.object_id = DDIPS.object_id\nINNER JOIN sys.schemas S on T.schema_id = S.schema_id\nINNER JOIN sys.indexes I ON I.object_id = DDIPS.object_id\nAND DDIPS.index_id = I.index_id\nWHERE DDIPS.database_id = DB_ID()\nand I.name is not null\nand T.name NOT LIKE '%staging%' and T.name NOT LIKE '%archi%' and T.name NOT LIKE '%exceptio%' \nand t.name not in( 'CheckfreeApiSerilog','NextlyThirdPartyLog','ACISeriLogs2','VerafinSeriLogs', 'PayrailzApiSerilog','SccuBeta_ErrorLog')\n--and t.name = 'LoginHistory'\nAND DDIPS.avg_fragmentation_in_percent > 30\nAND DDIPS.page_count>50000",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_BusinessData_Source",
+								"type": "DatasetReference",
+								"parameters": {
+									"SourceDB": "SCCU_Businessdata_PROD",
+									"SourceTable": "activityLogs",
+									"SourceSchema": "dbo"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Nextly_LoanDueAlerts_PROD')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
@@ -580,7 +1040,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/UAT_ThresholdSourceDataSet')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Nextly_TransactionAlert_PROD')]",
@@ -1816,16 +2278,9 @@
 							"batchCount": 1,
 							"activities": [
 								{
-									"name": "LogDb_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "Admin_LogDb_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
+									"name": "CheckRowCount",
+									"type": "Lookup",
+									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -1834,81 +2289,147 @@
 										"secureInput": false
 									},
 									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_AdminLogdb_PROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "Admin_LogDb_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "AzureSqlSource",
+											"type": "SqlMISource",
 											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+												"value": "SELECT count(1) as 'RecordCount' FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
 												"type": "Expression"
 											},
-											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
+										"dataset": {
 											"referenceName": "SCCUPROD_Admin_LogDB_Source",
 											"type": "DatasetReference",
 											"parameters": {
 												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
+												"SourceTable": {
+													"value": "@item().SourceTableName",
+													"type": "Expression"
+												},
+												"SourceSchema": {
+													"value": "@item().SourceSchemaName",
+													"type": "Expression"
+												}
 											}
+										}
+									}
+								},
+								{
+									"name": "If Reecords exists",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "CheckRowCount",
+											"dependencyConditions": [
+												"Succeeded"
+											]
 										}
 									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "LogDb_Script",
+												"type": "Script",
+												"dependsOn": [
+													{
+														"activity": "Admin_LogDb_Copy data",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"linkedServiceName": {
+													"referenceName": "SCCU_AdminLogdb_PROD",
+													"type": "LinkedServiceReference"
+												},
+												"typeProperties": {
+													"scripts": [
+														{
+															"type": "Query",
+															"text": {
+																"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
+																"type": "Expression"
+															}
+														}
+													],
+													"scriptBlockExecutionTimeout": "02:00:00"
+												}
+											},
+											{
+												"name": "Admin_LogDb_Copy data",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 3,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"writeBehavior": "insert",
+														"sqlWriterUseTableLock": false
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "SCCUPROD_Admin_LogDB_Source",
+														"type": "DatasetReference",
+														"parameters": {
+															"SourceDB": "@item().SourceDBName",
+															"SourceTable": "@item().SourceTableName",
+															"SourceSchema": "@item().SourceSchemaName"
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Archive_Destination",
+														"type": "DatasetReference",
+														"parameters": {
+															"DestinationTable": "@item().DestinationTableName",
+															"DestinationSchema": "@item().DestinationSchemaName"
+														}
+													}
+												]
 											}
-										}
-									]
+										]
+									}
 								}
 							]
 						}
@@ -2000,6 +2521,60 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "RebuildIndex",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Admin_LogDB_Archive_ForEach",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_RebuildIndex]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_AdminLogdb_PROD",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Update Statistics",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RebuildIndex",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_UpdateStatistics]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_AdminLogdb_PROD",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -2068,48 +2643,12 @@
 							"batchCount": 1,
 							"activities": [
 								{
-									"name": "MetaDB_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "MetaDB_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_AdminMetadb_PROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "MetaDB_Copy data",
-									"type": "Copy",
+									"name": "CheckRowCount",
+									"type": "Lookup",
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
-										"retry": 3,
+										"retry": 0,
 										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
@@ -2119,28 +2658,12 @@
 										"source": {
 											"type": "SqlMISource",
 											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+												"value": "SELECT count(1) as 'RecordCount' FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
 												"type": "Expression"
 											},
 											"partitionOption": "None"
 										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
+										"dataset": {
 											"referenceName": "SCCUPROD_Admin_MetaDB_Source",
 											"type": "DatasetReference",
 											"parameters": {
@@ -2149,17 +2672,122 @@
 												"SourceSchema": "@item().SourceSchemaName"
 											}
 										}
-									],
-									"outputs": [
+									}
+								},
+								{
+									"name": "If record exists",
+									"type": "IfCondition",
+									"dependsOn": [
 										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
+											"activity": "CheckRowCount",
+											"dependencyConditions": [
+												"Succeeded"
+											]
 										}
-									]
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "MetaDB_Script",
+												"type": "Script",
+												"dependsOn": [
+													{
+														"activity": "MetaDB_Copy data",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"linkedServiceName": {
+													"referenceName": "SCCU_AdminMetadb_PROD",
+													"type": "LinkedServiceReference"
+												},
+												"typeProperties": {
+													"scripts": [
+														{
+															"type": "Query",
+															"text": {
+																"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
+																"type": "Expression"
+															}
+														}
+													],
+													"scriptBlockExecutionTimeout": "02:00:00"
+												}
+											},
+											{
+												"name": "MetaDB_Copy data",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 3,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "SqlMISource",
+														"sqlReaderQuery": {
+															"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+															"type": "Expression"
+														},
+														"partitionOption": "None"
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"writeBehavior": "insert",
+														"sqlWriterUseTableLock": false
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "SCCUPROD_Admin_MetaDB_Source",
+														"type": "DatasetReference",
+														"parameters": {
+															"SourceDB": "@item().SourceDBName",
+															"SourceTable": "@item().SourceTableName",
+															"SourceSchema": "@item().SourceSchemaName"
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Archive_Destination",
+														"type": "DatasetReference",
+														"parameters": {
+															"DestinationTable": "@item().DestinationTableName",
+															"DestinationSchema": "@item().DestinationSchemaName"
+														}
+													}
+												]
+											}
+										]
+									}
 								}
 							]
 						}
@@ -2251,6 +2879,60 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "RebuildIndex",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Admin_MetaDB_Archive_ForEach",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_RebuildIndex]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_AdminMetadb_PROD",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Update Statistics",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RebuildIndex",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_UpdateStatistics]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_AdminMetadb_PROD",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -2319,16 +3001,9 @@
 							"batchCount": 1,
 							"activities": [
 								{
-									"name": "Anonymous_LogDb_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "Anonymous_LogDb_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
+									"name": "CheckRowCount",
+									"type": "Lookup",
+									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -2337,62 +3012,16 @@
 										"secureInput": false
 									},
 									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_AnonymousLogdb_PROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "Anonymous_LogDb_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "AzureSqlSource",
+											"type": "SqlMISource",
 											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+												"value": "SELECT count(1) as 'RecordCount' FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
 												"type": "Expression"
 											},
-											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
+										"dataset": {
 											"referenceName": "SCCUPROD_Anonymous_LogDB_Source",
 											"type": "DatasetReference",
 											"parameters": {
@@ -2401,17 +3030,123 @@
 												"SourceSchema": "@item().SourceSchemaName"
 											}
 										}
-									],
-									"outputs": [
+									}
+								},
+								{
+									"name": "If record exists",
+									"type": "IfCondition",
+									"dependsOn": [
 										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
+											"activity": "CheckRowCount",
+											"dependencyConditions": [
+												"Succeeded"
+											]
 										}
-									]
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Anonymous_LogDb_Script",
+												"type": "Script",
+												"dependsOn": [
+													{
+														"activity": "Anonymous_LogDb_Copy data",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"linkedServiceName": {
+													"referenceName": "SCCU_AnonymousLogdb_PROD",
+													"type": "LinkedServiceReference"
+												},
+												"typeProperties": {
+													"scripts": [
+														{
+															"type": "Query",
+															"text": {
+																"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
+																"type": "Expression"
+															}
+														}
+													],
+													"scriptBlockExecutionTimeout": "02:00:00"
+												}
+											},
+											{
+												"name": "Anonymous_LogDb_Copy data",
+												"type": "Copy",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 3,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"source": {
+														"type": "AzureSqlSource",
+														"sqlReaderQuery": {
+															"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+															"type": "Expression"
+														},
+														"queryTimeout": "02:00:00",
+														"partitionOption": "None"
+													},
+													"sink": {
+														"type": "AzureSqlSink",
+														"writeBehavior": "insert",
+														"sqlWriterUseTableLock": false
+													},
+													"enableStaging": false,
+													"translator": {
+														"type": "TabularTranslator",
+														"typeConversion": true,
+														"typeConversionSettings": {
+															"allowDataTruncation": true,
+															"treatBooleanAsNumber": false
+														}
+													}
+												},
+												"inputs": [
+													{
+														"referenceName": "SCCUPROD_Anonymous_LogDB_Source",
+														"type": "DatasetReference",
+														"parameters": {
+															"SourceDB": "@item().SourceDBName",
+															"SourceTable": "@item().SourceTableName",
+															"SourceSchema": "@item().SourceSchemaName"
+														}
+													}
+												],
+												"outputs": [
+													{
+														"referenceName": "Archive_Destination",
+														"type": "DatasetReference",
+														"parameters": {
+															"DestinationTable": "@item().DestinationTableName",
+															"DestinationSchema": "@item().DestinationSchemaName"
+														}
+													}
+												]
+											}
+										]
+									}
 								}
 							]
 						}
@@ -2503,177 +3238,13 @@
 								}
 							]
 						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Anonymous_MetaDB_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Anonymous_MetaDB_Archive_LookUp",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='AnonymousMetaDb' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
 					},
 					{
-						"name": "Anonymous_MetaDB_Archive_ForEach",
-						"type": "ForEach",
+						"name": "RebuildIndex",
+						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "Anonymous_MetaDB_Archive_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Anonymous_MetaDB_Archive_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "Anonymous_MetaDB_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "Anonymous_MetaDB_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_AnonymousMetadb_PROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "Anonymous_MetaDB_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SCCUPROD_Anonymous_MetaDB_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "METADB_Purge_LookUp",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Anonymous_MetaDB_Archive_ForEach",
+								"activity": "Anonymous_LogDB_Archive_ForEach",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -2688,244 +3259,19 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='AnonymousMetaDb' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Anonymous_MetaDB_Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "METADB_Purge_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('METADB_Purge_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "MetaDb_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_BBAlerts_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "BBAlerts_Archive",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
+							"storedProcedureName": "[[dbo].[sp_RebuildIndex]"
 						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BBAlerts'  AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
+						"linkedServiceName": {
+							"referenceName": "SCCU_AnonymousLogdb_PROD",
+							"type": "LinkedServiceReference"
 						}
 					},
 					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
+						"name": "Update Statistics",
+						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "BBAlerts_Archive",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('BBAlerts_Archive').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "BBAlerts_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "BBAlerts_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Logdb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "BBAlerts_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SCCUPROD_BBAlerts_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "BBAlerts_Purge",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
+								"activity": "RebuildIndex",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -2940,72 +3286,11 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BBAlerts' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "BBAlerts_Purge",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('BBAlerts_Purge').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "BBAlerts_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
+							"storedProcedureName": "[[dbo].[sp_UpdateStatistics]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_AnonymousLogdb_PROD",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -3018,1565 +3303,6 @@
 				"annotations": []
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_BusinessData_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "BusinessData_Archive",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "BusinessData_Archive",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('BusinessData_Archive').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "BusinessData_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "BusinessData_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_BusinessDataPROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "BusinessData_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SCCUPROD_BusinessData_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "BusinessData_Purge",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "BusinessData_Purge",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('BusinessData_Purge').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "BusinessData_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_LogDBMI_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "LogDBMI_Archive_LookUp",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='LogDBMI' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LogDBMI_Archive_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LogDBMI_Archive_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "LogDBMI_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "LogDbMI_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Logdb_PROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "LogDbMI_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlMISource",
-											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SCCUPROD_LogDBMI_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "LogDBMI_Purge_LookUp",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='LogDBMI' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LogDBMI_Purge_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LogDBMI_Purge_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "LogDBMI_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_LogDB_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "LogDB_Archive_LookUp",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='LogDb' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LogDB_Archive_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LogDB_Archive_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "LogDb_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "LogDb_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Logdb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "LogDb_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SCCUPROD_LogDB_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "LogDB_Purge_LookUp",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='LogDb' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LogDB_Purge_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LogDB_Purge_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "LogDb_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_MetaDB_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "MetaDB_Archive_LookUp",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='MetaDb' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "MetaDB_Archive_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('MetaDB_Archive_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "MetaDB_Script",
-									"type": "Script",
-									"dependsOn": [
-										{
-											"activity": "MetaDB_Copy data",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Metadb_PROD",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								},
-								{
-									"name": "MetaDB_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SCCUPROD_MetaDB_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Archive_Destination",
-											"type": "DatasetReference",
-											"parameters": {
-												"DestinationTable": "@item().DestinationTableName",
-												"DestinationSchema": "@item().DestinationSchemaName"
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "METADB_Purge_LookUp",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='MetaDb' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "METADB_Purge_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('METADB_Purge_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "MetaDb_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_LoanDueAlerts_PROD')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Count_LoanDueAlerts",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlMISource",
-								"sqlReaderStoredProcedureName": "[[dbo].[sps_LoanDueAlertSubscriptionToFile]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "PROD_SQLDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Set_RowCount_LoanDueAlerts",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Count_LoanDueAlerts",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "RowCount_LoanDueAlerts",
-							"value": {
-								"value": "@length(activity('Count_LoanDueAlerts').output.value)",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Check_RowCount_LoanDueAlerts",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Set_RowCount_LoanDueAlerts",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@greater(variables('RowCount_LoanDueAlerts'), 0)\n",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "LoanDueAlerts_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlMISource",
-											"sqlReaderQuery": "EXEC sps_LoanDueAlertSubscriptionToFile",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"name": "SubscriptionID",
-														"type": "Int32",
-														"physicalType": "int"
-													},
-													"sink": {
-														"name": "SubscriptionID",
-														"type": "String",
-														"physicalType": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "AccountID",
-														"type": "String",
-														"physicalType": "varchar"
-													},
-													"sink": {
-														"name": "AccountID",
-														"type": "String",
-														"physicalType": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "NumOfDaysBeforeDue",
-														"type": "Int32",
-														"physicalType": "int"
-													},
-													"sink": {
-														"name": "NumOfDaysBeforeDue",
-														"type": "String",
-														"physicalType": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "NumOfDaysAfterPastDue",
-														"type": "Int32",
-														"physicalType": "int"
-													},
-													"sink": {
-														"name": "NumOfDaysAfterPastDue",
-														"type": "String",
-														"physicalType": "String"
-													}
-												}
-											],
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "PROD_SQLDataSet",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "PROD_LoanDue_DataSet",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"RowCount_LoanDueAlerts": {
-						"type": "Integer"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_DynamicRetention_Main')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "This pipeline has activities which archive/purge data from souce DB's to Archive DB ",
-				"activities": [
-					{
-						"name": "Distinct DB",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT DestinationSchemaName FROM MasterConfig WHERE IsArchiveEnabled=1 OR IsPurgeEnabled=1 ",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Schemas",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Distinct DB",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Distinct DB').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "DbNameSwitch",
-									"type": "Switch",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"on": {
-											"value": "@item().DestinationSchemaName",
-											"type": "Expression"
-										},
-										"cases": [
-											{
-												"value": "MetaDb",
-												"activities": [
-													{
-														"name": "Meta DB",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_MetaDB_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "LogDb",
-												"activities": [
-													{
-														"name": "Log DB",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_LogDB_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "BusinessData",
-												"activities": [
-													{
-														"name": "BusinessData",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_BusinessData_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "BBAlerts",
-												"activities": [
-													{
-														"name": "BBAlerts",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_BBAlerts_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "AdminLogDb",
-												"activities": [
-													{
-														"name": "AdminLogDb",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_Admin_LogDB_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "AdminMetaDb",
-												"activities": [
-													{
-														"name": "AdminMetaDb",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_Admin_MetaDB_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "AnonymousLogDb",
-												"activities": [
-													{
-														"name": "AnonymousLogDb",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_Anonymous_LogDB_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "AnonymousMetaDb",
-												"activities": [
-													{
-														"name": "AnonymousMetaDb",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_Anonymous_MetaDB_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											},
-											{
-												"value": "LogDBMI",
-												"activities": [
-													{
-														"name": "SCCUPROD_LogDBMI_DynamicRetention",
-														"type": "ExecutePipeline",
-														"dependsOn": [],
-														"policy": {
-															"secureInput": false
-														},
-														"userProperties": [],
-														"typeProperties": {
-															"pipeline": {
-																"referenceName": "SCCUPROD_LogDBMI_DynamicRetention",
-																"type": "PipelineReference"
-															},
-															"waitOnCompletion": false,
-															"parameters": {}
-														}
-													}
-												]
-											}
-										]
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_MetaDB_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_LogDB_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_BusinessData_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_BBAlerts_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_Admin_LogDB_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_Admin_MetaDB_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_Anonymous_LogDB_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_Anonymous_MetaDB_DynamicRetention')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_LogDBMI_DynamicRetention')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_LoanDueTrigger')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Nextly_LoanDueAlerts_PROD",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FileName": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]",
-							"FilePath": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/PROD/LoanDueAlerts",
-					"blobPathEndsWith": ".txt",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Nextly_LoanDueAlerts_PROD')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PROD_ThresholAlert')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "Nextly_ThresholdAlert_PROD",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"FileName": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]",
-							"FilePath": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/to-nextly/blobs/PROD/ThresholdAlerts",
-					"blobPathEndsWith": ".txt",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Nextly_ThresholdAlert_PROD')]"
-			]
 		}
 	]
 }

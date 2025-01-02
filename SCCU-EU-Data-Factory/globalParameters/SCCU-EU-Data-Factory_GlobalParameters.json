@@ -1,1 +1,6 @@
-{}
+{
+	"global_sendmail_api_url": {
+		"type": "string",
+		"value": "test URL"
+	}
+}

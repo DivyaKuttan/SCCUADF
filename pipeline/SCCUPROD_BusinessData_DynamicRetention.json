@@ -310,6 +310,29 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "BusinessData_Rebuild_Stat",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "BusinessData_Rebuild_Index_Stat",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BusinessData_Rebuild_Stat",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"folder": {

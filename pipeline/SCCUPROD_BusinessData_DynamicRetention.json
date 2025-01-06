@@ -333,6 +333,29 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "BusinessData_Rebuild_ActivityLogs_IndexAndStat",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "BusinessData_Rebuild_Stat",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BusinessData_Rebuild_ActivityLogs_IndexAndStat",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"folder": {

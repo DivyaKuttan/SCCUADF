@@ -15,7 +15,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_RebuildIndex_UPDStat_ActivityLogs]"
+					"storedProcedureName": "[dbo].[sp_RebuildIndex_UpdStat_ActivityLogs]"
 				},
 				"linkedServiceName": {
 					"referenceName": "SCCU_BusinessDataPROD",

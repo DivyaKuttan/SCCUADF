@@ -1,9 +1,9 @@
 {
-	"name": "PurgeOldData_Tablebased",
+	"name": "PurgeOldData_ActivityMonitorLog",
 	"properties": {
 		"activities": [
 			{
-				"name": "PurgeRecords",
+				"name": "PurgeActivityMonitorLog",
 				"type": "Script",
 				"dependsOn": [],
 				"policy": {

@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "sp_RebuildIndex_UPDStat_ActivityLogs",
+				"name": "Rebuild Index Stat on ActivityLogs",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {

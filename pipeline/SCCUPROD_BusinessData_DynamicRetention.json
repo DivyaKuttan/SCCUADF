@@ -339,7 +339,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_Rebuild_Stat",
+						"activity": "Archive_ForEach",
 						"dependencyConditions": [
 							"Completed"
 						]

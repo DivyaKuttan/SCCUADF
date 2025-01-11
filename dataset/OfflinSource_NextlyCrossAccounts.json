@@ -18,7 +18,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/CrossAccounts",
+				"folderPath": "PROD/CrossAccounts",
 				"container": "offline-services"
 			},
 			"columnDelimiter": ",",

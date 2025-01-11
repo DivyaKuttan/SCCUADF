@@ -18,7 +18,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/NextlyAccountRoles",
+				"folderPath": "PROD/NextlyAccountRoles",
 				"container": "offline-services"
 			},
 			"columnDelimiter": ",",

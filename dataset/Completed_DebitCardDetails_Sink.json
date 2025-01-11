@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/COMPLETED/Completed_DebitCardDetails",
+				"folderPath": "PROD/COMPLETED/Completed_DebitCardDetails",
 				"container": "offline-services"
 			}
 		}

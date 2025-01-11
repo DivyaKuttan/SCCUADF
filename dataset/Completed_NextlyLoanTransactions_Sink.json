@@ -13,7 +13,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/COMPLETED/Completed_NextlyLoanTransactions",
+				"folderPath": "PROD/COMPLETED/Completed_NextlyLoanTransactions",
 				"container": "offline-services"
 			}
 		}

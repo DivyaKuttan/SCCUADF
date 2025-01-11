@@ -6,14 +6,14 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "OfflineServices_DataSets/Completed"
+			"name": "OfflineServices_DataSets/Completed/Destination"
 		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"folderPath": "DEV/COMPLETED/Completed_UserCreditCards",
+				"folderPath": "PROD/COMPLETED/Completed_UserCreditCards",
 				"container": "offline-services"
 			}
 		}

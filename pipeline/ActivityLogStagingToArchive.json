@@ -1,5 +1,5 @@
 {
-	"name": "ActivityLog_ImportFromStageToArchive",
+	"name": "ActivityLogStagingToArchive",
 	"properties": {
 		"activities": [
 			{
@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlMISource",
-						"sqlReaderQuery": "Select * from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) = Cast(getdate()-14 as date)",
+						"sqlReaderQuery": "Select * from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) = Cast(getdate()-34 as date) ",
 						"partitionOption": "None"
 					},
 					"sink": {

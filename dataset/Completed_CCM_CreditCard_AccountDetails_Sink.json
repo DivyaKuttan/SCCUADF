@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "OfflineServices_DataSets/Completed"
+			"name": "OfflineServices_DataSets/Completed/Destination"
 		},
 		"annotations": [],
 		"type": "Binary",

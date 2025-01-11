@@ -1,0 +1,16 @@
+{
+	"name": "OfflineDestination_UserCreditCards",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "UserCreditCards_Staging"
+		}
+	}
+}

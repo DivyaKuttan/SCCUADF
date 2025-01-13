@@ -197,7 +197,7 @@
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
 							"recursive": true,
-							"wildcardFolderPath": "PROD/CCM_CreditCard_AccountDetails",
+							"wildcardFolderPath": "PROD/NextlyAccountlockout",
 							"wildcardFileName": {
 								"value": "@pipeline().parameters.FileName",
 								"type": "Expression"
@@ -233,11 +233,11 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "NextlyAccountLockout 2025_01_08_120943.csv"
+				"defaultValue": "NextlyAccountLockout 2025_01_10_020037.csv"
 			},
 			"FilePath": {
 				"type": "string",
-				"defaultValue": "offline-services/DEV/NextlyAccountlockout"
+				"defaultValue": "offline-services/PROD/NextlyAccountlockout"
 			}
 		},
 		"folder": {

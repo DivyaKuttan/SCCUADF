@@ -351,7 +351,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "BusinessData_Rebuild_ActivityLogs_IndexAndStat",
+						"referenceName": "BusinessData_Rebuild_ActivityLogs_Index",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

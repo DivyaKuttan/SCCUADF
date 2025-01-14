@@ -1,9 +1,9 @@
 {
-	"name": "BusinessData_Rebuild_ActivityLogs_Index",
+	"name": "BusinessData_Rebuild_ActivityLogs_Stat",
 	"properties": {
 		"activities": [
 			{
-				"name": "Rebuild Index on ActivityLogs",
+				"name": "Rebuild Stat on ActivityLogs",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {
@@ -15,7 +15,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_RebuildIndex_ActivityLogs]"
+					"storedProcedureName": "[dbo].[sp_Rebuild_Statistics_ActivityLogs]"
 				},
 				"linkedServiceName": {
 					"referenceName": "SCCU_BusinessDataPROD",

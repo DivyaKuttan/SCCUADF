@@ -289,7 +289,7 @@
 				}
 			},
 			{
-				"name": "BusinessData_Rebuild_Index_Stat",
+				"name": "BusinessData_Rebuild_Index",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -316,7 +316,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "BusinessData_Rebuild_Index_Stat",
+						"activity": "BusinessData_Rebuild_Index",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -335,7 +335,7 @@
 				}
 			},
 			{
-				"name": "BusinessData_Rebuild_ActivityLogs_IndexAndStat",
+				"name": "BusinessData_Rebuild_ActivityLogs_Index",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -352,6 +352,29 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "BusinessData_Rebuild_ActivityLogs_Index",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "BusinessData_Rebuild_ActivityLogs_Stat",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "BusinessData_Rebuild_ActivityLogs_Index",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BusinessData_Rebuild_ActivityLogs_Stat",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

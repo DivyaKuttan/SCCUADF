@@ -8,7 +8,7 @@
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "CheckRowCount",
+						"activity": "IsRetentionEnabled",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -17,7 +17,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
+						"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [
@@ -73,7 +73,7 @@
 				}
 			},
 			{
-				"name": "CheckRowCount",
+				"name": "IsRetentionEnabled",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {

@@ -1,5 +1,5 @@
 {
-	"name": "DailyRetention_Main",
+	"name": "00_DailyRetention_Main",
 	"properties": {
 		"description": "PROD_DailyRetention_Main",
 		"activities": [

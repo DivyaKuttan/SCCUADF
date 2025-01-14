@@ -1,0 +1,78 @@
+{
+	"name": "Offline_Main",
+	"properties": {
+		"activities": [
+			{
+				"name": "Memberdata",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "MemberDataDetails",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"FileName": "@triggerBody().fileName",
+						"FilePath": "@triggerBody().folderPath"
+					}
+				}
+			},
+			{
+				"name": "Accounts",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Memberdata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "NextlyAccountDetails",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute Pipeline3",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute Pipeline4",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "OfflineServices"
+		},
+		"annotations": []
+	}
+}

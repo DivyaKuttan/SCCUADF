@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='BusinessData' AND SourceTableName='ActivityLogs' AND ArchiveDays > 0",
+							"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='ActivityLog'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -53,6 +53,8 @@
 						{
 							"name": "BusinessData_Script",
 							"type": "Script",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "BusinessData_Copy data",
@@ -102,7 +104,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} with (NOLOCK) WHERE CAST(@{item().KeyColumn} AS DATE) = DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
+										"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) > DATEADD(DAY, -1, CAST(GETDATE() AS DATE)) OR CAST(@{item().KeyColumn2} AS DATE) > DATEADD(DAY, -1, CAST(GETDATE() AS DATE))",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -110,8 +112,15 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"ID"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {

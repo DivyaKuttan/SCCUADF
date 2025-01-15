@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "PROD/UserCreditCards",
 							"wildcardFileName": {
-								"value": "@pipeline().parameters.FileName",
+								"value": "Nextly User Credit Cards DNA_CCM*.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -341,7 +341,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "Nextly User Credit Cards DNA_CCM 2025_01_14_001056.csv"
+				"defaultValue": "Nextly User Credit Cards DNA_CCM*.csv"
 			},
 			"FilePath": {
 				"type": "string",

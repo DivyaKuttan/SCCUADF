@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "PROD/CCM_CreditCard_AccountDetails",
 							"wildcardFileName": {
-								"value": "@pipeline().parameters.FileName",
+								"value": "Nextly CCM Credit Card Account Details*.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -463,7 +463,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "Nextly CCM Credit Card Account Details 2025_01_14_000743.csv"
+				"defaultValue": "Nextly CCM Credit Card Account Details*.csv"
 			},
 			"FilePath": {
 				"type": "string",

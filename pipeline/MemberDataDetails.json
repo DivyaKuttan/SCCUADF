@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "PROD/MemberDataDetails",
 							"wildcardFileName": {
-								"value": "@pipeline().parameters.FileName",
+								"value": "NextlyMemberData*.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -545,7 +545,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "NextlyMemberData 2025_01_14_005752.csv"
+				"defaultValue": "NextlyMemberData*.csv"
 			},
 			"FilePath": {
 				"type": "string",

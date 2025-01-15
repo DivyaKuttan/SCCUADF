@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "PROD/NextlyAccountDetails",
 							"wildcardFileName": {
-								"value": "@pipeline().parameters.FileName",
+								"value": "NextlyAccounts*.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -821,7 +821,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "NextlyAccounts 2025_01_14_010853.csv"
+				"defaultValue": "NextlyAccounts*.csv"
 			},
 			"FilePath": {
 				"type": "string",

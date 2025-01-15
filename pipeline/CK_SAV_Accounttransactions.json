@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "PROD/CK_SAV_Accounttransactions",
 							"wildcardFileName": {
-								"value": "@pipeline().parameters.FileName",
+								"value": "Nextly CK SAV TD Transactions Prior 15 Days *.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -356,7 +356,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "Nextly CK SAV TD Transactions Prior 15 Days 2025_01_14_010553.csv"
+				"defaultValue": "Nextly CK SAV TD Transactions Prior 15 Days *.csv"
 			},
 			"FilePath": {
 				"type": "string",

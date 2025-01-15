@@ -29,7 +29,7 @@
 							"recursive": true,
 							"wildcardFolderPath": "PROD/CrossAccounts",
 							"wildcardFileName": {
-								"value": "@pipeline().parameters.FileName",
+								"value": "NextlyCrossAccounts*.csv",
 								"type": "Expression"
 							},
 							"enablePartitionDiscovery": false
@@ -857,7 +857,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "NextlyCrossAccounts 2025_01_14_001855.csv"
+				"defaultValue": "NextlyCrossAccounts*.csv"
 			},
 			"FilePath": {
 				"type": "string",

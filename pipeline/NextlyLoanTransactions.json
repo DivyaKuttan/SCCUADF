@@ -369,7 +369,7 @@
 		"parameters": {
 			"FileName": {
 				"type": "string",
-				"defaultValue": "Nextly Loan Account Transactions Prior 15 Days 2025_01_14_014604.csv"
+				"defaultValue": "Nextly Loan Account Transactions Prior 15 Days*.csv"
 			},
 			"FilePath": {
 				"type": "string",

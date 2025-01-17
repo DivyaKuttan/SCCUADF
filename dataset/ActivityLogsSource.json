@@ -1,5 +1,5 @@
 {
-	"name": "ActivityLogs_StagingTableSource",
+	"name": "ActivityLogsSource",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_BusinessDataPROD",

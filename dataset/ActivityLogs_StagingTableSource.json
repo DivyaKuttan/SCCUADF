@@ -2,7 +2,7 @@
 	"name": "ActivityLogs_StagingTableSource",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "SCCU_BusinessdataPRODDummyTemp",
+			"referenceName": "SCCU_BusinessDataPROD",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
@@ -137,7 +137,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "ActivityLogs"
+			"table": ""
 		}
 	}
 }

@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "ActivityLog_Archive",
+				"name": "ActivityLog_UpsertTables",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -32,11 +32,11 @@
 				}
 			},
 			{
-				"name": "Archive_ForEach",
+				"name": "DependentTables_ForEach",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "ActivityLog_Archive",
+						"activity": "ActivityLog_UpsertTables",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -45,47 +45,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('ActivityLog_Archive').output.value",
+						"value": "@activity('ActivityLog_UpsertTables').output.value",
 						"type": "Expression"
 					},
 					"batchCount": 1,
 					"activities": [
-						{
-							"name": "BusinessData_Script",
-							"type": "Script",
-							"dependsOn": [
-								{
-									"activity": "BusinessData_Copy data",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"linkedServiceName": {
-								"referenceName": "SCCU_BusinessDataPROD",
-								"type": "LinkedServiceReference"
-							},
-							"typeProperties": {
-								"scripts": [
-									{
-										"type": "Query",
-										"text": {
-											"value": "SET NOCOUNT ON;\n\nDECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\n\n-- Repeat until no rows are affected\nWHILE 1 = 1\nBEGIN\n    DELETE  TOP (@BatchSize) FROM @{item().SourceSchemaName}.@{item().SourceTableName} with (rowlock) WHERE CAST(@{item().KeyColumn} AS DATE) = DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n    SET @RowsAffected = @@ROWCOUNT; \n    WAITFOR DELAY '00:00:01'\n    IF @RowsAffected = 0\n        BREAK; -- Exit the loop when no more rows are deleted\nEND\n",
-											"type": "Expression"
-										}
-									}
-								],
-								"scriptBlockExecutionTimeout": "02:00:00"
-							}
-						},
 						{
 							"name": "BusinessData_Copy data",
 							"type": "Copy",
@@ -110,8 +74,15 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"ID"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {
@@ -140,7 +111,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"DestinationTable": "@item().DestinationTableName",
-										"DestinationSchema": "@item().DestinationSchemaName"
+										"DestinationSchema": "dbo"
 									}
 								}
 							]
@@ -155,7 +126,7 @@
 				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Archive_ForEach",
+						"activity": "DependentTables_ForEach",
 						"dependencyConditions": [
 							"Completed"
 						]

@@ -37,7 +37,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ActivityLogs_StagingTableSource",
+						"referenceName": "ActivityLogsSource",
 						"type": "DatasetReference"
 					}
 				],

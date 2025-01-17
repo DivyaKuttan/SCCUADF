@@ -337,8 +337,6 @@
 			{
 				"name": "BusinessData_Rebuild_ActivityLogs_Index",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Archive_ForEach",
@@ -362,8 +360,6 @@
 			{
 				"name": "BusinessData_Rebuild_ActivityLogs_Stat",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "BusinessData_Rebuild_ActivityLogs_Index",

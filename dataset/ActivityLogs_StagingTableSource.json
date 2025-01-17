@@ -137,7 +137,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": ""
+			"table": "activitylogs"
 		}
 	}
 }

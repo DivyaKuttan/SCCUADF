@@ -1,5 +1,5 @@
 {
-	"name": "ActivityLogsCount",
+	"name": "ActivityLogsMonitorLogsCount",
 	"properties": {
 		"activities": [
 			{

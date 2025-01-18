@@ -46,7 +46,7 @@
 						"referenceName": "Archive_Destination",
 						"type": "DatasetReference",
 						"parameters": {
-							"DestinationTable": "ActivityLogs",
+							"DestinationTable": "ActivityMonitorLog",
 							"DestinationSchema": "BusinessData"
 						}
 					}

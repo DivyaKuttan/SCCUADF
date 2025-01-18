@@ -122,6 +122,8 @@
 			{
 				"name": "ActivityLogsToArchive",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false
@@ -130,6 +132,22 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "ActivityLogsToArchive",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "ActivityMonitorLogToArchive",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ActivityMonitorLogToArchive",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

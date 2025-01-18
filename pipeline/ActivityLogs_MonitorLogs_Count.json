@@ -46,7 +46,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlMISource",
-						"sqlReaderQuery": "Select count(1) from businessdata.activityLogs with (NoLock)\n    WHERE  Cast(CreatedDateas date) <= Cast(getdate()-60 as date)",
+						"sqlReaderQuery": "Select count(1) from Adaptive.ActivityMonitorLog with (NoLock)\n    WHERE  Cast(CreatedDateas date) <= Cast(getdate()-60 as date)",
 						"partitionOption": "None"
 					},
 					"dataset": {
@@ -54,8 +54,8 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"SourceDB": "SCCU_Businessdata_PROD",
-							"SourceTable": "activityLogs",
-							"SourceSchema": "dbo"
+							"SourceTable": "ActivityMonitorLog",
+							"SourceSchema": "Adaptive"
 						}
 					}
 				}

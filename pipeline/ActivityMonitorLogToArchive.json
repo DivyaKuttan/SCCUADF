@@ -1,0 +1,61 @@
+{
+	"name": "ActivityMonitorLogToArchive",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy ActivityMonitorLog To Archive 31st day",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 3,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlMISource",
+						"sqlReaderQuery": "Select * FROM Adaptive.ActivityMonitorLog with (NOLOCK)\n    WHERE  CAST(CreatedDate AS DATE) between DATEADD(DAY, -60, CAST(GETDATE() AS DATE)) and DATEADD(DAY, -55, CAST(GETDATE() AS DATE))",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ActivityLogsSource",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Archive_Destination",
+						"type": "DatasetReference",
+						"parameters": {
+							"DestinationTable": "ActivityLogs",
+							"DestinationSchema": "BusinessData"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "DataRetention/MISC"
+		},
+		"annotations": []
+	}
+}

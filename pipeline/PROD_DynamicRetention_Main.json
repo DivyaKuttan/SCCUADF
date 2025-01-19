@@ -131,8 +131,6 @@
 											{
 												"name": "SCCUPROD_ActivityLogs_Main",
 												"type": "ExecutePipeline",
-												"state": "Inactive",
-												"onInactiveMarkAs": "Succeeded",
 												"dependsOn": [],
 												"policy": {
 													"secureInput": false

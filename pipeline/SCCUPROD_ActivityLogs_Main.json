@@ -122,8 +122,6 @@
 			{
 				"name": "ActivityLogsToArchive",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false

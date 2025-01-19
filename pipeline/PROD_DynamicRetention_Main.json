@@ -141,7 +141,7 @@
 														"referenceName": "SCCUPROD_ActivityLogs_Main",
 														"type": "PipelineReference"
 													},
-													"waitOnCompletion": true
+													"waitOnCompletion": false
 												}
 											}
 										]

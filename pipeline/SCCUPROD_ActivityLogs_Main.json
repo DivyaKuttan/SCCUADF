@@ -122,7 +122,14 @@
 			{
 				"name": "ActivityLogsToArchive",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "PurgeOldData_ActivityLogs",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -138,14 +145,7 @@
 			{
 				"name": "PurgeOldData_ActivityLogs",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "ActivityLogsToArchive",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},

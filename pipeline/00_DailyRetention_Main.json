@@ -40,6 +40,8 @@
 						{
 							"name": "PurgeOldData_ActivityLogs",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureInput": false
@@ -56,6 +58,8 @@
 						{
 							"name": "PurgeOldData_ActivityMonitorLog",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureInput": false

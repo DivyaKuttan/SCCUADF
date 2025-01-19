@@ -134,6 +134,29 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "PurgeOldData_ActivityLogs",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ActivityLogsToArchive",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PurgeOldData_ActivityLogs",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"folder": {

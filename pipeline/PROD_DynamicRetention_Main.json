@@ -127,22 +127,6 @@
 													},
 													"waitOnCompletion": false
 												}
-											},
-											{
-												"name": "SCCUPROD_ActivityLogs_Main",
-												"type": "ExecutePipeline",
-												"dependsOn": [],
-												"policy": {
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"pipeline": {
-														"referenceName": "SCCUPROD_ActivityLogs_Main",
-														"type": "PipelineReference"
-													},
-													"waitOnCompletion": false
-												}
 											}
 										]
 									},

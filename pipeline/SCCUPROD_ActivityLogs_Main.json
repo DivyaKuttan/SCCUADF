@@ -5,7 +5,14 @@
 			{
 				"name": "ActivityLog_UpsertTables",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "PurgeOldData_ActivityLogs",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -124,7 +131,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "PurgeOldData_ActivityLogs",
+						"activity": "DependentTables_ForEach",
 						"dependencyConditions": [
 							"Completed"
 						]

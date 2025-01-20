@@ -164,6 +164,52 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "BusinessData_Rebuild_ActivityLogs_Index",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "DependentTables_ForEach",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BusinessData_Rebuild_ActivityLogs_Index",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "BusinessData_Rebuild_ActivityLogs_Stat",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "BusinessData_Rebuild_ActivityLogs_Index",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BusinessData_Rebuild_ActivityLogs_Stat",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"folder": {

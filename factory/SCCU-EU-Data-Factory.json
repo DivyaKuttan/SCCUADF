@@ -9,6 +9,10 @@
 			"FromEmail": {
 				"type": "string",
 				"value": "sccuadf@mail.cunextgen.org"
+			},
+			"EmailKey": {
+				"type": "string",
+				"value": "'"
 			}
 		}
 	},

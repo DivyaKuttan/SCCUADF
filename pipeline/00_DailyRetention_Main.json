@@ -36,6 +36,22 @@
 								},
 								"waitOnCompletion": true
 							}
+						},
+						{
+							"name": "SCCUPROD_ActivityLogs_Main",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SCCUPROD_ActivityLogs_Main",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false
+							}
 						}
 					]
 				}
@@ -63,29 +79,6 @@
 						"referenceName": "SCCUPROD_ArchiveSqlDataset",
 						"type": "DatasetReference"
 					}
-				}
-			},
-			{
-				"name": "SCCUPROD_ActivityLogs_Main",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "IsRetentionEnabled",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "SCCUPROD_ActivityLogs_Main",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": false
 				}
 			}
 		],

@@ -1,0 +1,66 @@
+{
+	"name": "ActivitySnapShotforMS",
+	"properties": {
+		"activities": [
+			{
+				"name": "CopyActivitySnapShot_FromBDtoArchiveforMS",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlMISource",
+						"sqlReaderStoredProcedureName": "[dbo].[sp_Rebuild_ActivitySnapshot]",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SCCUPROD_BusinessData_Source",
+						"type": "DatasetReference",
+						"parameters": {
+							"SourceDB": "Buisnessdata",
+							"SourceTable": "activitysnapshot",
+							"SourceSchema": "dbo"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Archive_Destination",
+						"type": "DatasetReference",
+						"parameters": {
+							"DestinationTable": "[ActivitySnapshot]",
+							"DestinationSchema": "dbo"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "DBOptimization"
+		},
+		"annotations": []
+	}
+}

@@ -59,6 +59,14 @@
 			"type": "string",
 			"defaultValue": "managedInstance"
 		},
+		"sccustagesql02_Temp_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-STAGE-SRV-RG/providers/Microsoft.Sql/managedInstances/sccustagesql02"
+		},
+		"sccustagesql02_Temp_properties_groupId": {
+			"type": "string",
+			"defaultValue": "managedInstance"
+		},
 		"SCCU_AdminLogdb_PROD_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
@@ -146,27 +154,12 @@
 		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "SCCU_BusinessData_UAT"
-		},
-		"SCCU_Businessdata_PROD_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_Businessdata_PROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/default')]",
-			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks",
-			"apiVersion": "2018-06-01",
-			"properties": {},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
@@ -188,9 +181,7 @@
 					"referenceName": "default"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default/SCCU_DataFactory_FileShare')]",
@@ -200,9 +191,7 @@
 				"privateLinkResourceId": "[parameters('SCCU_DataFactory_FileShare_properties_privateLinkResourceId')]",
 				"groupId": "[parameters('SCCU_DataFactory_FileShare_properties_groupId')]"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default/sccudatafactorystorage')]",
@@ -213,9 +202,7 @@
 				"groupId": "[parameters('sccudatafactorystorage_properties_groupId')]",
 				"fqdns": "[parameters('sccudatafactorystorage_properties_fqdns')]"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default/sccudatafactorystorage01')]",
@@ -226,9 +213,7 @@
 				"groupId": "[parameters('sccudatafactorystorage01_properties_groupId')]",
 				"fqdns": "[parameters('sccudatafactorystorage01_properties_fqdns')]"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default/sccudrsql01')]",
@@ -238,9 +223,7 @@
 				"privateLinkResourceId": "[parameters('sccudrsql01_properties_privateLinkResourceId')]",
 				"groupId": "[parameters('sccudrsql01_properties_groupId')]"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default/sccuprodsql01')]",
@@ -250,9 +233,17 @@
 				"privateLinkResourceId": "[parameters('sccuprodsql01_properties_privateLinkResourceId')]",
 				"groupId": "[parameters('sccuprodsql01_properties_groupId')]"
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
-			]
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/sccustagesql02_Temp')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('sccustagesql02_Temp_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('sccustagesql02_Temp_properties_groupId')]"
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/EmailAlerts')]",
@@ -327,6 +318,74 @@
 					"Pipelinename": {
 						"type": "string"
 					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendEmailActivity')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SendMail",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@pipeline().globalParameters.EmailKey",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@pipeline().globalParameters.global_sendmail_api_url",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"value": "{\n  \"personalizations\": [\n    {\n      \"to\": [\n        {\n          \"email\": @{pipeline().parameters.recipientEmail}\n        }\n      ],\n      \"subject\":  @{pipeline().parameters.EmailSubject}\n    }\n  ],\n  \"from\": {\n    \"email\": @{pipeline().globalParameters.FromEmail}\n  },\n  \"content\": [\n    {\n      \"type\": \"text/plain\",\n      \"value\": @{pipeline().parameters.EmailBody}\n    }\n  ]\n}\n",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"recipientEmail": {
+						"type": "string",
+						"defaultValue": "prem@claysys.com"
+					},
+					"EmailSubject": {
+						"type": "string",
+						"defaultValue": "Test Email from ADF"
+					},
+					"EmailBody": {
+						"type": "string",
+						"defaultValue": "Test Mail"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
 				},
 				"annotations": []
 			},
@@ -623,33 +682,6 @@
 					"authenticationType": "UserAssignedManagedIdentity",
 					"credential": {
 						"referenceName": "Credential_SCCU_BusinessDataUAT",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_Businessdata_PROD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_Businessdata_PROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_Businessdata_PROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_Businessdata_PROD",
 						"type": "CredentialReference"
 					}
 				},

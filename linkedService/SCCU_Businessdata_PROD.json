@@ -12,6 +12,9 @@
 			"credential": {
 				"referenceName": "Credential_SCCU_Businessdata_PROD",
 				"type": "CredentialReference"
+			},
+			"alwaysEncryptedSettings": {
+				"alwaysEncryptedAkvAuthType": "ManagedIdentity"
 			}
 		},
 		"connectVia": {

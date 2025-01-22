@@ -7,7 +7,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Execute Pipeline1",
+						"activity": "Static BusinessData",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -342,7 +342,7 @@
 				}
 			},
 			{
-				"name": "Execute Pipeline1",
+				"name": "Static BusinessData",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"policy": {

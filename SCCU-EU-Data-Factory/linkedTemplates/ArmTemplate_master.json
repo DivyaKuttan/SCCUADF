@@ -660,24 +660,6 @@
 					},
 					"PROD_LoanDueTrigger_properties_typeProperties_scope": {
 						"value": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]"
-					},
-					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
-						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]"
-					},
-					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
-						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
-					},
-					"PROD_ThresholAlert_properties_typeProperties_scope": {
-						"value": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]"
-					},
-					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
-						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]"
-					},
-					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
-						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
-					},
-					"PROD_TransactionAlert_properties_typeProperties_scope": {
-						"value": "[parameters('PROD_TransactionAlert_properties_typeProperties_scope')]"
 					}
 				}
 			},
@@ -698,6 +680,24 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
+						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]"
+					},
+					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath": {
+						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FilePath')]"
+					},
+					"PROD_ThresholAlert_properties_typeProperties_scope": {
+						"value": "[parameters('PROD_ThresholAlert_properties_typeProperties_scope')]"
+					},
+					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName": {
+						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FileName')]"
+					},
+					"PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath": {
+						"value": "[parameters('PROD_TransactionAlert_properties_Nextly_TransactionAlert_PROD_parameters_FilePath')]"
+					},
+					"PROD_TransactionAlert_properties_typeProperties_scope": {
+						"value": "[parameters('PROD_TransactionAlert_properties_typeProperties_scope')]"
 					}
 				}
 			},

@@ -131,7 +131,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "DependentTables_ForEach",
+						"activity": "ActivityLog_UpsertTables",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -171,6 +171,12 @@
 				"dependsOn": [
 					{
 						"activity": "DependentTables_ForEach",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "ActivityLogsToArchive",
 						"dependencyConditions": [
 							"Completed"
 						]

@@ -5,7 +5,14 @@
 			{
 				"name": "BusinessData_Archive",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -329,6 +336,22 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "BusinessData_Rebuild_Stat",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SCCUPROD_Static_BusinessData_DynamicRetention",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

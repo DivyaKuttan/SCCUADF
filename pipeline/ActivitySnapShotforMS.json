@@ -5,8 +5,6 @@
 			{
 				"name": "CopyActivitySnapShot_FromBDtoArchiveforMS",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -39,13 +37,8 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SCCUPROD_BusinessData_Source",
-						"type": "DatasetReference",
-						"parameters": {
-							"SourceDB": "Buisnessdata",
-							"SourceTable": "activitysnapshot",
-							"SourceSchema": "dbo"
-						}
+						"referenceName": "SnapshotSource",
+						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
@@ -53,40 +46,11 @@
 						"referenceName": "Archive_Destination",
 						"type": "DatasetReference",
 						"parameters": {
-							"DestinationTable": "[ActivitySnapshot]",
+							"DestinationTable": "ActivitySnapshot",
 							"DestinationSchema": "dbo"
 						}
 					}
 				]
-			},
-			{
-				"name": "Lookup1",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "SqlMISource",
-						"sqlReaderQuery": "\r\nSELECT \r\n\tgetdate() CaptureDateTime,\r\n\tes.session_id, blocking_session_id,\r\n\tDB_NAME(er.database_id) AS [database_name], \r\n\tOBJECT_NAME(qp.objectid, qp.dbid) AS [object_name],\r\n\t(SELECT qt.text AS [text()]\r\n\t\tFROM sys.dm_exec_sql_text(er.sql_handle) AS qt\r\n\t\tFOR XML PATH(''), TYPE) AS [running_batch],\r\n\t(SELECT SUBSTRING(qt2.text,\r\n\t\t(CASE WHEN er.statement_start_offset = 0 THEN 0 ELSE er.statement_start_offset/2 END),\r\n\t\t(CASE WHEN er.statement_end_offset = -1 THEN DATALENGTH(qt2.text) ELSE er.statement_end_offset/2 END - (CASE WHEN er.statement_start_offset = 0 THEN 0 ELSE er.statement_start_offset/2 END))) AS [text()]\r\n\t\tFROM sys.dm_exec_sql_text(er.sql_handle) AS qt2\r\n\t\tFOR XML PATH(''), TYPE) AS [running_statement],\r\n\t--ot.task_state AS [status],\r\n\ter.status,\r\n\t--er.command,\r\n\t--qp.query_plan,\r\n\ter.percent_complete,\r\n\t(er.cpu_time/1000) AS cpu_time_sec,\r\n\t(er.reads*8)/1024 AS physical_reads_KB,\r\n\t(er.logical_reads*8)/1024 AS logical_reads_KB,\r\n\t(er.writes*8)/1024 AS writes_KB,\r\n\ter.total_elapsed_time,\r\n\ter.wait_type,\r\n\ter.wait_resource,\r\n\ter.last_wait_type,\r\n\t(SELECT CASE\r\n\t\tWHEN pageid = 1 OR pageid % 8088 = 0 THEN 'Is_PFS_Page'\r\n\t\tWHEN pageid = 2 OR pageid % 511232 = 0 THEN 'Is_GAM_Page'\r\n\t\tWHEN pageid = 3 OR (pageid - 1) % 511232 = 0 THEN 'Is_SGAM_Page'\r\n\t\tWHEN pageid IS NULL THEN NULL\r\n\t\tELSE 'Is_not_PFS_GAM_SGAM_page' END\r\n\tFROM (SELECT CASE WHEN er.[wait_type] LIKE 'PAGE%LATCH%' AND er.[wait_resource] LIKE '%:%'\r\n\t\tTHEN CAST(RIGHT(er.[wait_resource], LEN(er.[wait_resource]) - CHARINDEX(':', er.[wait_resource], LEN(er.[wait_resource])-CHARINDEX(':', REVERSE(er.[wait_resource])))) AS int)\r\n\t\tELSE NULL END AS pageid) AS latch_pageid\r\n\t) AS wait_resource_type,\r\n\ter.wait_time AS wait_time_ms,\r\n\ter.cpu_time AS cpu_time_ms,\r\n\ter.open_transaction_count,\r\n\ter.estimated_completion_time,\r\n\tCASE WHEN mg.wait_time_ms IS NULL THEN DATEDIFF(ms, mg.request_time, mg.grant_time) ELSE mg.wait_time_ms END AS [grant_wait_time_ms],\r\n\tLEFT (CASE COALESCE(er.transaction_isolation_level, es.transaction_isolation_level)\r\n\t\tWHEN 0 THEN '0-Unspecified'\r\n\t\tWHEN 1 THEN '1-ReadUncommitted'\r\n\t\tWHEN 2 THEN '2-ReadCommitted'\r\n\t\tWHEN 3 THEN '3-RepeatableRead'\r\n\t\tWHEN 4 THEN '4-Serializable'\r\n\t\tWHEN 5 THEN '5-Snapshot'\r\n\t\tELSE CONVERT (VARCHAR(30), er.transaction_isolation_level) + '-UNKNOWN'\r\n    END, 30) AS transaction_isolation_level,\r\n\tmg.requested_memory_kb,\r\n\tmg.granted_memory_kb,\r\n\tmg.ideal_memory_kb,\r\n\tmg.query_cost,\r\n\t((((ssu.user_objects_alloc_page_count + (SELECT SUM(tsu.user_objects_alloc_page_count) FROM sys.dm_db_task_space_usage tsu WHERE tsu.session_id = ssu.session_id)) -\r\n\t\t(ssu.user_objects_dealloc_page_count + (SELECT SUM(tsu.user_objects_dealloc_page_count) FROM sys.dm_db_task_space_usage tsu WHERE tsu.session_id = ssu.session_id)))*8)/1024) AS user_obj_in_tempdb_MB,\r\n\t((((ssu.internal_objects_alloc_page_count + (SELECT SUM(tsu.internal_objects_alloc_page_count) FROM sys.dm_db_task_space_usage tsu WHERE tsu.session_id = ssu.session_id)) -\r\n\t\t(ssu.internal_objects_dealloc_page_count + (SELECT SUM(tsu.internal_objects_dealloc_page_count) FROM sys.dm_db_task_space_usage tsu WHERE tsu.session_id = ssu.session_id)))*8)/1024) AS internal_obj_in_tempdb_MB,\r\n\tes.[host_name],\r\n\tes.login_name,\r\n\t--es.original_login_name,\r\n\tes.[program_name],\r\n\t--ec.client_net_address,\r\n\tes.is_user_process,\r\n\tg.name AS workload_group\r\n--into ActivitySnapshot\r\nFROM sys.dm_exec_requests er\r\n\tLEFT OUTER JOIN sys.dm_exec_query_memory_grants mg ON er.session_id = mg.session_id AND er.request_id = mg.request_id\r\n\tLEFT OUTER JOIN sys.dm_db_session_space_usage ssu ON er.session_id = ssu.session_id\r\n\tLEFT OUTER JOIN sys.dm_exec_sessions es ON er.session_id = es.session_id\r\n\tLEFT OUTER JOIN sys.dm_resource_governor_workload_groups g ON es.group_id = g.group_id\r\n\tOUTER APPLY sys.dm_exec_query_plan (er.plan_handle) qp\r\nWHERE er.session_id <> @@SPID AND es.is_user_process = 1\r\n",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "SCCUPROD_BusinessData_Source",
-						"type": "DatasetReference",
-						"parameters": {
-							"SourceDB": "businessdata",
-							"SourceTable": "ActivitySnapshit",
-							"SourceSchema": "dbo"
-						}
-					}
-				}
 			}
 		],
 		"folder": {

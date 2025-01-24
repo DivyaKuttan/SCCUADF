@@ -861,7 +861,7 @@
 			},
 			"FilePath": {
 				"type": "string",
-				"defaultValue": "offline-services/DEV/CrossAccounts"
+				"defaultValue": "offline-services/PROD/CrossAccounts"
 			}
 		},
 		"folder": {

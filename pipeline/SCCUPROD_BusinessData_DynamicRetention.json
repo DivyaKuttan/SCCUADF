@@ -135,7 +135,7 @@
 												{
 													"type": "Query",
 													"text": {
-														"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
+														"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM @{item().SourceSchemaName}.@{item().SourceTableName}  \n\tWHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND",
 														"type": "Expression"
 													}
 												}

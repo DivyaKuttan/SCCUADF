@@ -2,7 +2,7 @@
 	"name": "Offline_Service_Prod_Scheduled",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipelines": [
 			{
 				"pipelineReference": {

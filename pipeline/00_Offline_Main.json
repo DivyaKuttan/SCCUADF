@@ -218,6 +218,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"pipeline": {
+						"referenceName": "NextlyLoanTransactions",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			}

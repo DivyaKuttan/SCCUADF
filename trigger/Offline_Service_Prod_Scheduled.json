@@ -1,0 +1,24 @@
+{
+	"name": "Offline_Service_Prod_Scheduled",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "00_Offline_Main",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2025-01-27T13:30:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}

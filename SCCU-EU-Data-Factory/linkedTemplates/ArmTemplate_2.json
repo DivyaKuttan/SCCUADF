@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp'"
-		},
 		"SCCU_DataFactory_FileShare_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SCCU_DataFactory_FileShare'"
@@ -20,6 +16,14 @@
 			"metadata": "Secure string for 'connectionString' of 'SCCU_OfflineModedb_PROD_DTU'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sccuprodsqldtu.database.windows.net;Initial Catalog=SCCU_OfflineModedb_PROD"
 		},
+		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BusinessDataUAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCU_BusinessData_UAT"
+		},
 		"SCCU_Businessdata_PROD_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
@@ -27,18 +31,6 @@
 		"SCCU_Businessdata_PROD_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuprodsql01.247d28acc382.database.windows.net"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "SA_SCCUSQLAPPFORMSPROD"
 		},
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"type": "string",
@@ -86,6 +78,31 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataUAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_server')]",
+					"database": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "UserAssignedManagedIdentity",
+					"credential": {
+						"referenceName": "Credential_SCCU_BusinessDataUAT",
+						"type": "CredentialReference"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SCCU_Businessdata_PROD')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -101,35 +118,6 @@
 					"credential": {
 						"referenceName": "Credential_SCCU_Businessdata_PROD",
 						"type": "CredentialReference"
-					},
-					"alwaysEncryptedSettings": {
-						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password')]"
 					},
 					"alwaysEncryptedSettings": {
 						"alwaysEncryptedAkvAuthType": "ManagedIdentity"

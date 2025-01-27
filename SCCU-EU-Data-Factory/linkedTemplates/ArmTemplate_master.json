@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp'"
-		},
 		"SCCU_DataFactory_FileShare_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SCCU_DataFactory_FileShare'"
@@ -115,18 +111,6 @@
 		"SCCU_Businessdata_PROD_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuprodsql01.247d28acc382.database.windows.net"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "SA_SCCUSQLAPPFORMSPROD"
 		},
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"type": "string",
@@ -431,12 +415,6 @@
 					},
 					"SCCU_BusinessDataPROD_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_database')]"
-					},
-					"SCCU_BusinessDataUAT_properties_typeProperties_server": {
-						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_server')]"
-					},
-					"SCCU_BusinessDataUAT_properties_typeProperties_database": {
-						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]"
 					}
 				}
 			},
@@ -458,29 +436,23 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password": {
-						"value": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password')]"
-					},
 					"SCCU_DataFactory_FileShare_connectionString": {
 						"value": "[parameters('SCCU_DataFactory_FileShare_connectionString')]"
 					},
 					"SCCU_OfflineModedb_PROD_DTU_connectionString": {
 						"value": "[parameters('SCCU_OfflineModedb_PROD_DTU_connectionString')]"
 					},
+					"SCCU_BusinessDataUAT_properties_typeProperties_server": {
+						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_server')]"
+					},
+					"SCCU_BusinessDataUAT_properties_typeProperties_database": {
+						"value": "[parameters('SCCU_BusinessDataUAT_properties_typeProperties_database')]"
+					},
 					"SCCU_Businessdata_PROD_properties_typeProperties_server": {
 						"value": "[parameters('SCCU_Businessdata_PROD_properties_typeProperties_server')]"
 					},
 					"SCCU_Businessdata_PROD_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_Businessdata_PROD_properties_typeProperties_database')]"
-					},
-					"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server": {
-						"value": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server')]"
-					},
-					"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database": {
-						"value": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database')]"
-					},
-					"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName": {
-						"value": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName')]"
 					},
 					"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 						"value": "[parameters('SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint')]"
@@ -651,15 +623,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
-						"value": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]"
-					},
-					"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
-						"value": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
-					},
-					"PROD_LoanDueTrigger_properties_typeProperties_scope": {
-						"value": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]"
 					}
 				}
 			},
@@ -680,6 +643,15 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName": {
+						"value": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FileName')]"
+					},
+					"PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath": {
+						"value": "[parameters('PROD_LoanDueTrigger_properties_Nextly_LoanDueAlerts_PROD_parameters_FilePath')]"
+					},
+					"PROD_LoanDueTrigger_properties_typeProperties_scope": {
+						"value": "[parameters('PROD_LoanDueTrigger_properties_typeProperties_scope')]"
 					},
 					"PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName": {
 						"value": "[parameters('PROD_ThresholAlert_properties_Nextly_ThresholdAlert_PROD_parameters_FileName')]"

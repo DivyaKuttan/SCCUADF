@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp'"
-		},
 		"SCCU_DataFactory_FileShare_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SCCU_DataFactory_FileShare'"
@@ -115,18 +111,6 @@
 		"SCCU_Businessdata_PROD_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccuprodsql01.247d28acc382.database.windows.net"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
-		},
-		"SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "SA_SCCUSQLAPPFORMSPROD"
 		},
 		"SCCU_DataFactory_Storage_properties_typeProperties_serviceEndpoint": {
 			"type": "string",
@@ -385,6 +369,267 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/00_Offline_Main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MemberData",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "MemberDataDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "AccountDetails",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "MemberData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyAccountDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "UserCreditCard",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AccountDetails",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "UserCreditCards",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "CCMCreditCard",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "CCM_CreditCard_AccountDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "SavingsAccount",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "CK_SAV_Accounttransactions",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "DebitCards",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DebitCardDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "AccountLockOut",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyAccountlockout",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "AccountRoles",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyAccountRoles",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "CrossAccounts",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyCrossAccounts",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "LoanTransaction",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyLoanTransactions",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/MemberDataDetails')]",
+				"[concat(variables('factoryId'), '/pipelines/NextlyAccountDetails')]",
+				"[concat(variables('factoryId'), '/pipelines/UserCreditCards')]",
+				"[concat(variables('factoryId'), '/pipelines/CCM_CreditCard_AccountDetails')]",
+				"[concat(variables('factoryId'), '/pipelines/CK_SAV_Accounttransactions')]",
+				"[concat(variables('factoryId'), '/pipelines/DebitCardDetails')]",
+				"[concat(variables('factoryId'), '/pipelines/NextlyAccountlockout')]",
+				"[concat(variables('factoryId'), '/pipelines/NextlyAccountRoles')]",
+				"[concat(variables('factoryId'), '/pipelines/NextlyCrossAccounts')]",
+				"[concat(variables('factoryId'), '/pipelines/NextlyLoanTransactions')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ActivityLogsMonitorLogsCount')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -607,77 +852,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/SCCUPROD_BusinessData_Source')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ActivitySnapShotforMS')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "CopyActivitySnapShot_FromBDtoArchiveforMS",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlMISource",
-								"sqlReaderStoredProcedureName": "[[dbo].[sp_Rebuild_ActivitySnapshot]",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "SnapshotSource",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Archive_Destination",
-								"type": "DatasetReference",
-								"parameters": {
-									"DestinationTable": "ActivitySnapshot",
-									"DestinationSchema": "dbo"
-								}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DBOptimization"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SnapshotSource')]",
-				"[concat(variables('factoryId'), '/datasets/Archive_Destination')]"
 			]
 		},
 		{
@@ -5296,7 +5470,7 @@
 					},
 					"FilePath": {
 						"type": "string",
-						"defaultValue": "offline-services/DEV/CrossAccounts"
+						"defaultValue": "offline-services/PROD/CrossAccounts"
 					}
 				},
 				"folder": {
@@ -9870,7 +10044,7 @@
 														{
 															"type": "Query",
 															"text": {
-																"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
+																"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM @{item().SourceSchemaName}.@{item().SourceTableName}  \n\tWHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND",
 																"type": "Expression"
 															}
 														}
@@ -18976,189 +19150,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SnapshotSource')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "CaptureDateTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "session_id",
-						"type": "smallint",
-						"precision": 5
-					},
-					{
-						"name": "blocking_session_id",
-						"type": "smallint",
-						"precision": 5
-					},
-					{
-						"name": "database_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "object_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "running_batch",
-						"type": "xml"
-					},
-					{
-						"name": "running_statement",
-						"type": "xml"
-					},
-					{
-						"name": "status",
-						"type": "nvarchar"
-					},
-					{
-						"name": "percent_complete",
-						"type": "real",
-						"precision": 7
-					},
-					{
-						"name": "cpu_time_sec",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "physical_reads_KB",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "logical_reads_KB",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "writes_KB",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "total_elapsed_time",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "wait_type",
-						"type": "nvarchar"
-					},
-					{
-						"name": "wait_resource",
-						"type": "nvarchar"
-					},
-					{
-						"name": "last_wait_type",
-						"type": "nvarchar"
-					},
-					{
-						"name": "wait_resource_type",
-						"type": "varchar"
-					},
-					{
-						"name": "wait_time_ms",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "cpu_time_ms",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "open_transaction_count",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "estimated_completion_time",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "grant_wait_time_ms",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "transaction_isolation_level",
-						"type": "varchar"
-					},
-					{
-						"name": "requested_memory_kb",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "granted_memory_kb",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "ideal_memory_kb",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "query_cost",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "user_obj_in_tempdb_MB",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "internal_obj_in_tempdb_MB",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "host_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "login_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "program_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "is_user_process",
-						"type": "bit"
-					},
-					{
-						"name": "workload_group",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ActivitySnapshot"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/UAT_BBAlertsDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -20058,37 +20049,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('SCCU_Businessdata_PROD_sp_Rebuild_ActivitySnapshot_Temp_password')]"
-					},
-					"alwaysEncryptedSettings": {
-						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/SCCU_DataFactory_FileShare')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -20297,6 +20257,86 @@
 				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
 				"[concat(variables('factoryId'), '/credentials/Credential_Prod_DTU')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ACISeri_Biweekly')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "BacPac Tables ACISeri_CheckFree_Vsofts_WeeklyTwice",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 4,
+						"startTime": "2025-01-29T10:35:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/BacPac Tables ACISeri_CheckFree_Vsofts_WeeklyTwice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Log_Log_Biweekly')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "BacPac Tables Log_LogTables_WeeklyTwice",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 4,
+						"startTime": "2025-01-31T10:35:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/BacPac Tables Log_LogTables_WeeklyTwice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Offline_Service_Prod_Scheduled')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2025-01-27T13:30:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PROD_DataRetentionTrigger')]",

@@ -13,6 +13,10 @@
 			"EmailKey": {
 				"type": "string",
 				"value": "'"
+			},
+			"ToEmailGroup": {
+				"type": "string",
+				"value": "SCCUADFNotifications@claysys.com"
 			}
 		}
 	},

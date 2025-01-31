@@ -51,6 +51,128 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Copy MemberActivityLogs To Archive 11th day",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 3,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlMISource",
+						"sqlReaderQuery": "Select * from MemberActivityLog with (NoLock)\n    WHERE  Cast(CreatedDate as date) = Cast(getdate()-11 as date) ",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ActivityLogsSource",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Archive_Destination",
+						"type": "DatasetReference",
+						"parameters": {
+							"DestinationTable": "MemberActivityLog",
+							"DestinationSchema": "BusinessData"
+						}
+					}
+				]
+			},
+			{
+				"name": "ActivityLogs Delete 11th day",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Copy ActivityLogs To Archive 11th day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataPROD",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) = Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "MemberActivityLogs Delete 11th day",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Copy MemberActivityLogs To Archive 11th day",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataPROD",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM MemberActivityLog  with (RowLock)\n    WHERE  Cast(CreatedDate as date) = Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
 		"folder": {

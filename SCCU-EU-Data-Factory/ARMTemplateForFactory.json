@@ -630,6 +630,54 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ActivityLogsBatchDelete10M')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ActivityLogsBatchDelete10M",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataPROD",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-35 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ActivityLogsMonitorLogsCount')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -650,7 +698,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "Select count(1) from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-45 as date)",
+								"sqlReaderQuery": "Select count(1) from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-35 as date)",
 								"partitionOption": "None"
 							},
 							"dataset": {
@@ -667,6 +715,8 @@
 					{
 						"name": "ActivityMonitorLogs count",
 						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -762,6 +812,129 @@
 								}
 							}
 						]
+					},
+					{
+						"name": "Copy MemberActivityLogs To Archive 11th day",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlMISource",
+								"sqlReaderQuery": "Select * from MemberActivityLog with (NoLock)\n    WHERE  Cast(CreatedDate as date) = Cast(getdate()-11 as date) ",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ActivityLogsSource",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Archive_Destination",
+								"type": "DatasetReference",
+								"parameters": {
+									"DestinationTable": "MemberActivityLog",
+									"DestinationSchema": "BusinessData"
+								}
+							}
+						]
+					},
+					{
+						"name": "ActivityLogs Delete 11th day",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Copy ActivityLogs To Archive 11th day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataPROD",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) = Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "MemberActivityLogs Delete 11th day",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Copy MemberActivityLogs To Archive 11th day",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataPROD",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM MemberActivityLog  with (RowLock)\n    WHERE  Cast(CreatedDate as date) = Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -774,7 +947,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ActivityLogsSource')]",
-				"[concat(variables('factoryId'), '/datasets/Archive_Destination')]"
+				"[concat(variables('factoryId'), '/datasets/Archive_Destination')]",
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
 			]
 		},
 		{
@@ -7094,86 +7268,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PurgeOldData_ActivityLogs')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "BusinessData_Delete",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_BusinessDataPROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-45 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "ArchiveDB_Delete",
-						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Archivedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM businessdata.activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-46 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/MISC"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Archivedb_PROD_DTU')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/PurgeOldData_ActivityMonitorLog')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -7219,6 +7313,90 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PurgeOld_ActivityLogs')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ArchiveDB_ActivtyLogs_Delete45daysOld",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_Archivedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM businessdata.activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-46 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "ArchiveDB_MemberActivtyLogs_Delete45daysOld",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "ArchiveDB_ActivtyLogs_Delete45daysOld",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_Archivedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM businessdata.MemberActivityLog  with (RowLock)\n    WHERE  Cast(CreatedDate as date) < Cast(getdate()-46 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Archivedb_PROD_DTU')]"
 			]
 		},
 		{
@@ -7887,14 +8065,7 @@
 					{
 						"name": "ActivityLog_UpsertTables",
 						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "PurgeOldData_ActivityLogs",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -8034,23 +8205,6 @@
 						}
 					},
 					{
-						"name": "PurgeOldData_ActivityLogs",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PurgeOldData_ActivityLogs",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
 						"name": "BusinessData_Rebuild_ActivityLogs_Index",
 						"type": "ExecutePipeline",
 						"dependsOn": [
@@ -8103,6 +8257,30 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "PurgeOld_ActivityLogs",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ActivityLogsToArchive",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PurgeOld_ActivityLogs",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -8116,9 +8294,9 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/SCCUPROD_ArchiveSqlDataset')]",
 				"[concat(variables('factoryId'), '/pipelines/ActivityLogsToArchive')]",
-				"[concat(variables('factoryId'), '/pipelines/PurgeOldData_ActivityLogs')]",
 				"[concat(variables('factoryId'), '/pipelines/BusinessData_Rebuild_ActivityLogs_Index')]",
 				"[concat(variables('factoryId'), '/pipelines/BusinessData_Rebuild_ActivityLogs_Stat')]",
+				"[concat(variables('factoryId'), '/pipelines/PurgeOld_ActivityLogs')]",
 				"[concat(variables('factoryId'), '/datasets/SCCUPROD_BusinessData_Source')]",
 				"[concat(variables('factoryId'), '/datasets/Archive_Destination')]"
 			]

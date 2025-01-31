@@ -5,14 +5,7 @@
 			{
 				"name": "ActivityLog_UpsertTables",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "PurgeOldData_ActivityLogs",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -150,22 +143,6 @@
 				}
 			},
 			{
-				"name": "PurgeOldData_ActivityLogs",
-				"type": "ExecutePipeline",
-				"dependsOn": [],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "PurgeOldData_ActivityLogs",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
-			},
-			{
 				"name": "BusinessData_Rebuild_ActivityLogs_Index",
 				"type": "ExecutePipeline",
 				"dependsOn": [
@@ -212,6 +189,29 @@
 				"typeProperties": {
 					"pipeline": {
 						"referenceName": "BusinessData_Rebuild_ActivityLogs_Stat",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "PurgeOld_ActivityLogs",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ActivityLogsToArchive",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PurgeOld_ActivityLogs",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true

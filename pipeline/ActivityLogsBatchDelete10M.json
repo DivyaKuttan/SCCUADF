@@ -23,7 +23,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-41 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+								"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-40 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
 								"type": "Expression"
 							}
 						}

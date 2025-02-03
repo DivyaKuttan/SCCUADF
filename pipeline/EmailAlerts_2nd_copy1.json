@@ -55,6 +55,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"method": "POST",
+					"headers": {
+						"Authorization": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+						"Content-Type": "application/json"
+					},
 					"url": "https://api.sendgrid.com/v3/mail/send",
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",

@@ -40,7 +40,7 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"value": "{\n\"personalizations\": [\n   {\n    \"to\": [\n       {\n        \"email\": \"prem@claysys.com\"\n       }\n     ],\n    \"subject\": \"Test Email from ADF\"\n   }\n ],\n\"from\": {\n  \"email\": \"sccuadf@mail.cunextgen.org\"\n },\n\"content\": [\n   {\n    \"type\": \"text/plain\",\n    \"value\": \"Hello, this is a test email sent from ADF using SendGrid!\"\n   }\n ]\n}",
+						"value": "{\"personalizations\":[{\"to\":[{\"email\":\"prem@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.EmailSubject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"Subject: @{pipeline().parameters.EmailSubject}\\nImportance: \"High\"\\nContent: @{pipeline().parameters.EmailBody}]}}",
 						"type": "Expression"
 					}
 				}

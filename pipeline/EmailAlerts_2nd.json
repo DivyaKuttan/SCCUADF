@@ -1,0 +1,102 @@
+{
+	"name": "EmailAlerts_2nd",
+	"properties": {
+		"description": "Pipeline email notification on job completion",
+		"activities": [
+			{
+				"name": "SendEmailNotification",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetSendGridAPIKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"url": {
+						"value": "https://api.sendgrid.com/v3/mail/send",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"body": "{\n  \"personalizations\": [\n    {\n      \"to\": [{ \"email\": \"@{pipeline().parameters.EmailTo}\" }]\n    }\n  ],\n  \"from\": {\n    \"email\": \"@{pipeline().globalParameters.FromEmail}\"\n  },\n  \"subject\": \"@{concat('Pipeline ', pipeline().Pipeline, ' - ', if(equals(pipeline().TriggerType, 'Failure'), 'Failure', 'Success'))}\",\n  \"content\": [\n    {\n      \"type\": \"text/plain\",\n      \"value\": \"@{concat(\n        'Pipeline Name: ', pipeline().Pipeline, '\\n',\n        'Status: ', if(equals(pipeline().TriggerType, 'Failure'), 'Failure', 'Success'), '\\n',\n        'Importance: ', if(equals(pipeline().TriggerType, 'Failure'), 'High', 'Normal'), '\\n',\n        'Data Factory Name: ', pipeline().DataFactory, '\\n',\n        if(equals(pipeline().TriggerType, 'Failure'), concat('Failed Activity: ', activity('YourActivityName').Error.activityName, '\\n'), ''),\n        'Message: ', pipeline().parameters.Message, '\\n'\n      )}\"\n    }\n  ],\n  \"custom_args\": {\n    \"DataFactoryName\": \"@{pipeline().DataFactory}\",\n    \"PipelineName\": \"@{pipeline().Pipeline}\",\n    \"Status\": \"@{if(equals(pipeline().TriggerType, 'Failure'), 'Failure', 'Success')}\"\n  }\n}\n"
+				}
+			},
+			{
+				"name": "GetSendGridAPIKey",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"url": {
+						"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"Activity": {
+				"type": "string"
+			},
+			"EmailTo": {
+				"type": "string",
+				"defaultValue": "SCCUADFNotifications@claysys.com"
+			},
+			"Subject": {
+				"type": "string"
+			},
+			"Message": {
+				"type": "string"
+			},
+			"Status": {
+				"type": "string"
+			},
+			"Importance": {
+				"type": "string"
+			},
+			"DataFactoryName": {
+				"type": "string"
+			},
+			"Pipelinename": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}

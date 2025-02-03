@@ -56,7 +56,10 @@
 				"typeProperties": {
 					"method": "POST",
 					"headers": {
-						"Authorization": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+						"Authorization": {
+							"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+							"type": "Expression"
+						},
 						"Content-Type": "application/json"
 					},
 					"url": "https://api.sendgrid.com/v3/mail/send",
@@ -80,7 +83,7 @@
 						"subject": "@{pipeline().parameters.subject}",
 						"content": [
 							{
-								"type": "text/plain",
+								"type": "text/html",
 								"value": "Subject: @{pipeline().parameters.subject}\nImportance: @{pipeline().parameters.importance}\nContent: @{pipeline().parameters.content}\nPipeline Name: @{pipeline().parameters.pipelineName}"
 							}
 						],

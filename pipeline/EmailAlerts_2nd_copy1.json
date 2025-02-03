@@ -94,16 +94,13 @@
 		],
 		"parameters": {
 			"Subject": {
-				"type": "string",
-				"defaultValue": "Test"
+				"type": "string"
 			},
 			"Content": {
-				"type": "string",
-				"defaultValue": "This is test email"
+				"type": "string"
 			},
 			"Importance": {
-				"type": "string",
-				"defaultValue": "Normal"
+				"type": "string"
 			},
 			"Pipelinename": {
 				"type": "string"

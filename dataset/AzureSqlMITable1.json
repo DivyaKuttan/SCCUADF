@@ -1,0 +1,12 @@
+{
+	"name": "AzureSqlMITable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_AdminLogdb_PROD",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlMITable",
+		"schema": []
+	}
+}

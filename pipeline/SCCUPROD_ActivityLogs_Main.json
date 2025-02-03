@@ -197,6 +197,8 @@
 			{
 				"name": "PurgeOld_ActivityLogs",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ActivityLogsToArchive",

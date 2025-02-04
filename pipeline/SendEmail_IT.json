@@ -112,6 +112,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "DataRetention/BacPac"
+		},
 		"annotations": []
 	}
 }

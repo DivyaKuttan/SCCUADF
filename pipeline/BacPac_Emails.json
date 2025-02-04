@@ -19,7 +19,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "SendEmail_BacPac",
+						"referenceName": "SendEmail_IT",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
@@ -65,6 +65,9 @@
 			"procName": {
 				"type": "string"
 			}
+		},
+		"folder": {
+			"name": "DataRetention/BacPac"
 		},
 		"annotations": []
 	}

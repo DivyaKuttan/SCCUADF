@@ -50,12 +50,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "EXEC @{pipeline().parameters.procName}",
+						"sqlReaderQuery": {
+							"value": "EXEC @{pipeline().parameters.procName}",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "AzureSqlTable1",
+						"referenceName": "BacPac_Email_Proc",
 						"type": "DatasetReference"
 					}
 				}

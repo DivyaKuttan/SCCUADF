@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "SCCU-EU-Data-Factory"
 		},
+		"SCCU-KEYVAULT_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-NW-RG/providers/Microsoft.KeyVault/vaults/SCCU-KEYVAULT"
+		},
+		"SCCU-KEYVAULT_properties_groupId": {
+			"type": "string",
+			"defaultValue": "vault"
+		},
 		"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
@@ -130,22 +138,6 @@
 		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "SCCUUAT_BBAlerts"
-		},
-		"SCCU_BusinessDataDev_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccudevsql01.database.windows.net"
-		},
-		"SCCU_BusinessDataDev_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_BusinessData_Dev"
-		},
-		"SCCU_BusinessDataPROD_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
-		},
-		"SCCU_BusinessDataPROD_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SCCU_Businessdata_PROD"
 		}
 	},
 	"variables": {
@@ -179,6 +171,18 @@
 					"type": "ManagedVirtualNetworkReference",
 					"referenceName": "default"
 				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/SCCU-KEYVAULT')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('SCCU-KEYVAULT_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('SCCU-KEYVAULT_properties_groupId')]"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
@@ -259,14 +263,14 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/EmailAlerts')]",
+			"name": "[concat(parameters('factoryName'), '/SendEmail')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"description": "Pipeline email notification on job completion",
 				"activities": [
 					{
-						"name": "Send Email for pipeline",
+						"name": "GetSendGridAPIKey",
 						"type": "WebActivity",
 						"dependsOn": [],
 						"policy": {
@@ -278,27 +282,81 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"method": "POST",
+							"method": "GET",
 							"headers": {
 								"Content-Type": "application/json"
 							},
 							"url": {
-								"value": "@pipeline().globalParameters.global_sendmail_api_url",
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
 								"type": "Expression"
 							},
 							"connectVia": {
 								"referenceName": "AutoResolveIntegrationRuntime",
 								"type": "IntegrationRuntimeReference"
 							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
 							"body": {
-								"DataFactoryName": "@{pipeline().parameters.DataFactoryName}",
-								"PipelineName": "@{pipeline().parameters.PipelineName}",
-								"Activity": "@{pipeline().parameters.Activity}",
-								"PipelineStatus": "@{pipeline().parameters.Status}",
-								"EmailTo": "@{pipeline().parameters.EmailTo}",
-								"Subject": "@{pipeline().parameters.Subject}",
-								"Importance": "@{pipeline().parameters.Importance}",
-								"Message": "@{pipeline().parameters.Message}"
+								"personalizations": [
+									{
+										"to": [
+											{
+												"email": "SCCUADFNotifications@claysys.com"
+											}
+										]
+									}
+								],
+								"from": {
+									"email": "@{pipeline().globalParameters.FromEmail}"
+								},
+								"subject": "@{pipeline().parameters.subject}",
+								"content": [
+									{
+										"type": "text/html",
+										"value": " @{pipeline().parameters.content}"
+									}
+								],
+								"custom_args": {
+									"pipelineName": "@{pipeline().parameters.pipelineName}",
+									"importance": "@{pipeline().parameters.importance}"
+								}
 							}
 						}
 					}
@@ -307,30 +365,21 @@
 					"elapsedTimeMetric": {}
 				},
 				"parameters": {
-					"Activity": {
-						"type": "string"
-					},
-					"EmailTo": {
-						"type": "string"
-					},
 					"Subject": {
 						"type": "string"
 					},
-					"Message": {
-						"type": "string"
-					},
-					"Status": {
+					"Content": {
 						"type": "string"
 					},
 					"Importance": {
 						"type": "string"
 					},
-					"DataFactoryName": {
-						"type": "string"
-					},
 					"Pipelinename": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
 				},
 				"annotations": []
 			},
@@ -347,7 +396,14 @@
 					{
 						"name": "SendMail",
 						"type": "WebActivity",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -360,11 +416,12 @@
 							"method": "POST",
 							"headers": {
 								"Authorization": {
-									"value": "@pipeline().globalParameters.EmailKey",
+									"value": "@concat('Bearer ',activity('GetSendGridAPIKey').output.value)",
 									"type": "Expression"
 								},
 								"Content-Type": "application/json"
 							},
+							"disableCertValidation": true,
 							"url": {
 								"value": "@pipeline().globalParameters.global_sendmail_api_url",
 								"type": "Expression"
@@ -374,8 +431,39 @@
 								"type": "IntegrationRuntimeReference"
 							},
 							"body": {
-								"value": "{\n  \"personalizations\": [\n    {\n      \"to\": [\n        {\n          \"email\": @{pipeline().parameters.recipientEmail}\n        }\n      ],\n      \"subject\":  @{pipeline().parameters.EmailSubject}\n    }\n  ],\n  \"from\": {\n    \"email\": @{pipeline().globalParameters.FromEmail}\n  },\n  \"content\": [\n    {\n      \"type\": \"text/plain\",\n      \"value\": @{pipeline().parameters.EmailBody}\n    }\n  ]\n}\n",
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"prem@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.EmailSubject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"Subject: @{pipeline().parameters.EmailSubject}\\nImportance: \"High\"\\nContent: @{pipeline().parameters.EmailBody}]}}",
 								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
 							}
 						}
 					}
@@ -399,6 +487,134 @@
 				},
 				"folder": {
 					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendEmail_IT')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"personalizations": [
+									{
+										"to": [
+											{
+												"email": "SCCUADFNotifications@claysys.com"
+											},
+											{
+												"email": "dbcusoitsupport@cunextgen.com"
+											}
+										]
+									}
+								],
+								"from": {
+									"email": "@{pipeline().globalParameters.FromEmail}"
+								},
+								"subject": "@{pipeline().parameters.subject}",
+								"content": [
+									{
+										"type": "text/html",
+										"value": " @{pipeline().parameters.content}"
+									}
+								],
+								"custom_args": {
+									"pipelineName": "@{pipeline().parameters.pipelineName}",
+									"importance": "@{pipeline().parameters.importance}"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string"
+					},
+					"Content": {
+						"type": "string"
+					},
+					"Importance": {
+						"type": "string"
+					},
+					"Pipelinename": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/BacPac"
 				},
 				"annotations": []
 			},
@@ -611,64 +827,6 @@
 					"credential": {
 						"referenceName": "Credential_SCCUUAT_BBAlerts",
 						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataDev')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "For DEV SQL Server",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_database')]",
-					"encrypt": "optional",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credentials_BusinessDataDev",
-						"type": "CredentialReference"
-					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataPROD')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlMI",
-				"typeProperties": {
-					"server": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_server')]",
-					"database": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "UserAssignedManagedIdentity",
-					"credential": {
-						"referenceName": "Credential_SCCU_BusinessDataPROD",
-						"type": "CredentialReference"
-					},
-					"alwaysEncryptedSettings": {
-						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
 					}
 				},
 				"connectVia": {

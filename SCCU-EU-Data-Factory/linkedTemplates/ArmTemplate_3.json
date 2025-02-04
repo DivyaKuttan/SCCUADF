@@ -13,232 +13,34 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/ActivityLogsSource')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlMITable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataPROD",
+					"referenceName": "SCCU_AdminLogdb_PROD",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "Id",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "DateTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "MemberName",
-						"type": "varchar"
-					},
-					{
-						"name": "AccountNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "Module",
-						"type": "varchar"
-					},
-					{
-						"name": "Description",
-						"type": "varchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Guid",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ObjectGUID",
-						"type": "varchar"
-					},
-					{
-						"name": "BrowserVersion",
-						"type": "varchar"
-					},
-					{
-						"name": "IPAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "BrowserName",
-						"type": "varchar"
-					},
-					{
-						"name": "LogEventType",
-						"type": "varchar"
-					},
-					{
-						"name": "SessionID",
-						"type": "varchar"
-					},
-					{
-						"name": "MappingType",
-						"type": "varchar"
-					},
-					{
-						"name": "DeviceID",
-						"type": "varchar"
-					},
-					{
-						"name": "ActionOrService",
-						"type": "varchar"
-					},
-					{
-						"name": "PayeeOrDestinationAccountNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "TransactionAmount",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "SuccessStatus",
-						"type": "varchar"
-					},
-					{
-						"name": "PersonNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "eAgreementNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "SourceAccountNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "CorrelationID",
-						"type": "varchar"
-					},
-					{
-						"name": "PayeeOrDestination",
-						"type": "varchar"
-					},
-					{
-						"name": "SourceOfLogin",
-						"type": "varchar"
-					},
-					{
-						"name": "UserAgentString",
-						"type": "text"
-					},
-					{
-						"name": "IsExcluded",
-						"type": "bit"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "activitylogs"
-				}
+				"schema": [],
+				"typeProperties": {}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Archive_Destination')]",
+			"name": "[concat(parameters('factoryName'), '/BacPac_Email_Proc')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "SCCU_Archivedb_PROD_DTU",
+					"referenceName": "SCCU_Logdb_PROD_DTU",
 					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"DestinationTable": {
-						"type": "string"
-					},
-					"DestinationSchema": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "DataRetentionDatasets/Dynamic"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ErrorID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "TenantID",
-						"type": "varchar"
-					},
-					{
-						"name": "FormID",
-						"type": "varchar"
-					},
-					{
-						"name": "SystemIP",
-						"type": "varchar"
-					},
-					{
-						"name": "SiteURL",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Message",
-						"type": "nvarchar"
-					},
-					{
-						"name": "InnerException",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Comments",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().DestinationSchema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().DestinationTable",
-						"type": "Expression"
-					}
-				}
+				"schema": [],
+				"typeProperties": {}
 			},
 			"dependsOn": []
 		},

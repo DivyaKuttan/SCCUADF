@@ -16,6 +16,22 @@
 			"metadata": "Secure string for 'connectionString' of 'SCCU_OfflineModedb_PROD_DTU'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sccuprodsqldtu.database.windows.net;Initial Catalog=SCCU_OfflineModedb_PROD"
 		},
+		"SCCU_BusinessDataDev_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccudevsql01.database.windows.net"
+		},
+		"SCCU_BusinessDataDev_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCU_BusinessData_Dev"
+		},
+		"SCCU_BusinessDataPROD_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_BusinessDataPROD_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCU_Businessdata_PROD"
+		},
 		"SCCU_BusinessDataUAT_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "sccuuatsql01.database.windows.net"
@@ -77,6 +93,60 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataDev')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "For DEV SQL Server",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]",
+					"database": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "UserAssignedManagedIdentity",
+					"credential": {
+						"referenceName": "Credentials_BusinessDataDev",
+						"type": "CredentialReference"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataPROD')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlMI",
+				"typeProperties": {
+					"server": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_server')]",
+					"database": "[parameters('SCCU_BusinessDataPROD_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "UserAssignedManagedIdentity",
+					"credential": {
+						"referenceName": "Credential_SCCU_BusinessDataPROD",
+						"type": "CredentialReference"
+					},
+					"alwaysEncryptedSettings": {
+						"alwaysEncryptedAkvAuthType": "ManagedIdentity"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataUAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -318,293 +388,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ActivityLogsBatchDelete10M')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ActivityLogsBatchDelete10M",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_BusinessDataPROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-35 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/MISC"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BacPac Tables ACISeri_CheckFree_Vsofts_WeeklyTwice')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-				"activities": [
-					{
-						"name": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/BacPac"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BacPac Tables Daily')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ExternalRequestTxs_BacPac",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUpTables]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "sp_Bacpac_BackUp_NextlyCoreLog",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "ExternalRequestTxs_BacPac",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_NextlyCoreLog]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Delete ExternalRequestTxs",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "sp_Bacpac_BackUp_NextlyCoreLog",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteBackUpTables]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Delete NextlyCoreLog",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Delete ExternalRequestTxs",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_Delete_NextlyCoreLog]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/BacPac"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD')]",
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BacPac Tables Log_LogTables_WeeklyTwice')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "[[dbo].[sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice]",
-				"activities": [
-					{
-						"name": "sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "sp_Bacpac_Delete_Log_LogTables_WeeklyTwice",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_Delete_Log_LogTables_WeeklyTwice]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/BacPac"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/BusinessData_Rebuild_ActivityLogs_Index')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -639,7 +422,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/BusinessData_Rebuild_ActivityLogs_Stat')]",
@@ -676,7 +461,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/BusinessData_Rebuild_Index')]",
@@ -767,7 +554,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/BusinessData_Rebuild_Stat')]",
@@ -804,7 +593,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PurgeOldData_ActivityMonitorLog')]",
@@ -850,7 +641,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/PurgeOld_ActivityLogs')]",
@@ -931,6 +724,238 @@
 					"name": "DataRetention/MISC"
 				},
 				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ActivityLogsSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_BusinessDataPROD",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlMITable",
+				"schema": [
+					{
+						"name": "Id",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "DateTime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "MemberName",
+						"type": "varchar"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "Module",
+						"type": "varchar"
+					},
+					{
+						"name": "Description",
+						"type": "varchar"
+					},
+					{
+						"name": "Type",
+						"type": "varchar"
+					},
+					{
+						"name": "Guid",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ObjectGUID",
+						"type": "varchar"
+					},
+					{
+						"name": "BrowserVersion",
+						"type": "varchar"
+					},
+					{
+						"name": "IPAddress",
+						"type": "varchar"
+					},
+					{
+						"name": "BrowserName",
+						"type": "varchar"
+					},
+					{
+						"name": "LogEventType",
+						"type": "varchar"
+					},
+					{
+						"name": "SessionID",
+						"type": "varchar"
+					},
+					{
+						"name": "MappingType",
+						"type": "varchar"
+					},
+					{
+						"name": "DeviceID",
+						"type": "varchar"
+					},
+					{
+						"name": "ActionOrService",
+						"type": "varchar"
+					},
+					{
+						"name": "PayeeOrDestinationAccountNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "TransactionAmount",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "SuccessStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "PersonNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "eAgreementNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "SourceAccountNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "CorrelationID",
+						"type": "varchar"
+					},
+					{
+						"name": "PayeeOrDestination",
+						"type": "varchar"
+					},
+					{
+						"name": "SourceOfLogin",
+						"type": "varchar"
+					},
+					{
+						"name": "UserAgentString",
+						"type": "text"
+					},
+					{
+						"name": "IsExcluded",
+						"type": "bit"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "activitylogs"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Archive_Destination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_Archivedb_PROD_DTU",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"DestinationTable": {
+						"type": "string"
+					},
+					"DestinationSchema": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetentionDatasets/Dynamic"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ErrorID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TenantID",
+						"type": "varchar"
+					},
+					{
+						"name": "FormID",
+						"type": "varchar"
+					},
+					{
+						"name": "SystemIP",
+						"type": "varchar"
+					},
+					{
+						"name": "SiteURL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Type",
+						"type": "varchar"
+					},
+					{
+						"name": "Message",
+						"type": "nvarchar"
+					},
+					{
+						"name": "InnerException",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Comments",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().DestinationSchema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().DestinationTable",
+						"type": "Expression"
+					}
+				}
 			},
 			"dependsOn": []
 		}

@@ -200,6 +200,14 @@
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage01"
 		},
+		"SCCU-KEYVAULT_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-NW-RG/providers/Microsoft.KeyVault/vaults/SCCU-KEYVAULT"
+		},
+		"SCCU-KEYVAULT_properties_groupId": {
+			"type": "string",
+			"defaultValue": "vault"
+		},
 		"SCCU_DataFactory_FileShare_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/a8cd236d-26bd-46eb-81fc-dea8aac0fe3c/resourceGroups/SCCU-EU-PROD-SRV-RG/providers/Microsoft.Storage/storageAccounts/sccudatafactorystorage"
@@ -630,54 +638,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/ActivityLogsBatchDelete10M')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ActivityLogsBatchDelete10M",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_BusinessDataPROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) < Cast(getdate()-35 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/MISC"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/ActivityLogsMonitorLogsCount')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1074,6 +1034,38 @@
 							"referenceName": "SCCU_Logdb_PROD_DTU",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "BacPac_ACISeri_Notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BacPac_Emails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1085,7 +1077,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]",
+				"[concat(variables('factoryId'), '/pipelines/BacPac_Emails')]"
 			]
 		},
 		{
@@ -1194,6 +1187,32 @@
 							"referenceName": "SCCU_Logdb_PROD_DTU",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "BacPacDaily_Notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Delete NextlyCoreLog",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BacPac_Emails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"procName": "sp_Bacpac_GetEmailData_Daily"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1206,7 +1225,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD')]",
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]",
+				"[concat(variables('factoryId'), '/pipelines/BacPac_Emails')]"
 			]
 		},
 		{
@@ -1255,6 +1275,38 @@
 							"referenceName": "SCCU_Logdb_PROD_DTU",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "BacPacLog_Notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "sp_Bacpac_Delete_Log_LogTables_WeeklyTwice",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BacPac_Emails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_Log"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1266,7 +1318,95 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]",
+				"[concat(variables('factoryId'), '/pipelines/BacPac_Emails')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BacPac_Emails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Send Email",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Getemail",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail_IT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@activity('Getemail').output.firstRow.Subject",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('Getemail').output.firstRow.EmailBody",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Getemail",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "EXEC @{pipeline().parameters.procName}",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "BacPac_Email_Proc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"procName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/BacPac"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SendEmail_IT')]",
+				"[concat(variables('factoryId'), '/datasets/BacPac_Email_Proc')]"
 			]
 		},
 		{
@@ -2715,86 +2855,6 @@
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_OfflineModedb_PROD_DTU')]",
 				"[concat(variables('factoryId'), '/datasets/Completed_DebitCardDetails_Source')]",
 				"[concat(variables('factoryId'), '/datasets/Completed_DebitCardDetails_Sink')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/EmailAlerts')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Pipeline email notification on job completion",
-				"activities": [
-					{
-						"name": "Send Email for pipeline",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/json"
-							},
-							"url": {
-								"value": "@pipeline().globalParameters.global_sendmail_api_url",
-								"type": "Expression"
-							},
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"body": {
-								"DataFactoryName": "@{pipeline().parameters.DataFactoryName}",
-								"PipelineName": "@{pipeline().parameters.PipelineName}",
-								"Activity": "@{pipeline().parameters.Activity}",
-								"PipelineStatus": "@{pipeline().parameters.Status}",
-								"EmailTo": "@{pipeline().parameters.EmailTo}",
-								"Subject": "@{pipeline().parameters.Subject}",
-								"Importance": "@{pipeline().parameters.Importance}",
-								"Message": "@{pipeline().parameters.Message}"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"Activity": {
-						"type": "string"
-					},
-					"EmailTo": {
-						"type": "string"
-					},
-					"Subject": {
-						"type": "string"
-					},
-					"Message": {
-						"type": "string"
-					},
-					"Status": {
-						"type": "string"
-					},
-					"Importance": {
-						"type": "string"
-					},
-					"DataFactoryName": {
-						"type": "string"
-					},
-					"Pipelinename": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -8261,6 +8321,8 @@
 					{
 						"name": "PurgeOld_ActivityLogs",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ActivityLogsToArchive",
@@ -10095,7 +10157,7 @@
 							{
 								"activity": "Static BusinessData",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -11657,7 +11719,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,t2.createddate FROM EmulationActivityDynamicDescriptionValue t1 LEFT JOIN EmulationActivityLogs t2 on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM EmulationActivityDynamicDescriptionValue t1 WITH (NOLOCK) LEFT JOIN EmulationActivityLogs t2 WITH (NOLOCK) on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n",
 								"partitionOption": "None"
 							},
 							"sink": {
@@ -11809,7 +11871,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,t2.createddate FROM MemberActivityDynamicDescriptionValue t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate \nFROM MemberActivityDynamicDescriptionValue t1 with (Nolock) LEFT JOIN memberactivitylog t2 with (Nolock) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
 								"partitionOption": "None"
 							},
 							"sink": {
@@ -11961,7 +12023,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,t2.createddate FROM TransferMemberActivityLog t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
 								"partitionOption": "None"
 							},
 							"sink": {
@@ -12340,15 +12402,54 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SendEmailActivity')]",
+			"name": "[concat(parameters('factoryName'), '/SendEmail')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Pipeline email notification on job completion",
 				"activities": [
 					{
-						"name": "SendMail",
+						"name": "GetSendGridAPIKey",
 						"type": "WebActivity",
 						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -12361,11 +12462,105 @@
 							"method": "POST",
 							"headers": {
 								"Authorization": {
-									"value": "@pipeline().globalParameters.EmailKey",
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
 									"type": "Expression"
 								},
 								"Content-Type": "application/json"
 							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"personalizations": [
+									{
+										"to": [
+											{
+												"email": "SCCUADFNotifications@claysys.com"
+											}
+										]
+									}
+								],
+								"from": {
+									"email": "@{pipeline().globalParameters.FromEmail}"
+								},
+								"subject": "@{pipeline().parameters.subject}",
+								"content": [
+									{
+										"type": "text/html",
+										"value": " @{pipeline().parameters.content}"
+									}
+								],
+								"custom_args": {
+									"pipelineName": "@{pipeline().parameters.pipelineName}",
+									"importance": "@{pipeline().parameters.importance}"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string"
+					},
+					"Content": {
+						"type": "string"
+					},
+					"Importance": {
+						"type": "string"
+					},
+					"Pipelinename": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendEmailActivity')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SendMail",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ',activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"disableCertValidation": true,
 							"url": {
 								"value": "@pipeline().globalParameters.global_sendmail_api_url",
 								"type": "Expression"
@@ -12375,8 +12570,39 @@
 								"type": "IntegrationRuntimeReference"
 							},
 							"body": {
-								"value": "{\n  \"personalizations\": [\n    {\n      \"to\": [\n        {\n          \"email\": @{pipeline().parameters.recipientEmail}\n        }\n      ],\n      \"subject\":  @{pipeline().parameters.EmailSubject}\n    }\n  ],\n  \"from\": {\n    \"email\": @{pipeline().globalParameters.FromEmail}\n  },\n  \"content\": [\n    {\n      \"type\": \"text/plain\",\n      \"value\": @{pipeline().parameters.EmailBody}\n    }\n  ]\n}\n",
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"prem@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.EmailSubject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"Subject: @{pipeline().parameters.EmailSubject}\\nImportance: \"High\"\\nContent: @{pipeline().parameters.EmailBody}]}}",
 								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
 							}
 						}
 					}
@@ -12400,6 +12626,134 @@
 				},
 				"folder": {
 					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendEmail_IT')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"personalizations": [
+									{
+										"to": [
+											{
+												"email": "SCCUADFNotifications@claysys.com"
+											},
+											{
+												"email": "dbcusoitsupport@cunextgen.com"
+											}
+										]
+									}
+								],
+								"from": {
+									"email": "@{pipeline().globalParameters.FromEmail}"
+								},
+								"subject": "@{pipeline().parameters.subject}",
+								"content": [
+									{
+										"type": "text/html",
+										"value": " @{pipeline().parameters.content}"
+									}
+								],
+								"custom_args": {
+									"pipelineName": "@{pipeline().parameters.pipelineName}",
+									"importance": "@{pipeline().parameters.importance}"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string"
+					},
+					"Content": {
+						"type": "string"
+					},
+					"Importance": {
+						"type": "string"
+					},
+					"Pipelinename": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/BacPac"
 				},
 				"annotations": []
 			},
@@ -13010,6 +13364,42 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_Archivedb_PROD_DTU')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlMITable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_AdminLogdb_PROD",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlMITable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_AdminLogdb_PROD')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BacPac_Email_Proc')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_Logdb_PROD_DTU",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]"
 			]
 		},
 		{
@@ -21026,6 +21416,18 @@
 			"apiVersion": "2018-06-01",
 			"properties": {},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/default/SCCU-KEYVAULT')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('SCCU-KEYVAULT_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('SCCU-KEYVAULT_properties_groupId')]"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default/SCCU_DataFactory_FileShare')]",

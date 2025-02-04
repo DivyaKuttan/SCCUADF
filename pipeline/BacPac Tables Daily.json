@@ -102,6 +102,32 @@
 					"referenceName": "SCCU_Logdb_PROD_DTU",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "BacPacDaily_Notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Delete NextlyCoreLog",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BacPac_Emails",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"procName": "sp_Bacpac_GetEmailData_Daily"
+					}
+				}
 			}
 		],
 		"folder": {

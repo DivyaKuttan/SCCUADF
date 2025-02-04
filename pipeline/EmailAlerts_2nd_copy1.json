@@ -84,7 +84,7 @@
 						"content": [
 							{
 								"type": "text/html",
-								"value": "Subject: @{pipeline().parameters.subject}\nImportance: @{pipeline().parameters.importance}\nContent: @{pipeline().parameters.content}\nPipeline Name: @{pipeline().parameters.pipelineName}"
+								"value": " @{pipeline().parameters.content}"
 							}
 						],
 						"custom_args": {

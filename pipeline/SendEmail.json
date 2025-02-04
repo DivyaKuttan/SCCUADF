@@ -1,5 +1,5 @@
 {
-	"name": "EmailAlerts_2nd_copy1",
+	"name": "SendEmail",
 	"properties": {
 		"description": "Pipeline email notification on job completion",
 		"activities": [

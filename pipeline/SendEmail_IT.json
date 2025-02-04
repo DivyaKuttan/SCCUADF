@@ -1,5 +1,5 @@
 {
-	"name": "SendEmail_BacPac",
+	"name": "SendEmail_IT",
 	"properties": {
 		"description": "Pipeline email notification on job completion",
 		"activities": [

@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Execute Pipeline1",
+				"name": "Send Email",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -19,7 +19,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "EmailAlerts_2nd_copy1",
+						"referenceName": "SendEmail",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

@@ -42,6 +42,38 @@
 					"referenceName": "SCCU_Logdb_PROD_DTU",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "BacPac_ACISeri_Notification",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "BacPac_Emails",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
+					}
+				}
 			}
 		],
 		"folder": {

@@ -19,7 +19,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "SendEmail",
+						"referenceName": "SendEmail_BacPac",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

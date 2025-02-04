@@ -63,8 +63,7 @@
 		],
 		"parameters": {
 			"procName": {
-				"type": "string",
-				"defaultValue": "sp_Bacpac_GetEmailData_WeeklyTwice_Log"
+				"type": "string"
 			}
 		},
 		"annotations": []

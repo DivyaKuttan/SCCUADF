@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "BacPac_Email_Proc",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SCCU_Logdb_PROD_DTU",

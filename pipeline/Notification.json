@@ -24,7 +24,10 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": "@activity('Getemail').output.firstRow.Subject",
+						"Subject": {
+							"value": "@activity('Getemail').output.firstRow.Subject",
+							"type": "Expression"
+						},
 						"Content": {
 							"value": "@activity('Getemail').output.firstRow.EmailBody",
 							"type": "Expression"
@@ -47,7 +50,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[dbo].[sp_Bacpac_GetEmailData_Daily]",
+						"sqlReaderQuery": "EXEC @{pipeline().parameters.procName}",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -58,6 +61,12 @@
 				}
 			}
 		],
+		"parameters": {
+			"procName": {
+				"type": "string",
+				"defaultValue": "sp_Bacpac_GetEmailData_WeeklyTwice_Log"
+			}
+		},
 		"annotations": []
 	}
 }

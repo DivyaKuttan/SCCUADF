@@ -104,9 +104,6 @@
 			},
 			"Importance": {
 				"type": "string"
-			},
-			"Pipelinename": {
-				"type": "string"
 			}
 		},
 		"folder": {

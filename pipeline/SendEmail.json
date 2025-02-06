@@ -68,29 +68,8 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"personalizations": [
-							{
-								"to": [
-									{
-										"email": "SCCUADFNotifications@claysys.com"
-									}
-								]
-							}
-						],
-						"from": {
-							"email": "@{pipeline().globalParameters.FromEmail}"
-						},
-						"subject": "@{pipeline().parameters.subject}",
-						"content": [
-							{
-								"type": "text/html",
-								"value": " @{pipeline().parameters.content}"
-							}
-						],
-						"custom_args": {
-							"pipelineName": "@{pipeline().parameters.pipelineName}",
-							"importance": "@{pipeline().parameters.importance}"
-						}
+						"value": "@pipeline().parameters.Content",
+						"type": "Expression"
 					}
 				}
 			}

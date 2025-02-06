@@ -54,7 +54,7 @@
 							}
 						},
 						{
-							"name": "SendEmail",
+							"name": "SendEmailSuccess",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
@@ -90,6 +90,40 @@
 										"type": "Expression"
 									},
 									"Importance": "Low"
+								}
+							}
+						},
+						{
+							"name": "SendMainl-ActivityLogFailure",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "SCCUPROD_ActivityLogs_Main",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "Pipeline @activity('SCCUPROD_ActivityLogs_Main').name failed",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "@activity('SCCUPROD_ActivityLogs_Main').output.errors.message",
+										"type": "Expression"
+									},
+									"Importance": "High"
 								}
 							}
 						}

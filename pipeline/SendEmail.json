@@ -68,7 +68,7 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.content}\"}],\"importance\":\"@{pipeline().parameters.importance}\"}}",
+						"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"importance\":\"@{pipeline().parameters.Importance}\"}}",
 						"type": "Expression"
 					}
 				}

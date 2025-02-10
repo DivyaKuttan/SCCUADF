@@ -317,13 +317,20 @@
 				"typeProperties": {
 					"source": {
 						"type": "SqlMISource",
-						"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+						"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
 						"partitionOption": "None"
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"ID"
+							]
+						},
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -387,6 +394,18 @@
 									"name": "SourceAccountNumber",
 									"type": "String",
 									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							}
 						],

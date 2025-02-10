@@ -5,6 +5,8 @@
 			{
 				"name": "EmulationActivityDynamicDescriptionValue_copy",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -108,6 +110,8 @@
 			{
 				"name": "EmulationActivityDynamicDescriptionValue",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "EmulationActivityDynamicDescriptionValue_copy",
@@ -141,6 +145,8 @@
 			{
 				"name": "EmulationActivityDynamicDescriptionValue_Purge",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "EmulationActivityDynamicDescriptionValue",
@@ -174,6 +180,8 @@
 			{
 				"name": "MemberActivityDynamicDescriptionValue_Copy",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -277,6 +285,8 @@
 			{
 				"name": "MemberActivityDynamicDescriptionValue",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "MemberActivityDynamicDescriptionValue_Copy",
@@ -310,6 +320,8 @@
 			{
 				"name": "MemberActivityDynamicDescriptionValue_Purge",
 				"type": "Script",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "MemberActivityDynamicDescriptionValue",

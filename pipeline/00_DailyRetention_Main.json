@@ -154,6 +154,22 @@
 						"type": "DatasetReference"
 					}
 				}
+			},
+			{
+				"name": "AdminLoginHistory",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SCCUPROD_AdminLoginHistory",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"folder": {

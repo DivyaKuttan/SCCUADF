@@ -89,7 +89,7 @@
 										"value": "SCCU Daily DB maintenance has been completed.",
 										"type": "Expression"
 									},
-									"Importance": "Low"
+									"Importance": "Normal"
 								}
 							}
 						},

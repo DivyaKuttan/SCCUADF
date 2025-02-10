@@ -108,7 +108,7 @@
 			"Importance": {
 				"type": "string"
 			},
-			"Pipelinename": {
+			"PipelineName": {
 				"type": "string"
 			}
 		},

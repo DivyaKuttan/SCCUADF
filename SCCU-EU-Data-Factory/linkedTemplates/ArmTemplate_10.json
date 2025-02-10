@@ -49,6 +49,150 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/BacPac Tables Daily')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ExternalRequestTxs_BacPac",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUpTables]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_Logdb_PROD",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "sp_Bacpac_BackUp_NextlyCoreLog",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ExternalRequestTxs_BacPac",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_NextlyCoreLog]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_Logdb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Delete ExternalRequestTxs",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "sp_Bacpac_BackUp_NextlyCoreLog",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteBackUpTables]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_Logdb_PROD",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Delete NextlyCoreLog",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Delete ExternalRequestTxs",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_Bacpac_Delete_NextlyCoreLog]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_Logdb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "BacPacDaily_Notification",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Delete NextlyCoreLog",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BacPac_Emails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"procName": "sp_Bacpac_GetEmailData_Daily"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/BacPac"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/BacPac Tables Log_LogTables_WeeklyTwice')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1237,6 +1381,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/BacPac Tables Daily')]",
 				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_BusinessData_DynamicRetention')]"
 			]
 		},
@@ -1353,8 +1498,116 @@
 											"referenceName": "SCCUPROD_ActivityLogs_Main",
 											"type": "PipelineReference"
 										},
-										"waitOnCompletion": false,
+										"waitOnCompletion": true,
 										"parameters": {}
+									}
+								},
+								{
+									"name": "SendEmailSuccess",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "SCCU Daily maintenance has been completed",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "SCCU Daily DB maintenance has been completed.",
+												"type": "Expression"
+											},
+											"Importance": "Normal"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-ActivityLogFailure",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('SCCUPROD_ActivityLogs_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('SCCUPROD_ActivityLogs_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-BusinessDataFailure_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('PROD_DynamicRetention_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('PROD_DynamicRetention_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
 									}
 								}
 							]
@@ -1384,6 +1637,23 @@
 								"type": "DatasetReference",
 								"parameters": {}
 							}
+						}
+					},
+					{
+						"name": "AdminLoginHistory",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SCCUPROD_AdminLoginHistory",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
 						}
 					}
 				],

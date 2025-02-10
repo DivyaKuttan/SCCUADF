@@ -334,29 +334,8 @@
 								"type": "IntegrationRuntimeReference"
 							},
 							"body": {
-								"personalizations": [
-									{
-										"to": [
-											{
-												"email": "SCCUADFNotifications@claysys.com"
-											}
-										]
-									}
-								],
-								"from": {
-									"email": "@{pipeline().globalParameters.FromEmail}"
-								},
-								"subject": "@{pipeline().parameters.subject}",
-								"content": [
-									{
-										"type": "text/html",
-										"value": " @{pipeline().parameters.content}"
-									}
-								],
-								"custom_args": {
-									"pipelineName": "@{pipeline().parameters.pipelineName}",
-									"importance": "@{pipeline().parameters.importance}"
-								}
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"type": "Expression"
 							}
 						}
 					}
@@ -366,16 +345,16 @@
 				},
 				"parameters": {
 					"Subject": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "test sub"
 					},
 					"Content": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "Teest ema"
 					},
 					"Importance": {
-						"type": "string"
-					},
-					"Pipelinename": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "Normal"
 					}
 				},
 				"folder": {
@@ -609,7 +588,7 @@
 					"Importance": {
 						"type": "string"
 					},
-					"Pipelinename": {
+					"PipelineName": {
 						"type": "string"
 					}
 				},

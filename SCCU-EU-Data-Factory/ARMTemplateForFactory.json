@@ -328,8 +328,116 @@
 											"referenceName": "SCCUPROD_ActivityLogs_Main",
 											"type": "PipelineReference"
 										},
-										"waitOnCompletion": false,
+										"waitOnCompletion": true,
 										"parameters": {}
+									}
+								},
+								{
+									"name": "SendEmailSuccess",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "SCCU Daily maintenance has been completed",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "SCCU Daily DB maintenance has been completed.",
+												"type": "Expression"
+											},
+											"Importance": "Normal"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-ActivityLogFailure",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('SCCUPROD_ActivityLogs_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('SCCUPROD_ActivityLogs_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-BusinessDataFailure_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('PROD_DynamicRetention_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('PROD_DynamicRetention_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
 									}
 								}
 							]
@@ -360,6 +468,23 @@
 								"parameters": {}
 							}
 						}
+					},
+					{
+						"name": "AdminLoginHistory",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SCCUPROD_AdminLoginHistory",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -372,8 +497,10 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/SCCUPROD_ArchiveSqlDataset')]",
+				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_AdminLoginHistory')]",
 				"[concat(variables('factoryId'), '/pipelines/PROD_DynamicRetention_Main')]",
-				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_ActivityLogs_Main')]"
+				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_ActivityLogs_Main')]",
+				"[concat(variables('factoryId'), '/pipelines/SendEmail')]"
 			]
 		},
 		{
@@ -8364,6 +8491,45 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SCCUPROD_AdminLoginHistory')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "spi_AdminLoginHistoryActiveMember",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[spi_AdminLoginHistoryActiveMember]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataPROD",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Admin_LogDB_DynamicRetention')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -11719,13 +11885,20 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM EmulationActivityDynamicDescriptionValue t1 WITH (NOLOCK) LEFT JOIN EmulationActivityLogs t2 WITH (NOLOCK) on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM EmulationActivityDynamicDescriptionValue t1 WITH (NOLOCK) LEFT JOIN EmulationActivityLogs t2 WITH (NOLOCK) on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -11765,6 +11938,18 @@
 											"name": "ActivityDynamicDescriptionValue",
 											"type": "String",
 											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
 										}
 									}
 								],
@@ -11817,7 +12002,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE t1\nFROM EmulationActivityDynamicDescriptionValue t1\nLEFT JOIN EmulationActivityLogs t2\n    ON t1.EmulationActivityLogId = t2.Id\nWHERE CAST(t2.CreatedDate AS DATE) < DATEADD(DAY, -10, CAST(GETDATE() AS DATE))\n    OR t2.Id IS NULL;"
+									"text": "DELETE t1\nFROM EmulationActivityDynamicDescriptionValue t1\nLEFT JOIN EmulationActivityLogs t2\n    ON t1.EmulationActivityLogId = t2.Id\nWHERE CAST(t2.CreatedDate AS DATE) < DATEADD(DAY, -10, CAST(GETDATE() AS DATE))"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -11871,13 +12056,20 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate \nFROM MemberActivityDynamicDescriptionValue t1 with (Nolock) LEFT JOIN memberactivitylog t2 with (Nolock) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate \nFROM MemberActivityDynamicDescriptionValue t1 with (Nolock) LEFT JOIN memberactivitylog t2 with (Nolock) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -11917,6 +12109,18 @@
 											"name": "ActivityDynamicDescriptionValue",
 											"type": "String",
 											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
 										}
 									}
 								],
@@ -11969,7 +12173,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE t1 FROM MemberActivityDynamicDescriptionValue t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n"
+									"text": "DELETE t1 FROM MemberActivityDynamicDescriptionValue t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -12023,13 +12227,20 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -12094,6 +12305,18 @@
 											"type": "String",
 											"physicalType": "varchar"
 										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
 									}
 								],
 								"typeConversion": true,
@@ -12145,7 +12368,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE t1 FROM TransferMemberActivityLog t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n"
+									"text": "DELETE t1 FROM TransferMemberActivityLog t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -12183,6 +12406,108 @@
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
 						}
+					},
+					{
+						"name": "SendMainl-BusinessDataFailure_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "TransferMemberActivityLog_Copy",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "MemberActivityDynamicDescriptionValue_Copy",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-BusinessDataFailure_copy1_copy2",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "EmulationActivityDynamicDescriptionValue_copy",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -12201,7 +12526,8 @@
 				"[concat(variables('factoryId'), '/datasets/PROD_MemberActivityDynamicDescriptionValue_Source')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_MemberActivityDynamicDescriptionValue_Destination')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_TransferMemberActivityLog_Source')]",
-				"[concat(variables('factoryId'), '/datasets/PROD_TransferMemberActivityLog_Destination')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_TransferMemberActivityLog_Destination')]",
+				"[concat(variables('factoryId'), '/pipelines/SendEmail')]"
 			]
 		},
 		{
@@ -12473,29 +12799,8 @@
 								"type": "IntegrationRuntimeReference"
 							},
 							"body": {
-								"personalizations": [
-									{
-										"to": [
-											{
-												"email": "SCCUADFNotifications@claysys.com"
-											}
-										]
-									}
-								],
-								"from": {
-									"email": "@{pipeline().globalParameters.FromEmail}"
-								},
-								"subject": "@{pipeline().parameters.subject}",
-								"content": [
-									{
-										"type": "text/html",
-										"value": " @{pipeline().parameters.content}"
-									}
-								],
-								"custom_args": {
-									"pipelineName": "@{pipeline().parameters.pipelineName}",
-									"importance": "@{pipeline().parameters.importance}"
-								}
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"type": "Expression"
 							}
 						}
 					}
@@ -12505,16 +12810,16 @@
 				},
 				"parameters": {
 					"Subject": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "test sub"
 					},
 					"Content": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "Teest ema"
 					},
 					"Importance": {
-						"type": "string"
-					},
-					"Pipelinename": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "Normal"
 					}
 				},
 				"folder": {
@@ -12748,7 +13053,7 @@
 					"Importance": {
 						"type": "string"
 					},
-					"Pipelinename": {
+					"PipelineName": {
 						"type": "string"
 					}
 				},

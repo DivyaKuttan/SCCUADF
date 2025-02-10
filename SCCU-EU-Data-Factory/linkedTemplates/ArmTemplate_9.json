@@ -13,6 +13,283 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Nextly_LoanDueAlerts_PROD')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ExternalAlert_LoanDueStaging_Copy data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/LoanDueAlerts",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlMISink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "SubscriptionID",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "SubscriptionID",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "DueDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DueDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "AmountDue",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AmountDue",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Prod_LoanDueAlertsSourceDataset",
+								"type": "DatasetReference",
+								"parameters": {
+									"TransactionFileName": " @pipeline().parameters.FileName"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Prod_LoanDueAlertsSinkDataSet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "External_LoanAlertQueue_Stored procedure",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ExternalAlert_LoanDueStaging_Copy data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "spi_ExternalLoanALertQueue"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataPROD",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "Truncate LoanDueAlerts staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "Prod_LoanDueAlertsSourceDataset",
+								"type": "DatasetReference",
+								"parameters": {
+									"TransactionFileName": " @pipeline().parameters.FileName"
+								}
+							},
+							"fieldList": [
+								"exists"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "External_LoanAlertQueue_Stored procedure",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/LoanDueAlerts",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "PROD_CompletedLoanDueAlertsSource",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "PROD_CompletedLoanDueAlertsSink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Truncate LoanDueAlerts staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "sp_Truncate_External_LoanDueAlertStaging"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_BusinessDataPROD",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"concurrency": 1,
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string",
+						"defaultValue": "LoanDueAlerts10102024.txt"
+					},
+					"FilePath": {
+						"type": "string",
+						"defaultValue": "to-nextly/PROD/LoanDueAlerts"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Nextly_ThresholdAlert_PROD')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -4170,13 +4447,20 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM EmulationActivityDynamicDescriptionValue t1 WITH (NOLOCK) LEFT JOIN EmulationActivityLogs t2 WITH (NOLOCK) on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM EmulationActivityDynamicDescriptionValue t1 WITH (NOLOCK) LEFT JOIN EmulationActivityLogs t2 WITH (NOLOCK) on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -4216,6 +4500,18 @@
 											"name": "ActivityDynamicDescriptionValue",
 											"type": "String",
 											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
 										}
 									}
 								],
@@ -4268,7 +4564,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE t1\nFROM EmulationActivityDynamicDescriptionValue t1\nLEFT JOIN EmulationActivityLogs t2\n    ON t1.EmulationActivityLogId = t2.Id\nWHERE CAST(t2.CreatedDate AS DATE) < DATEADD(DAY, -10, CAST(GETDATE() AS DATE))\n    OR t2.Id IS NULL;"
+									"text": "DELETE t1\nFROM EmulationActivityDynamicDescriptionValue t1\nLEFT JOIN EmulationActivityLogs t2\n    ON t1.EmulationActivityLogId = t2.Id\nWHERE CAST(t2.CreatedDate AS DATE) < DATEADD(DAY, -10, CAST(GETDATE() AS DATE))"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -4322,13 +4618,20 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate \nFROM MemberActivityDynamicDescriptionValue t1 with (Nolock) LEFT JOIN memberactivitylog t2 with (Nolock) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate \nFROM MemberActivityDynamicDescriptionValue t1 with (Nolock) LEFT JOIN memberactivitylog t2 with (Nolock) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -4368,6 +4671,18 @@
 											"name": "ActivityDynamicDescriptionValue",
 											"type": "String",
 											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
 										}
 									}
 								],
@@ -4420,7 +4735,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE t1 FROM MemberActivityDynamicDescriptionValue t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n"
+									"text": "DELETE t1 FROM MemberActivityDynamicDescriptionValue t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -4474,13 +4789,20 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  createddate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null",
+								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -4545,6 +4867,18 @@
 											"type": "String",
 											"physicalType": "varchar"
 										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
 									}
 								],
 								"typeConversion": true,
@@ -4596,7 +4930,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE t1 FROM TransferMemberActivityLog t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) or t2.id is null\n"
+									"text": "DELETE t1 FROM TransferMemberActivityLog t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -4633,6 +4967,108 @@
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "SendMainl-BusinessDataFailure_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "TransferMemberActivityLog_Copy",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "MemberActivityDynamicDescriptionValue_Copy",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-BusinessDataFailure_copy1_copy2",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "EmulationActivityDynamicDescriptionValue_copy",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
 						}
 					}
 				],
@@ -5533,150 +5969,6 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/BacPac"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BacPac Tables Daily')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ExternalRequestTxs_BacPac",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUpTables]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "sp_Bacpac_BackUp_NextlyCoreLog",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "ExternalRequestTxs_BacPac",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_NextlyCoreLog]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Delete ExternalRequestTxs",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "sp_Bacpac_BackUp_NextlyCoreLog",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteBackUpTables]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Delete NextlyCoreLog",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Delete ExternalRequestTxs",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_Delete_NextlyCoreLog]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "BacPacDaily_Notification",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Delete NextlyCoreLog",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "BacPac_Emails",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"procName": "sp_Bacpac_GetEmailData_Daily"
 							}
 						}
 					}

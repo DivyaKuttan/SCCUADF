@@ -68,7 +68,7 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"importance\":\"@{pipeline().parameters.Importance}\"}}",
+						"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
 						"type": "Expression"
 					}
 				}
@@ -76,13 +76,16 @@
 		],
 		"parameters": {
 			"Subject": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "test sub"
 			},
 			"Content": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "Teest ema"
 			},
 			"Importance": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "Normal"
 			}
 		},
 		"folder": {

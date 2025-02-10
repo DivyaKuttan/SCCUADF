@@ -116,11 +116,45 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"Subject": {
-										"value": "Pipeline @activity('SCCUPROD_ActivityLogs_Main').name failed",
+										"value": "@concat('Pipeline -', activity('SCCUPROD_ActivityLogs_Main').name, ' has been failed')",
 										"type": "Expression"
 									},
 									"Content": {
 										"value": "@activity('SCCUPROD_ActivityLogs_Main').output.errors.message",
+										"type": "Expression"
+									},
+									"Importance": "High"
+								}
+							}
+						},
+						{
+							"name": "SendMainl-BusinessDataFailure_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "PROD_DynamicRetention_Main",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "@concat('Pipeline -', activity('PROD_DynamicRetention_Main').name, ' has been failed')",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "@activity('PROD_DynamicRetention_Main').output.errors.message",
 										"type": "Expression"
 									},
 									"Importance": "High"

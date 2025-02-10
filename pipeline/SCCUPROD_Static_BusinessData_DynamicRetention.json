@@ -566,6 +566,74 @@
 						"Importance": "High"
 					}
 				}
+			},
+			{
+				"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "MemberActivityDynamicDescriptionValue_Copy",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "SendMainl-BusinessDataFailure_copy1_copy2",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "EmulationActivityDynamicDescriptionValue_copy",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
 			}
 		],
 		"folder": {

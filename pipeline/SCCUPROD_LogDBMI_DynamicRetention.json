@@ -113,7 +113,7 @@
 										],
 										"policy": {
 											"timeout": "0.12:00:00",
-											"retry": 0,
+											"retry": 3,
 											"retryIntervalInSeconds": 30,
 											"secureOutput": false,
 											"secureInput": false
@@ -193,6 +193,74 @@
 												}
 											}
 										]
+									},
+									{
+										"name": "SendMainl-BusinessDataFailure_copy1",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "LogDbMI_Copy data",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('LogDbMI_Copy data').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('LogDbMI_Copy data').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
+									},
+									{
+										"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "LogDBMI_Script",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('LogDBMI_Script').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('LogDBMI_Script').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
 									}
 								]
 							}

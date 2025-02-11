@@ -25,7 +25,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT DISTINCT DestinationSchemaName FROM MasterConfig WHERE IsArchiveEnabled=1 OR IsPurgeEnabled=1 ",
+						"sqlReaderQuery": "SELECT DISTINCT DestinationSchemaName FROM MasterConfig \r\nWHERE ( IsArchiveEnabled=1 OR IsPurgeEnabled=1 ) and \r\nDestinationSchemaName <> 'BusinessData'\r\nUNION \r\nSELECT 'BusinessData' as DestinationSchemaName",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -125,7 +125,7 @@
 														"referenceName": "SCCUPROD_BusinessData_DynamicRetention",
 														"type": "PipelineReference"
 													},
-													"waitOnCompletion": true
+													"waitOnCompletion": false
 												}
 											}
 										]

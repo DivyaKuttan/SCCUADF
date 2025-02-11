@@ -167,7 +167,14 @@
 			{
 				"name": "IsRetentionEnabled",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -192,7 +199,14 @@
 			{
 				"name": "AdminLoginHistory",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute Pipeline1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -203,6 +217,27 @@
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": "SCCU DB daily maintenance started",
+						"Content": "SCCU DB daily maintenance started",
+						"Importance": "Normal"
+					}
 				}
 			}
 		],

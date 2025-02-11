@@ -5,6 +5,9 @@
 			"referenceName": "SCCU_Archivedb_PROD_DTU",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "OfflineServices_DataSets/Offline_Archival"
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [],

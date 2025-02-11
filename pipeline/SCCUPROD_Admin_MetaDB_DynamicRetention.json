@@ -101,11 +101,11 @@
 								},
 								"ifTrueActivities": [
 									{
-										"name": "MetaDB_Script",
+										"name": "AdminMetaDB_Script",
 										"type": "Script",
 										"dependsOn": [
 											{
-												"activity": "MetaDB_Copy data",
+												"activity": "AdminMetaDB_Copy data",
 												"dependencyConditions": [
 													"Succeeded"
 												]
@@ -137,7 +137,7 @@
 										}
 									},
 									{
-										"name": "MetaDB_Copy data",
+										"name": "AdminMetaDB_Copy data",
 										"type": "Copy",
 										"dependsOn": [],
 										"policy": {
@@ -193,6 +193,74 @@
 												}
 											}
 										]
+									},
+									{
+										"name": "SendMainl-BusinessDataFailure_copy1",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "AdminMetaDB_Copy data",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('AdminMetaDB_Copy data').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('AdminMetaDB_Copy data').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
+									},
+									{
+										"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "AdminMetaDB_Script",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('AdminMetaDB_Script').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('AdminMetaDB_Script').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
 									}
 								]
 							}

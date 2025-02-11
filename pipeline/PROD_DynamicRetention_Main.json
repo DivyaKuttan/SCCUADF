@@ -125,7 +125,7 @@
 														"referenceName": "SCCUPROD_BusinessData_DynamicRetention",
 														"type": "PipelineReference"
 													},
-													"waitOnCompletion": false
+													"waitOnCompletion": true
 												}
 											}
 										]

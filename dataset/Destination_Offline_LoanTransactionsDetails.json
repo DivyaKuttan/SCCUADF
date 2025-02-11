@@ -1,0 +1,16 @@
+{
+	"name": "Destination_Offline_LoanTransactionsDetails",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SCCU_Archivedb_PROD_DTU",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "Offline",
+			"table": "LoanTransactionsDetails"
+		}
+	}
+}

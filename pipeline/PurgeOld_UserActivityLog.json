@@ -23,7 +23,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "DECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\nDECLARE @DaysOld INT = @{DaysOld};  -- ADF parameter\n\nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM Adaptive.UserActivityLog WITH (ROWLOCK)\n    WHERE CAST(CreatedOn AS DATE) <= DATEADD(DAY, -@DaysOld, CAST(GETDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT;  \n    PRINT @RowsAffected;\n    \n    WAITFOR DELAY '00:00:02';\n\n    IF @RowsAffected = 0\n        BREAK;  \nEND\n",
+								"value": "DECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\nDECLARE @DaysOld INT = @{pipeline().parameters.Daysold};  -- ADF parameter\n\nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM Adaptive.UserActivityLog WITH (ROWLOCK)\n    WHERE CAST(CreatedOn AS DATE) <= DATEADD(DAY, -@DaysOld, CAST(GETDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT;  \n    PRINT @RowsAffected;\n    \n    WAITFOR DELAY '00:00:02';\n\n    IF @RowsAffected = 0\n        BREAK;  \nEND\n",
 								"type": "Expression"
 							}
 						}

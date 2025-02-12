@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "UserActivityLog Delete by day",
+				"name": "UserActivityLog delete",
 				"type": "Script",
 				"dependsOn": [],
 				"policy": {
@@ -23,7 +23,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "@DECLARE BatchSize INT = 8000;\nDECLARE RowsAffected INT;\n\nWHILE 1 = 1\nBEGIN\n    DELETE TOP (BatchSize)\n    FROM Adaptive.UserActivityLog with (RowLock)\n    WHERE  CAST(CreatedOn AS DATE) <= DATEADD(DAY, -pipeline().parameters.DaysOld, CAST(GETDATE() AS DATE))\n\n    SET RowsAffected = ROWCOUNT;  \n    Print RowsAffected\n\tWAITFOR DELAY '00:00:02';\n    IF RowsAffected = 0\n        BREAK;  \nEND",
+								"value": "DECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\nDECLARE @DaysOld INT = @{DaysOld};  -- ADF parameter\n\nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM Adaptive.UserActivityLog WITH (ROWLOCK)\n    WHERE CAST(CreatedOn AS DATE) <= DATEADD(DAY, -@DaysOld, CAST(GETDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT;  \n    PRINT @RowsAffected;\n    \n    WAITFOR DELAY '00:00:02';\n\n    IF @RowsAffected = 0\n        BREAK;  \nEND\n",
 								"type": "Expression"
 							}
 						}
@@ -33,9 +33,9 @@
 			}
 		],
 		"parameters": {
-			"DaysOld": {
+			"Daysold": {
 				"type": "string",
-				"defaultValue": "90"
+				"defaultValue": "95"
 			}
 		},
 		"folder": {

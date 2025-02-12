@@ -23,7 +23,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "DECLARE @BatchSize INT = 8000;\nDECLARE @RowsAffected INT;\n\nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM Adaptive.UserActivityLog with (RowLock)\n    WHERE  CAST(CreatedOn AS DATE) <= DATEADD(DAY, -96, CAST(GETDATE() AS DATE))\n\n    SET @RowsAffected = @@ROWCOUNT;  \n    Print @RowsAffected\n\tWAITFOR DELAY '00:00:02';\n    IF @RowsAffected = 0\n        BREAK;  \nEND",
+								"value": "@DECLARE BatchSize INT = 8000;\nDECLARE RowsAffected INT;\n\nWHILE 1 = 1\nBEGIN\n    DELETE TOP (BatchSize)\n    FROM Adaptive.UserActivityLog with (RowLock)\n    WHERE  CAST(CreatedOn AS DATE) <= DATEADD(DAY, -pipeline().parameters.DaysOld, CAST(GETDATE() AS DATE))\n\n    SET RowsAffected = ROWCOUNT;  \n    Print RowsAffected\n\tWAITFOR DELAY '00:00:02';\n    IF RowsAffected = 0\n        BREAK;  \nEND",
 								"type": "Expression"
 							}
 						}

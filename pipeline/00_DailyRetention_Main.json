@@ -54,46 +54,6 @@
 							}
 						},
 						{
-							"name": "SendEmailSuccess",
-							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "PROD_DynamicRetention_Main",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								},
-								{
-									"activity": "SCCUPROD_ActivityLogs_Main",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "SendEmail",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"Subject": {
-										"value": "SCCU Daily maintenance has been completed",
-										"type": "Expression"
-									},
-									"Content": {
-										"value": "SCCU Daily DB maintenance has been completed.",
-										"type": "Expression"
-									},
-									"Importance": "Normal"
-								}
-							}
-						},
-						{
 							"name": "SendMainl-ActivityLogFailure",
 							"type": "ExecutePipeline",
 							"dependsOn": [
@@ -167,7 +127,14 @@
 			{
 				"name": "IsRetentionEnabled",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "SendEmail",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -192,7 +159,14 @@
 			{
 				"name": "AdminLoginHistory",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "SendEmail",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -203,6 +177,30 @@
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "SendEmail",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('SCCU DATA Retention/Maintenance Pipeline - ',pipeline().Pipeline,'Started')",
+							"type": "Expression"
+						},
+						"Content": "@concat('SCCU DATA Retention/Maintenance Pipeline - ',pipeline().Pipeline,'Started')",
+						"Importance": "Normal"
+					}
 				}
 			}
 		],

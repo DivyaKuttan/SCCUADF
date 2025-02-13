@@ -356,6 +356,46 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "SendEmailSuccess",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Purge_ForEach",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "BusinessData_Rebuild_Stat",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "SCCU Daily maintenance has been completed",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "SCCU Daily DB maintenance has been completed.",
+							"type": "Expression"
+						},
+						"Importance": "Normal"
+					}
+				}
 			}
 		],
 		"folder": {

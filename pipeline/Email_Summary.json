@@ -1,5 +1,5 @@
 {
-	"name": "SendEmail_Summary",
+	"name": "Email_Summary",
 	"properties": {
 		"description": "Pipeline Summary email notification on job completion",
 		"activities": [

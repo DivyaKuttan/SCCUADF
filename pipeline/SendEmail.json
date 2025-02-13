@@ -77,11 +77,11 @@
 		"parameters": {
 			"Subject": {
 				"type": "string",
-				"defaultValue": "test sub"
+				"defaultValue": "Test Email from ADF pipeline"
 			},
 			"Content": {
 				"type": "string",
-				"defaultValue": "Teest ema"
+				"defaultValue": "Test Email from ADF pipeline"
 			},
 			"Importance": {
 				"type": "string",

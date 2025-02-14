@@ -211,6 +211,10 @@
 										},
 										"userProperties": [],
 										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail_Failure",
+												"type": "PipelineReference"
+											},
 											"waitOnCompletion": true,
 											"parameters": {
 												"Subject": {
@@ -241,6 +245,10 @@
 										},
 										"userProperties": [],
 										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail_Failure",
+												"type": "PipelineReference"
+											},
 											"waitOnCompletion": true,
 											"parameters": {
 												"Subject": {

@@ -234,7 +234,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "StoredProcedure_Emails",
+									"referenceName": "Summary_StoredProcedure_Emails",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

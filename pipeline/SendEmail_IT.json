@@ -68,32 +68,8 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"personalizations": [
-							{
-								"to": [
-									{
-										"email": "SCCUADFNotifications@claysys.com"
-									},
-									{
-										"email": "dbcusoitsupport@cunextgen.com"
-									}
-								]
-							}
-						],
-						"from": {
-							"email": "@{pipeline().globalParameters.FromEmail}"
-						},
-						"subject": "@{pipeline().parameters.subject}",
-						"content": [
-							{
-								"type": "text/html",
-								"value": " @{pipeline().parameters.content}"
-							}
-						],
-						"custom_args": {
-							"pipelineName": "@{pipeline().parameters.pipelineName}",
-							"importance": "@{pipeline().parameters.importance}"
-						}
+						"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"},{\"email\":\"SCCUADF_PMONotifications@claysys.com\"}{\"email\":\"dbcusoitsupport@cunextgen.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\" @{pipeline().parameters.content}\"}],\"custom_args\":{\"pipelineName\":\"@{pipeline().parameters.pipelineName}\",\"importance\":\"@{pipeline().parameters.importance}\"}}",
+						"type": "Expression"
 					}
 				}
 			}

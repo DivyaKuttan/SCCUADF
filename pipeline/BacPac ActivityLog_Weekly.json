@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Execute Pipeline1",
+				"name": "ActivityLog Weekly Notification",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"policy": {

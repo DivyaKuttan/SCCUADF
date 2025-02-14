@@ -216,6 +216,32 @@
 									"Importance": "High"
 								}
 							}
+						},
+						{
+							"name": "Execute Pipeline2",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "SendEmailSuccess",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "StoredProcedure_Emails",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"procName": "sp_GetEmailData_BacpacRetention_Summary"
+								}
+							}
 						}
 					]
 				}

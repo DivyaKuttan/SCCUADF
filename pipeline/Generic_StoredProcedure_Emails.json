@@ -1,5 +1,5 @@
 {
-	"name": "StoredProcedure_Emails",
+	"name": "Generic_StoredProcedure_Emails",
 	"properties": {
 		"activities": [
 			{

@@ -1,0 +1,33 @@
+{
+	"name": "MondayBackUp",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "StoredProcedure_Emails",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"procName": {
+							"value": "sp_Bacpac_GetEmailData_WeeklyActivityLogs",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "DataRetention/MISC"
+		},
+		"annotations": []
+	}
+}

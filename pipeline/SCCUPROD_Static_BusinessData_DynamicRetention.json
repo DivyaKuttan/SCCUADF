@@ -550,19 +550,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "SendEmail",
+						"referenceName": "SendEmail_Failure",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
-							"type": "Expression"
-						},
+						"Subject": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+						"Content": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
 						"Importance": "High"
 					}
 				}
@@ -584,19 +578,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "SendEmail",
+						"referenceName": "SendEmail_Failure",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
-							"type": "Expression"
-						},
+						"Subject": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+						"Content": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
 						"Importance": "High"
 					}
 				}
@@ -618,19 +606,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "SendEmail",
+						"referenceName": "SendEmail_Failure",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
-							"type": "Expression"
-						},
+						"Subject": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+						"Content": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
 						"Importance": "High"
 					}
 				}

@@ -251,7 +251,7 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "Execute Pipeline1",
+						"activity": "Start Maintenance Notification",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -279,7 +279,7 @@
 				}
 			},
 			{
-				"name": "Execute Pipeline1",
+				"name": "Start Maintenance Notification",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"policy": {

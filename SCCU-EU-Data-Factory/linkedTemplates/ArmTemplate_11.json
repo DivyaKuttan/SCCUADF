@@ -1,0 +1,1076 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "SCCU-EU-Data-Factory"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/00_Offline_Main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MemberData",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "MemberDataDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "AccountDetails",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "MemberData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyAccountDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "UserCreditCard",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AccountDetails",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "UserCreditCards",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "CCMCreditCard",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "CCM_CreditCard_AccountDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "SavingsAccount",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "CK_SAV_Accounttransactions",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "DebitCards",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DebitCardDetails",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "AccountLockOut",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyAccountlockout",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "AccountRoles",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyAccountRoles",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "CrossAccounts",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyCrossAccounts",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "LoanTransaction",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "NextlyLoanTransactions",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_DynamicRetention_Main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "This pipeline has activities which archive/purge data from souce DB's to Archive DB ",
+				"activities": [
+					{
+						"name": "Distinct DB",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "BacPac Tables Daily",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT DISTINCT DestinationSchemaName FROM MasterConfig \r\nWHERE ( IsArchiveEnabled=1 OR IsPurgeEnabled=1 ) and \r\nDestinationSchemaName <> 'BusinessData'\r\nUNION \r\nSELECT 'BusinessData' as DestinationSchemaName",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_ArchiveSqlDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Schemas",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Distinct DB",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Distinct DB').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 1,
+							"activities": [
+								{
+									"name": "DbNameSwitch",
+									"type": "Switch",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"on": {
+											"value": "@item().DestinationSchemaName",
+											"type": "Expression"
+										},
+										"cases": [
+											{
+												"value": "MetaDb",
+												"activities": [
+													{
+														"name": "Meta DB",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_MetaDB_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "LogDb",
+												"activities": [
+													{
+														"name": "Log DB",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_LogDB_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "BusinessData",
+												"activities": [
+													{
+														"name": "BusinessData",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_BusinessData_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": true,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "BBAlerts",
+												"activities": [
+													{
+														"name": "BBAlerts",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_BBAlerts_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "AdminLogDb",
+												"activities": [
+													{
+														"name": "AdminLogDb",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_Admin_LogDB_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "AdminMetaDb",
+												"activities": [
+													{
+														"name": "AdminMetaDb",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_Admin_MetaDB_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "AnonymousLogDb",
+												"activities": [
+													{
+														"name": "AnonymousLogDb",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_Anonymous_LogDB_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "AnonymousMetaDb",
+												"activities": [
+													{
+														"name": "AnonymousMetaDb",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_Anonymous_MetaDB_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											},
+											{
+												"value": "LogDBMI",
+												"activities": [
+													{
+														"name": "SCCUPROD_LogDBMI_DynamicRetention",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "SCCUPROD_LogDBMI_DynamicRetention",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": false,
+															"parameters": {}
+														}
+													}
+												]
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "BacPac Tables Daily",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "BacPac Tables Daily",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ACISeri_Biweekly')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "BacPac Tables ACISeri_CheckFree_Vsofts_WeeklyTwice",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 4,
+						"startTime": "2025-01-29T10:35:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ActivityLog_Weekly_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "BacPac ActivityLog_Weekly",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Week",
+						"interval": 1,
+						"startTime": "2025-02-17T12:00:00",
+						"timeZone": "India Standard Time",
+						"schedule": {
+							"weekDays": [
+								"Monday"
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Log_Log_Biweekly')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "BacPac Tables Log_LogTables_WeeklyTwice",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 4,
+						"startTime": "2025-01-31T10:35:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/00_DailyRetention_Main')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "PROD_DailyRetention_Main",
+				"activities": [
+					{
+						"name": "If Retention Enabled",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "IsRetentionEnabled",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Start Maintenance Notification_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Success",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": "SCCU DB daily maintenance Disabled",
+											"Content": "SCCU DB daily maintenance Disabled",
+											"Importance": "High"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "PROD_DynamicRetention_Main",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Start Maintenance Notification",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PROD_DynamicRetention_Main",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "SCCUPROD_ActivityLogs_Main",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Start Maintenance Notification",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SCCUPROD_ActivityLogs_Main",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "SendEmailSuccess",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "AdminLoginHistory",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Success",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "SCCU Daily maintenance has been completed",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "SCCU Daily DB maintenance has been completed.",
+												"type": "Expression"
+											},
+											"Importance": "Normal"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-ActivityLogFailure",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('SCCUPROD_ActivityLogs_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('SCCUPROD_ActivityLogs_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-BusinessDataFailure_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('PROD_DynamicRetention_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('PROD_DynamicRetention_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "AdminLoginHistory",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Start Maintenance Notification",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SCCUPROD_AdminLoginHistory",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "SendMainl-ActivityLogFailure_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "AdminLoginHistory",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('AdminLoginHistory').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('AdminLoginHistory').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "Summary Email",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SendEmailSuccess",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Summary_StoredProcedure_Emails",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"procName": "sp_GetEmailData_BacpacRetention_Summary"
+										}
+									}
+								},
+								{
+									"name": "Start Maintenance Notification",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Success",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": "SCCU DB daily maintenance started",
+											"Content": "SCCU DB daily maintenance started",
+											"Importance": "Normal"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "IsRetentionEnabled",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT count(1) as 'RecordCount' FROM [dbo].[DailyRetentionConfig] where PipelineRun=1",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_ArchiveSqlDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/PROD_DynamicRetention_Main')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_Offline_Prod_Trigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "00_Offline_Main",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2025-02-14T13:30:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/00_Offline_Main')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PROD_DataRetentionTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "00_DailyRetention_Main",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2024-10-23T10:30:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/00_DailyRetention_Main')]"
+			]
+		}
+	]
+}

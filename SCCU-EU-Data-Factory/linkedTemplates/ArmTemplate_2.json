@@ -16,6 +16,22 @@
 			"metadata": "Secure string for 'connectionString' of 'SCCU_OfflineModedb_PROD_DTU'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sccuprodsqldtu.database.windows.net;Initial Catalog=SCCU_OfflineModedb_PROD"
 		},
+		"SCCU_BBAlertsPROD_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccusqlmi.247d28acc382.database.windows.net"
+		},
+		"SCCU_BBAlertsPROD_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCU_BBAlerts_PROD"
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sccuuatsql01.database.windows.net"
+		},
+		"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SCCUUAT_BBAlerts"
+		},
 		"SCCU_BusinessDataDev_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "sccudevsql01.database.windows.net"
@@ -93,6 +109,56 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_BBAlertsPROD')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlMI",
+				"typeProperties": {
+					"server": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_server')]",
+					"database": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "UserAssignedManagedIdentity",
+					"credential": {
+						"referenceName": "Credential_SCCU_BBAlertsPROD",
+						"type": "CredentialReference"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCCU_BBAlertsUAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]",
+					"database": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "UserAssignedManagedIdentity",
+					"credential": {
+						"referenceName": "Credential_SCCUUAT_BBAlerts",
+						"type": "CredentialReference"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SCCU_BusinessDataDev')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -726,193 +792,6 @@
 				"annotations": []
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_AdminLoginHistory')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "spi_AdminLoginHistoryActiveMember",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[spi_AdminLoginHistoryActiveMember]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_BusinessDataPROD",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/MISC"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ActivityLogsSource')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "SCCU_BusinessDataPROD",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlMITable",
-				"schema": [
-					{
-						"name": "Id",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "DateTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "MemberName",
-						"type": "varchar"
-					},
-					{
-						"name": "AccountNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "Module",
-						"type": "varchar"
-					},
-					{
-						"name": "Description",
-						"type": "varchar"
-					},
-					{
-						"name": "Type",
-						"type": "varchar"
-					},
-					{
-						"name": "Guid",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ObjectGUID",
-						"type": "varchar"
-					},
-					{
-						"name": "BrowserVersion",
-						"type": "varchar"
-					},
-					{
-						"name": "IPAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "BrowserName",
-						"type": "varchar"
-					},
-					{
-						"name": "LogEventType",
-						"type": "varchar"
-					},
-					{
-						"name": "SessionID",
-						"type": "varchar"
-					},
-					{
-						"name": "MappingType",
-						"type": "varchar"
-					},
-					{
-						"name": "DeviceID",
-						"type": "varchar"
-					},
-					{
-						"name": "ActionOrService",
-						"type": "varchar"
-					},
-					{
-						"name": "PayeeOrDestinationAccountNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "TransactionAmount",
-						"type": "float",
-						"precision": 15
-					},
-					{
-						"name": "SuccessStatus",
-						"type": "varchar"
-					},
-					{
-						"name": "PersonNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "eAgreementNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "SourceAccountNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "CorrelationID",
-						"type": "varchar"
-					},
-					{
-						"name": "PayeeOrDestination",
-						"type": "varchar"
-					},
-					{
-						"name": "SourceOfLogin",
-						"type": "varchar"
-					},
-					{
-						"name": "UserAgentString",
-						"type": "text"
-					},
-					{
-						"name": "IsExcluded",
-						"type": "bit"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "activitylogs"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
-			]
 		}
 	]
 }

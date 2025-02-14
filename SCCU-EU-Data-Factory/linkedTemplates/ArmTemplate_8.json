@@ -13,6 +13,150 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/UAT_CompletedThresholdSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "UAT/CompletedThreshold",
+						"container": "to-nextly"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_CompletedThresholdSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "UAT/ThresholdAlerts",
+						"container": "to-nextly"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_CompletedTransactionSink')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "UAT/CompletedTransaction",
+						"container": "to-nextly"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_CompletedTransactionSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "UAT/TransactionAlerts",
+						"container": "to-nextly"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_DoneProcessingDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "DoneProcessing@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/DoneProcessing",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/UAT_GetExternalAlertRecipientsDataSet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SCCU_DataFactory_Storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "Alertsubscriber@{formatDateTime(addHours(utcnow(), -4), 'MMddyyyyHHmm')}.txt",
+							"type": "Expression"
+						},
+						"folderPath": "UAT/Alertsubscriber",
+						"container": "from-nextly"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/UAT_GetThresholdAlertSubscriptionsDataSet')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -459,7 +603,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "Select * from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) = Cast(getdate()-11 as date) ",
+								"sqlReaderQuery": "Select * from activityLogs with (NoLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-11 as date) ",
 								"partitionOption": "None"
 							},
 							"sink": {
@@ -510,7 +654,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "SqlMISource",
-								"sqlReaderQuery": "Select * from MemberActivityLog with (NoLock)\n    WHERE  Cast(CreatedDate as date) = Cast(getdate()-11 as date) ",
+								"sqlReaderQuery": "Select * from MemberActivityLog with (NoLock)\n    WHERE  Cast(CreatedDate as date) <= Cast(getdate()-11 as date) ",
 								"partitionOption": "None"
 							},
 							"sink": {
@@ -574,7 +718,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) = Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM activityLogs  with (RowLock)\n    WHERE  Cast(datetime as date) <= Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
 										"type": "Expression"
 									}
 								}
@@ -610,7 +754,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM MemberActivityLog  with (RowLock)\n    WHERE  Cast(CreatedDate as date) = Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
+										"value": "DECLARE @BatchSize INT = 10000;\nDECLARE @RowsAffected INT;\n \n \nWHILE 1 = 1\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM MemberActivityLog  with (RowLock)\n    WHERE  Cast(CreatedDate as date) <= Cast(getdate()-11 as date)\n    \n    SET @RowsAffected = @@ROWCOUNT; \n    \n\tWAITFOR DELAY '00:00:01';\n    IF @RowsAffected = 0\n        BREAK; \nEND\n",
 										"type": "Expression"
 									}
 								}
@@ -1276,386 +1420,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CK_SAV_Accounttransactions')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "CK_SAV_Accounttransactions_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "CK_SAV_Accounttransactions_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/CK_SAV_Accounttransactions",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"enableSkipIncompatibleRow": true,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ACCOUNT_NUMBER",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ACCOUNT_NUMBER",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_NUMBER",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_NUMBER",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_POSTING_DATE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_POSTING_DATE",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_ACTIVITY_DATE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_ACTIVITY_DATE",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "DEBIT_CREDIT_FLAG",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DEBIT_CREDIT_FLAG",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_STATUS_CODE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_STATUS_CODE",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_STATUS_DESCRIPTION",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_STATUS_DESCRIPTION",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_TYPE_CODE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_TYPE_CODE",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_DESCRIPTION",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_DESCRIPTION",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_AMOUNT",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_AMOUNT",
-											"type": "Decimal",
-											"physicalType": "decimal",
-											"scale": 2,
-											"precision": 18
-										}
-									},
-									{
-										"source": {
-											"name": "EXTERNAL_RTXN_DESCNBR",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "EXTERNAL_RTXN_DESCNBR",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EXTERNAL_RTXN_DESCTEXT",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "EXTERNAL_RTXN_DESCTEXT",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "INTERNAL_RTXN_DESCNBR",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "INTERNAL_RTXN_DESCNBR",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "INTERNAL_RTXN_DESCTEXT",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "INTERNAL_RTXN_DESCTEXT",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_CK_SAV_Accounttransactions",
-								"type": "DatasetReference",
-								"parameters": {
-									"CK_SAV_Accounttransactionsons_Staging": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_CK_SAV_Accounttransactions",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "CK_SAV_Accounttransactions_StagingTruncate",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[CK_SAV_Accounttransactions_Staging]"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "CK_SAV_Accounttransactions_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[Spi_InsertToAccountTransactionsDetails]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "completed copy",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/CK_SAV_Accounttransactions",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_CK_SAV_Accounttransactions_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_CK_SAV_Accounttransactions_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "Nextly CK SAV TD Transactions Prior 15 Days*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/CK_SAV_Accounttransactions"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DebitCardDetails')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2009,444 +1773,14 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/MemberDataDetails')]",
+			"name": "[concat(parameters('factoryName'), '/DepositTransaction_Archival')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "MemberDataDetails_CopyData",
+						"name": "AccountTransactions_Copy",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "MemberDataDetails_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/MemberDataDetails",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "MemberNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MemberNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerPersonNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerPersonNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerOrganizationNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerOrganizationNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AgreementNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AgreementNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AgreementType",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AgreementType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OrgName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OrgName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OrgTypeDescription",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OrgTypeDescription",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "FirstName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "FirstName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LastName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LastName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AddressUseCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AddressUseCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AddressLineText",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AddressLineText",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CityName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CityName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ZipCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ZipCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "StateCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "StateCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CountryCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CountryCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CountryName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CountryName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Email",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Email",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EmailTypeCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "EmailTypeCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EmailTypeDescription",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "EmailTypeDescription",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "HomePhone",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "HomePhone",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "HomePhoneUseCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "HomePhoneUseCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CellPhone",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CellPhone",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CellPhoneUseCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CellPhoneUseCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BusinessPhone",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BusinessPhone",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BusinessPhoneUseCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BusinessPhoneUseCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OrgTaxIds",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OrgTaxIds",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PersonTaxId",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PersonTaxId",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ShareAccountNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ShareAccountNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DateOfBirth",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DateOfBirth",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									},
-									{
-										"source": {
-											"name": "MemberDateLastContact",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MemeberDateLastContact",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_MemberDataDetails",
-								"type": "DatasetReference",
-								"parameters": {
-									"MemberDataDetails": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_MemberDataDetails",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "MemberDataDetails_StagingTruncate",
-						"type": "Script",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -2456,168 +1790,15 @@
 							"secureInput": false
 						},
 						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[MemberDataDetails_Staging]"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "MemberDataDetails_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "Spi_InsertIntoMembersOffline"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "completed copy",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/MemberDataDetails",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT * FROM [dbo].[AccountTransactionsDetails] \n\tWHERE \n\t\t[PostingDate] <DATEADD(DAY,-15,CAST(GETUTCDATE() AS DATE));",
+									"type": "Expression"
 								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_MemberDataDetails_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_MemberDataDetails_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "NextlyMemberData*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/MemberDataDetails"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/NextlyAccountDetails')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "NextlyAccountDetails_Staging_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "NextlyAccountDetails_Staging Truncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyAccountDetails",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
@@ -2630,1135 +1811,33 @@
 								"mappings": [
 									{
 										"source": {
-											"name": "AccountNumber",
-											"type": "String",
-											"physicalType": "String"
+											"name": "ID",
+											"type": "Int64",
+											"physicalType": "bigint"
 										},
 										"sink": {
-											"name": "AccountNumber",
+											"name": "ID",
 											"type": "Int64",
 											"physicalType": "bigint"
 										}
 									},
 									{
 										"source": {
-											"name": "OpenDate",
+											"name": "ObjectGUID",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "OpenDate",
+											"name": "ObjectGUID",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
-									{
-										"source": {
-											"name": "AccountDateLastContact",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountDateLastContact",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentAccountStatusCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentAccountStatusCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentAccountStatusDesc",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentAccountStatusDesc",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AccountOwnershipCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountOwnershipCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AccountOwnershipDesc",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountOwnershipDesc",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MajorAccountTypeCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MajorAccountTypeCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MinorAccountTypeCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MinorAccountTypeCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MinorAccountTypeDescription",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MinorAccountTypeDescription",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ProductFullName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ProductFullName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AccountNickName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountNickName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BalanceCategoryCodeEscrow",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BalanceCategoryCodeEscrow",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentBalanceEscrow",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentBalanceEscrow",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BalanceCategoryCodeUnapplied",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BalanceCategoryCodeUnapplied",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentBalanceUnapplied",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentBalanceUnapplied",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BalanceCategoryCodeLIP",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BalanceCategoryCodeLIP",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentLIPBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentLIPBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "NextPaymentDueDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "NextPaymentDueDate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentDueDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentDueDate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LastPaymentDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LastPaymentDate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LastPaymentAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LastPaymentAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RegularPaymentAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RegularPaymentAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanInterestRate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanInterestRate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PayoffBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PayoffBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PayDownBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PayDownBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PrincipalBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PrincipalBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AmountToPayCurrent",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AmountToPayCurrent",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TotalPerDiem",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "TotalPerDiem",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TotalAmountCurrentlyDue",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "TotalAmountCurrentlyDue",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AmountPastDue",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AmountPastDue",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OriginalLoanAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OriginalLoanAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanCurrentTerm",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanCurrentTerm",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanRemainingTerm",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanRemainingTerm",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RemainingPayments",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RemainingPayments",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PaymentCalculationPeriod",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PaymentCalculationPeriod",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreditLimitAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CreditLimitAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AvailableCredit",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AvailableCredit",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositInterestRate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositInterestRate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositLastInterestAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositLastInterestAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositLastInterestPostDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositLastInterestPostDate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositCurrentTerm",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositCurrentTerm",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MaturityDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MaturityDate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerPersonNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerPersonNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerOrganizationNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerOrganizationNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AccountType",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MemberNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MemberNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AgreementNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AgreementNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_NextlyAccountDetails",
-								"type": "DatasetReference",
-								"parameters": {
-									"NextlyAccountDetails": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_NextlyAccountDetails",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "NextlyAccountDetails_Staging Truncate",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE StagingTable_AccountDetails"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "NextlyAccountDetails_Staging_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[Spi_InsertIntoAccountDetails]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Copy data2",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyAccountDetails",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_NextlyAccountDetails_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_NextlyAccountDetails_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "NextlyAccounts*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/DEV/NextlyAccountDetails"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/NextlyAccountRoles')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "NextlyAccountRoles_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "NextlyAccountRoles_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyAccountRoles",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
 									{
 										"source": {
 											"name": "AccountNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RoleEntityNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RoleEntityNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RoleEntityTypeCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RoleEntityTypeCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RoleCode",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RoleCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RoleDescription",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RoleDescription",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MemberName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MemberName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_NextlyAccountRoles",
-								"type": "DatasetReference",
-								"parameters": {
-									"NextlyAccountRoles": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_NextlyAccountRoles",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "NextlyAccountRoles_StagingTruncate",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE NextlyAccountRoles_Staging"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "NextlyAccountRoles_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "Spi_InsertToMemberRolesDetails"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Copy data2",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyAccountRoles",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_NextlyAccountRoles_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_NextlyAccountRoles_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "NextlyAccountRoles*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/NextlyAccountRoles"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/NextlyAccountlockout')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "NextlyAccountlockout_Staging_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "NextlyAccountlockout_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyAccountlockout",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "AccountNumber",
-											"type": "String",
-											"physicalType": "String"
+											"type": "Int64",
+											"physicalType": "bigint"
 										},
 										"sink": {
 											"name": "AccountNumber",
@@ -3768,1260 +1847,110 @@
 									},
 									{
 										"source": {
-											"name": "LockoutFlagCode",
-											"type": "String",
-											"physicalType": "String"
+											"name": "RTXNNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
 										},
 										"sink": {
-											"name": "LockoutFlagCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LockoutFlagDescription",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LockoutFlagDescription",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "InactiveDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "InactiveDate",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_NextlyAccountlockout",
-								"type": "DatasetReference",
-								"parameters": {
-									"NextlyAccountlockout": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_NextlyAccountlockout",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "NextlyAccountlockout_StagingTruncate",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE NextlyAccountlockout_Staging"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "NextlyAccountlockout_Staging_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "Spi_InsertToMemberLockOutFlagDetails"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Copy data2",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyAccountlockout",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_NextlyAccountlockout_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_NextlyAccountlockout_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "NextlyAccountLockout*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/NextlyAccountlockout"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/NextlyCrossAccounts')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "NextlyCrossAccounts_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "NextlyCrossAccounst_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/CrossAccounts",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "AccountNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountNumber",
+											"name": "RTXNNumber",
 											"type": "Int64",
 											"physicalType": "bigint"
 										}
 									},
 									{
 										"source": {
-											"name": "AllowCrossAcctXferYN",
-											"type": "String",
-											"physicalType": "String"
+											"name": "PostingDate",
+											"type": "DateTime",
+											"physicalType": "date"
 										},
 										"sink": {
-											"name": "AllowCrossAcctXferYN",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OpenDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OpenDate",
+											"name": "PostingDate",
 											"type": "DateTime",
 											"physicalType": "date"
 										}
 									},
 									{
 										"source": {
-											"name": "AccountDateLastContact",
-											"type": "String",
-											"physicalType": "String"
+											"name": "ActivityDate",
+											"type": "DateTime",
+											"physicalType": "date"
 										},
 										"sink": {
-											"name": "AccountDateLastContact",
+											"name": "ActivityDate",
 											"type": "DateTime",
 											"physicalType": "date"
 										}
 									},
 									{
 										"source": {
-											"name": "CurrentAccountStatusCode",
+											"name": "DebitCreditFlag",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "CurrentAccountStatusCode",
+											"name": "DebitCreditFlag",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
 									{
 										"source": {
-											"name": "CurrentAccountStatusDesc",
+											"name": "Statuscode",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "CurrentAccountStatusDesc",
+											"name": "Statuscode",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
 									{
 										"source": {
-											"name": "AccountOwnershipCode",
+											"name": "StatusDescription",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "AccountOwnershipCode",
+											"name": "StatusDescription",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
 									{
 										"source": {
-											"name": "AccountOwnershipDesc",
+											"name": "RTXNTypecode",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "AccountOwnershipDesc",
+											"name": "RTXNTypecode",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
 									{
 										"source": {
-											"name": "MajorAccountTypeCode",
+											"name": "RTXNTypeDescription",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "MajorAccountTypeCode",
+											"name": "RTXNTypeDescription",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
 									{
 										"source": {
-											"name": "MinorAccountTypeCode",
-											"type": "String",
-											"physicalType": "String"
+											"name": "Amount",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 18
 										},
 										"sink": {
-											"name": "MinorAccountTypeCode",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MinorAccountTypeDescription",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MinorAccountTypeDescription",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ProductFullName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ProductFullName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AccountNickName",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountNickName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BalanceCategoryCodeEscrow",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BalanceCategoryCodeEscrow",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentBalanceEscrow",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentBalanceEscrow",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BalanceCategoryCodeUnapplied",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BalanceCategoryCodeUnapplied",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentBalanceUnapplied",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentBalanceUnapplied",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "BalanceCategoryCodeLIP",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "BalanceCategoryCodeLIP",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentLIPBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentLIPBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "NextPaymentDueDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "NextPaymentDueDate",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									},
-									{
-										"source": {
-											"name": "CurrentDueDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CurrentDueDate",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									},
-									{
-										"source": {
-											"name": "LastPaymentDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LastPaymentDate",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									},
-									{
-										"source": {
-											"name": "LastPaymentAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LastPaymentAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RegularPaymentAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RegularPaymentAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanInterestRate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanInterestRate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PayoffBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PayoffBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PayDownBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PayDownBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PrincipalBalance",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PrincipalBalance",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AmountToPayCurrent",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AmountToPayCurrent",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TotalPerDiem",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "TotalPerDiem",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TotalAmountCurrentlyDue",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "TotalAmountCurrentlyDue",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AmountPastDue",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AmountPastDue",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OriginalLoanAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OriginalLoanAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanCurrentTerm",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanCurrentTerm",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "LoanRemainingTerm",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "LoanRemainingTerm",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RemainingPayments",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RemainingPayments",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PaymentCalculationPeriod",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PaymentCalculationPeriod",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreditLimitAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CreditLimitAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "AvailableCredit",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AvailableCredit",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositInterestRate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositInterestRate",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositPriorYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositYTDInterestPaid",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositYTDInterestPaid",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositLastInterestAmount",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositLastInterestAmount",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositLastInterestPostDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositLastInterestPostDate",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									},
-									{
-										"source": {
-											"name": "DepositCurrentTerm",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DepositCurrentTerm",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "MaturityDate",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MaturityDate",
-											"type": "DateTime",
-											"physicalType": "date"
-										}
-									},
-									{
-										"source": {
-											"name": "AccountType",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "AccountType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PersonNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "PersonNumber",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "CrossAcctAgreementNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CrossAcctAgreementNumber",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "CrossAcctMemberNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CrossAcctMemberNumber",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerPersonNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerPersonNumber",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerOrganizationNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerOrganizationNumber",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "OwnerMemberNumber",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "OwnerMemberNumber",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_NextlyCrossAccounts",
-								"type": "DatasetReference",
-								"parameters": {
-									"CrossAccounts": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_NextlyCrossAccounts",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "NextlyCrossAccounst_StagingTruncate",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE NextlyCrossAccounts_Staging"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "NextlyCrossAccounts_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[Spi_InsertIntoMemberCrossAccounts]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "completed copy",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/CrossAccounts",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_CrossAccounts_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_CrossAccounts_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "NextlyCrossAccounts*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/CrossAccounts"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/NextlyLoanTransactions')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "NextlyLoanTransactions_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "NextlyLoanTransactions_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyLoanTransactions",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"enableSkipIncompatibleRow": false,
-							"logSettings": {
-								"enableCopyActivityLog": true,
-								"copyActivityLogSettings": {
-									"logLevel": "Warning",
-									"enableReliableLogging": false
-								},
-								"logLocationSettings": {
-									"linkedServiceName": {
-										"referenceName": "SCCU_DataFactory_Storage",
-										"type": "LinkedServiceReference"
-									}
-								}
-							},
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ACCOUNT_NUMBER",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "ACCOUNT_NUMBER",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_NUMBER",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_NUMBER",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_POSTING_DATE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_POSTING_DATE",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_ACTIVITY_DATE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_ACTIVITY_DATE",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "DEBIT_CREDIT_FLAG",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DEBIT_CREDIT_FLAG",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_STATUS_CODE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_STATUS_CODE",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_STATUS_DESCRIPTION",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_STATUS_DESCRIPTION",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_TYPE_CODE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_TYPE_CODE",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_DESCRIPTION",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_DESCRIPTION",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RTXN_AMOUNT",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "RTXN_AMOUNT",
+											"name": "Amount",
 											"type": "Decimal",
 											"physicalType": "decimal",
 											"scale": 2,
@@ -5030,48 +1959,24 @@
 									},
 									{
 										"source": {
-											"name": "EXTERNAL_RTXN_DESCNBR",
+											"name": "ExternalRTXNDescText",
 											"type": "String",
-											"physicalType": "String"
+											"physicalType": "varchar"
 										},
 										"sink": {
-											"name": "EXTERNAL_RTXN_DESCNBR",
+											"name": "ExternalRTXNDescText",
 											"type": "String",
 											"physicalType": "varchar"
 										}
 									},
 									{
 										"source": {
-											"name": "EXTERNAL_RTXN_DESCTEXT",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "EXTERNAL_RTXN_DESCTEXT",
+											"name": "InternalRTXNDescText",
 											"type": "String",
 											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "INTERNAL_RTXN_DESCNBR",
-											"type": "String",
-											"physicalType": "String"
 										},
 										"sink": {
-											"name": "INTERNAL_RTXN_DESCNBR",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "INTERNAL_RTXN_DESCTEXT",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "INTERNAL_RTXN_DESCTEXT",
+											"name": "InternalRTXNDescText",
 											"type": "String",
 											"physicalType": "varchar"
 										}
@@ -5086,25 +1991,30 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "OfflinSource_NExtlyLoanTransaction",
+								"referenceName": "Source_Offline_AccountTransactionsDetails",
 								"type": "DatasetReference",
-								"parameters": {
-									"NextlyLoanTransactions": "@pipeline().parameters.FileName"
-								}
+								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "OfflineDestination_NextlyLoanTransactions",
+								"referenceName": "Destination_Offline_AccountTransactionsDetails",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						]
 					},
 					{
-						"name": "NextlyLoanTransactions_StagingTruncate",
+						"name": "AccountTransactionsDelete_Script",
 						"type": "Script",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "AccountTransactions_Copy",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -5121,18 +2031,21 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "TRUNCATE TABLE NExtlyLoanTransactions_Staging"
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000; \nDECLARE @RowsAffected INT = 1; \nDECLARE @TotalDeletedRows INT = 0; \n\nWHILE (@RowsAffected > 0)\nBEGIN\n    DELETE TOP (@BatchSize)\n    FROM \n        [dbo].[AccountTransactionsDetails]\n    WHERE \n        [PostingDate]  < DATEADD(DAY, -15, CAST(GETUTCDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT; \n    SET @TotalDeletedRows = @TotalDeletedRows + @RowsAffected;\nEND\n\n\nSELECT @TotalDeletedRows AS TotalDeletedRows;\n",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					},
 					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
+						"name": "Purge_Script",
+						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "NextlyLoanTransactions_CopyData",
+								"activity": "AccountTransactionsDelete_Script",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -5146,89 +2059,29 @@
 							"secureInput": false
 						},
 						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[Spi_InsertToLoanTransactionsDetails]"
-						},
 						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"referenceName": "SCCU_Archivedb_PROD_DTU",
 							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Copy data2",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
 						},
-						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/NextlyLoanTransactions",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000; \nDECLARE @RowsAffected INT = 1; \nDECLARE @TotalDeletedRows INT = 0; \n\nWHILE (@RowsAffected > 0)\nBEGIN\n    DELETE TOP (@BatchSize)\n   FROM \n\t\t[Offline].[AccountTransactionsDetails] \n\tWHERE \n\t\t[PostingDate] < DATEADD(DAY,-47,CAST(GETUTCDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT; \n    SET @TotalDeletedRows = @TotalDeletedRows + @RowsAffected;\nEND\n\n\nSELECT @TotalDeletedRows AS TotalDeletedRows;\n",
 										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
+									}
 								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_NextlyLoanTransactions_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_NextlyLoanTransactions_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "Nextly Loan Account Transactions Prior 15 Days*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/NextlyLoanTransactions"
-					}
-				},
 				"folder": {
-					"name": "OfflineServices"
+					"name": "OfflineServices/Offline_Archival"
 				},
 				"annotations": []
 			},

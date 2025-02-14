@@ -13,6 +13,3238 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Generic_StoredProcedure_Emails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Send Email",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Getemail",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Generic_SendEmail",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@activity('Getemail').output.firstRow.Subject",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('Getemail').output.firstRow.EmailBody",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Getemail",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "EXEC @{pipeline().parameters.procName}",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "BacPac_Email_Proc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"procName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/BacPac"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LoanTransaction_Archival')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LoanTransactions",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT * \tFROM [dbo].[LoanTransactionsDetails] \n\tWHERE \n\t\t[PostingDate]  <DATEADD(DAY,-15,CAST(GETUTCDATE() AS DATE));",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ID",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "ObjectGUID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ObjectGUID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "AccountNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "RTXNNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										},
+										"sink": {
+											"name": "RTXNNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "PostingDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										},
+										"sink": {
+											"name": "PostingDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "ActivityDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										},
+										"sink": {
+											"name": "ActivityDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "DebitCreditFlag",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "DebitCreditFlag",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Statuscode",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Statuscode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "StatusDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "StatusDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RTXNTypecode",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "RTXNTypecode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RTXNTypeDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "RTXNTypeDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Amount",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 18
+										},
+										"sink": {
+											"name": "Amount",
+											"type": "Decimal",
+											"physicalType": "decimal",
+											"scale": 2,
+											"precision": 18
+										}
+									},
+									{
+										"source": {
+											"name": "ExternalRTXNDescText",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ExternalRTXNDescText",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "InternalRTXNDescText",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "InternalRTXNDescText",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Source_Offline_LoanTransactionsDetails",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Destination_Offline_LoanTransactionsDetails",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "AccountTransactionsDelete_Script",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "LoanTransactions",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000; \nDECLARE @RowsAffected INT = 1; \nDECLARE @TotalDeletedRows INT = 0; \n\nWHILE (@RowsAffected > 0)\nBEGIN\n    DELETE \n\tFROM \n\t\t[dbo].[LoanTransactionsDetails]\n\tWHERE \n\t\t[PostingDate]  < DATEADD(DAY,-15,CAST(GETUTCDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT; \n    SET @TotalDeletedRows = @TotalDeletedRows + @RowsAffected;\nEND\n\n\nSELECT @TotalDeletedRows AS TotalDeletedRows;\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Purge_Script",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "AccountTransactionsDelete_Script",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_Archivedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "DECLARE @BatchSize INT = 10000; \nDECLARE @RowsAffected INT = 1; \nDECLARE @TotalDeletedRows INT = 0; \n\nWHILE (@RowsAffected > 0)\nBEGIN\n    DELETE \n\tFROM \n\t\t[Offline].[LoanTransactionsDetails]\n\tWHERE \n\t\t[PostingDate] < DATEADD(DAY,-47,CAST(GETUTCDATE() AS DATE));\n\n    SET @RowsAffected = @@ROWCOUNT; \n    SET @TotalDeletedRows = @TotalDeletedRows + @RowsAffected;\nEND\n\nSELECT @TotalDeletedRows AS TotalDeletedRows;\n",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "OfflineServices/Offline_Archival"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MemberDataDetails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MemberDataDetails_CopyData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "MemberDataDetails_StagingTruncate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/MemberDataDetails",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "MemberNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MemberNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerPersonNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerPersonNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerOrganizationNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerOrganizationNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AgreementNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AgreementNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AgreementType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AgreementType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrgName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OrgName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrgTypeDescription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OrgTypeDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "FirstName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "FirstName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LastName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LastName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AddressUseCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AddressUseCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AddressLineText",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AddressLineText",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CityName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CityName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ZipCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ZipCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "StateCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "StateCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CountryCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CountryCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CountryName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CountryName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Email",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Email",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EmailTypeCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "EmailTypeCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EmailTypeDescription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "EmailTypeDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "HomePhone",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "HomePhone",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "HomePhoneUseCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "HomePhoneUseCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CellPhone",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CellPhone",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CellPhoneUseCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CellPhoneUseCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BusinessPhone",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BusinessPhone",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BusinessPhoneUseCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BusinessPhoneUseCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrgTaxIds",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OrgTaxIds",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PersonTaxId",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PersonTaxId",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ShareAccountNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ShareAccountNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DateOfBirth",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DateOfBirth",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "MemberDateLastContact",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MemeberDateLastContact",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OfflinSource_MemberDataDetails",
+								"type": "DatasetReference",
+								"parameters": {
+									"MemberDataDetails": "@pipeline().parameters.FileName"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OfflineDestination_MemberDataDetails",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "MemberDataDetails_StagingTruncate",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE [dbo].[MemberDataDetails_Staging]"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "MemberDataDetails_CopyData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "Spi_InsertIntoMembersOffline"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "completed copy",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Stored procedure1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/MemberDataDetails",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Completed_MemberDataDetails_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Completed_MemberDataDetails_Sink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string",
+						"defaultValue": "NextlyMemberData*.csv"
+					},
+					"FilePath": {
+						"type": "string",
+						"defaultValue": "offline-services/PROD/MemberDataDetails"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NextlyAccountDetails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "NextlyAccountDetails_Staging_CopyData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "NextlyAccountDetails_Staging Truncate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/NextlyAccountDetails",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "AccountNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "OpenDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OpenDate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountDateLastContact",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountDateLastContact",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentAccountStatusCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentAccountStatusCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentAccountStatusDesc",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentAccountStatusDesc",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountOwnershipCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountOwnershipCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountOwnershipDesc",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountOwnershipDesc",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MajorAccountTypeCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MajorAccountTypeCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MinorAccountTypeCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MinorAccountTypeCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MinorAccountTypeDescription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MinorAccountTypeDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ProductFullName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ProductFullName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountNickName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountNickName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BalanceCategoryCodeEscrow",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BalanceCategoryCodeEscrow",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentBalanceEscrow",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentBalanceEscrow",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BalanceCategoryCodeUnapplied",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BalanceCategoryCodeUnapplied",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentBalanceUnapplied",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentBalanceUnapplied",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BalanceCategoryCodeLIP",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BalanceCategoryCodeLIP",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentLIPBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentLIPBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "NextPaymentDueDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "NextPaymentDueDate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentDueDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentDueDate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LastPaymentDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LastPaymentDate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LastPaymentAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LastPaymentAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RegularPaymentAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RegularPaymentAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanInterestRate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanInterestRate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PayoffBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PayoffBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PayDownBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PayDownBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PrincipalBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PrincipalBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AmountToPayCurrent",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AmountToPayCurrent",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TotalPerDiem",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "TotalPerDiem",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TotalAmountCurrentlyDue",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "TotalAmountCurrentlyDue",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AmountPastDue",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AmountPastDue",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OriginalLoanAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OriginalLoanAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanCurrentTerm",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanCurrentTerm",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanRemainingTerm",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanRemainingTerm",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RemainingPayments",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RemainingPayments",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PaymentCalculationPeriod",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PaymentCalculationPeriod",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreditLimitAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CreditLimitAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AvailableCredit",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AvailableCredit",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositInterestRate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositInterestRate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositLastInterestAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositLastInterestAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositLastInterestPostDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositLastInterestPostDate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositCurrentTerm",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositCurrentTerm",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MaturityDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MaturityDate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerPersonNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerPersonNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerOrganizationNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerOrganizationNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MemberNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MemberNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AgreementNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AgreementNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OfflinSource_NextlyAccountDetails",
+								"type": "DatasetReference",
+								"parameters": {
+									"NextlyAccountDetails": "@pipeline().parameters.FileName"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OfflineDestination_NextlyAccountDetails",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "NextlyAccountDetails_Staging Truncate",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE StagingTable_AccountDetails"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "NextlyAccountDetails_Staging_CopyData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[Spi_InsertIntoAccountDetails]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Copy data2",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Stored procedure1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/NextlyAccountDetails",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Completed_NextlyAccountDetails_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Completed_NextlyAccountDetails_Sink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string",
+						"defaultValue": "NextlyAccounts*.csv"
+					},
+					"FilePath": {
+						"type": "string",
+						"defaultValue": "offline-services/DEV/NextlyAccountDetails"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NextlyAccountRoles')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "NextlyAccountRoles_CopyData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "NextlyAccountRoles_StagingTruncate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/NextlyAccountRoles",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "AccountNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RoleEntityNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RoleEntityNumber",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RoleEntityTypeCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RoleEntityTypeCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RoleCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RoleCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RoleDescription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RoleDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MemberName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MemberName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OfflinSource_NextlyAccountRoles",
+								"type": "DatasetReference",
+								"parameters": {
+									"NextlyAccountRoles": "@pipeline().parameters.FileName"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OfflineDestination_NextlyAccountRoles",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "NextlyAccountRoles_StagingTruncate",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE NextlyAccountRoles_Staging"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "NextlyAccountRoles_CopyData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "Spi_InsertToMemberRolesDetails"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Copy data2",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Stored procedure1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/NextlyAccountRoles",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Completed_NextlyAccountRoles_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Completed_NextlyAccountRoles_Sink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string",
+						"defaultValue": "NextlyAccountRoles*.csv"
+					},
+					"FilePath": {
+						"type": "string",
+						"defaultValue": "offline-services/PROD/NextlyAccountRoles"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NextlyAccountlockout')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "NextlyAccountlockout_Staging_CopyData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "NextlyAccountlockout_StagingTruncate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/NextlyAccountlockout",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "AccountNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "LockoutFlagCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LockoutFlagCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LockoutFlagDescription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LockoutFlagDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "InactiveDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "InactiveDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OfflinSource_NextlyAccountlockout",
+								"type": "DatasetReference",
+								"parameters": {
+									"NextlyAccountlockout": "@pipeline().parameters.FileName"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OfflineDestination_NextlyAccountlockout",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "NextlyAccountlockout_StagingTruncate",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE NextlyAccountlockout_Staging"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "NextlyAccountlockout_Staging_CopyData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "Spi_InsertToMemberLockOutFlagDetails"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Copy data2",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Stored procedure1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/NextlyAccountlockout",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Completed_NextlyAccountlockout_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Completed_NextlyAccountlockout_Sink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string",
+						"defaultValue": "NextlyAccountLockout*.csv"
+					},
+					"FilePath": {
+						"type": "string",
+						"defaultValue": "offline-services/PROD/NextlyAccountlockout"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NextlyCrossAccounts')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "NextlyCrossAccounts_CopyData",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "NextlyCrossAccounst_StagingTruncate",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/CrossAccounts",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "AccountNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "AllowCrossAcctXferYN",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AllowCrossAcctXferYN",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OpenDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OpenDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountDateLastContact",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountDateLastContact",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentAccountStatusCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentAccountStatusCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentAccountStatusDesc",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentAccountStatusDesc",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountOwnershipCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountOwnershipCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountOwnershipDesc",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountOwnershipDesc",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MajorAccountTypeCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MajorAccountTypeCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MinorAccountTypeCode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MinorAccountTypeCode",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MinorAccountTypeDescription",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MinorAccountTypeDescription",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ProductFullName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ProductFullName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountNickName",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountNickName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BalanceCategoryCodeEscrow",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BalanceCategoryCodeEscrow",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentBalanceEscrow",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentBalanceEscrow",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BalanceCategoryCodeUnapplied",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BalanceCategoryCodeUnapplied",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentBalanceUnapplied",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentBalanceUnapplied",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "BalanceCategoryCodeLIP",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "BalanceCategoryCodeLIP",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentLIPBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentLIPBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "NextPaymentDueDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "NextPaymentDueDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "CurrentDueDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CurrentDueDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "LastPaymentDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LastPaymentDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "LastPaymentAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LastPaymentAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RegularPaymentAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RegularPaymentAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanInterestRate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanInterestRate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PayoffBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PayoffBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PayDownBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PayDownBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PrincipalBalance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PrincipalBalance",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AmountToPayCurrent",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AmountToPayCurrent",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TotalPerDiem",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "TotalPerDiem",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TotalAmountCurrentlyDue",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "TotalAmountCurrentlyDue",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AmountPastDue",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AmountPastDue",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OriginalLoanAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OriginalLoanAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanCurrentTerm",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanCurrentTerm",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "LoanRemainingTerm",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "LoanRemainingTerm",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RemainingPayments",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RemainingPayments",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PaymentCalculationPeriod",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PaymentCalculationPeriod",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreditLimitAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CreditLimitAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AvailableCredit",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AvailableCredit",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositInterestRate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositInterestRate",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositPriorYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositYTDInterestPaid",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositYTDInterestPaid",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositLastInterestAmount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositLastInterestAmount",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositLastInterestPostDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositLastInterestPostDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "DepositCurrentTerm",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DepositCurrentTerm",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "MaturityDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "MaturityDate",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "AccountType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccountType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PersonNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "PersonNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "CrossAcctAgreementNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CrossAcctAgreementNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "CrossAcctMemberNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CrossAcctMemberNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerPersonNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerPersonNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerOrganizationNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerOrganizationNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									},
+									{
+										"source": {
+											"name": "OwnerMemberNumber",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "OwnerMemberNumber",
+											"type": "Int64",
+											"physicalType": "bigint"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OfflinSource_NextlyCrossAccounts",
+								"type": "DatasetReference",
+								"parameters": {
+									"CrossAccounts": "@pipeline().parameters.FileName"
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OfflineDestination_NextlyCrossAccounts",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "NextlyCrossAccounst_StagingTruncate",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE NextlyCrossAccounts_Staging"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "NextlyCrossAccounts_CopyData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[Spi_InsertIntoMemberCrossAccounts]"
+						},
+						"linkedServiceName": {
+							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "completed copy",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Stored procedure1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "PROD/CrossAccounts",
+									"wildcardFileName": {
+										"value": "@pipeline().parameters.FileName",
+										"type": "Expression"
+									},
+									"deleteFilesAfterCompletion": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Completed_CrossAccounts_Source",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Completed_CrossAccounts_Sink",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string",
+						"defaultValue": "NextlyCrossAccounts*.csv"
+					},
+					"FilePath": {
+						"type": "string",
+						"defaultValue": "offline-services/PROD/CrossAccounts"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Nextly_LoanDueAlerts_PROD')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1650,7 +4882,7 @@
 												],
 												"policy": {
 													"timeout": "0.12:00:00",
-													"retry": 0,
+													"retry": 3,
 													"retryIntervalInSeconds": 30,
 													"secureOutput": false,
 													"secureInput": false
@@ -1731,6 +4963,74 @@
 														}
 													}
 												]
+											},
+											{
+												"name": "SendMail-BusinessDataFailure",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "Admin_LogDb_Copy data",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('Admin_LogDb_Copy data').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('Admin_LogDb_Copy data').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
+											},
+											{
+												"name": "SendMail-BusinessDataFailure_Delete",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "LogDb_Script",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('LogDb_Script').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('LogDb_Script').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
 											}
 										]
 									}
@@ -1997,11 +5297,11 @@
 										},
 										"ifTrueActivities": [
 											{
-												"name": "MetaDB_Script",
+												"name": "AdminMetaDB_Script",
 												"type": "Script",
 												"dependsOn": [
 													{
-														"activity": "MetaDB_Copy data",
+														"activity": "AdminMetaDB_Copy data",
 														"dependencyConditions": [
 															"Succeeded"
 														]
@@ -2009,7 +5309,7 @@
 												],
 												"policy": {
 													"timeout": "0.12:00:00",
-													"retry": 0,
+													"retry": 3,
 													"retryIntervalInSeconds": 30,
 													"secureOutput": false,
 													"secureInput": false
@@ -2033,7 +5333,7 @@
 												}
 											},
 											{
-												"name": "MetaDB_Copy data",
+												"name": "AdminMetaDB_Copy data",
 												"type": "Copy",
 												"dependsOn": [],
 												"policy": {
@@ -2089,6 +5389,74 @@
 														}
 													}
 												]
+											},
+											{
+												"name": "SendMail-BusinessDataFailure",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "AdminMetaDB_Copy data",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('AdminMetaDB_Copy data').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('AdminMetaDB_Copy data').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
+											},
+											{
+												"name": "SendMail-BusinessDataFailure_Delete",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "AdminMetaDB_Script",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('AdminMetaDB_Script').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('AdminMetaDB_Script').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
 											}
 										]
 									}
@@ -2367,7 +5735,7 @@
 												],
 												"policy": {
 													"timeout": "0.12:00:00",
-													"retry": 0,
+													"retry": 3,
 													"retryIntervalInSeconds": 30,
 													"secureOutput": false,
 													"secureInput": false
@@ -2448,6 +5816,74 @@
 														}
 													}
 												]
+											},
+											{
+												"name": "SendMail-BusinessDataFailure",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "Anonymous_LogDb_Copy data",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('Anonymous_LogDb_Copy data').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('Anonymous_LogDb_Copy data').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
+											},
+											{
+												"name": "SendMail-BusinessDataFailure_Delete",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "Anonymous_LogDb_Script",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('Anonymous_LogDb_Script').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('Anonymous_LogDb_Script').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
 											}
 										]
 									}
@@ -2729,7 +6165,7 @@
 												],
 												"policy": {
 													"timeout": "0.12:00:00",
-													"retry": 0,
+													"retry": 3,
 													"retryIntervalInSeconds": 30,
 													"secureOutput": false,
 													"secureInput": false
@@ -2810,6 +6246,74 @@
 														}
 													}
 												]
+											},
+											{
+												"name": "SendMail-BusinessDataFailure",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "Anonymous_MetaDB_Copy data",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('Anonymous_MetaDB_Copy data').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('Anonymous_MetaDB_Copy data').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
+											},
+											{
+												"name": "SendMail-BusinessDataFailure_Delete",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "Anonymous_MetaDB_Script",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('Anonymous_MetaDB_Script').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('Anonymous_MetaDB_Script').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
 											}
 										]
 									}
@@ -3038,7 +6542,7 @@
 									],
 									"policy": {
 										"timeout": "0.12:00:00",
-										"retry": 0,
+										"retry": 3,
 										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
@@ -3067,7 +6571,7 @@
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
-										"retry": 0,
+										"retry": 3,
 										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
@@ -3119,6 +6623,74 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "SendMail-BusinessDataFailure",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "BBAlerts_Copy data",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('BBAlerts_Copy data').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('BBAlerts_Copy data').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "SendMail-BusinessDataFailure_Delete",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "BBAlerts_Script",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('BBAlerts_Script').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('BBAlerts_Script').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
 								}
 							]
 						}
@@ -3394,7 +6966,7 @@
 												],
 												"policy": {
 													"timeout": "0.12:00:00",
-													"retry": 0,
+													"retry": 3,
 													"retryIntervalInSeconds": 30,
 													"secureOutput": false,
 													"secureInput": false
@@ -3474,6 +7046,74 @@
 														}
 													}
 												]
+											},
+											{
+												"name": "SendMail-BusinessDataFailure",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "LogDbMI_Copy data",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('LogDbMI_Copy data').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('LogDbMI_Copy data').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
+											},
+											{
+												"name": "SendMail-BusinessDataFailure_Delete",
+												"type": "ExecutePipeline",
+												"dependsOn": [
+													{
+														"activity": "LogDBMI_Script",
+														"dependencyConditions": [
+															"Failed"
+														]
+													}
+												],
+												"policy": {
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "SendEmail_Failure",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"Subject": {
+															"value": "@concat('Pipeline -', activity('LogDBMI_Script').name, ' has been failed')",
+															"type": "Expression"
+														},
+														"Content": {
+															"value": "@activity('LogDBMI_Script').output.errors.message",
+															"type": "Expression"
+														},
+														"Importance": "High"
+													}
+												}
 											}
 										]
 									}
@@ -3629,2355 +7269,6 @@
 				},
 				"folder": {
 					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_LogDB_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "LogDB_Archive_LookUp",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='LogDb' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LogDB_Archive_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LogDB_Archive_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "CheckRowCount",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT count(1) as 'RecordCount' FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "SCCUPROD_LogDB_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									}
-								},
-								{
-									"name": "If Condition1",
-									"type": "IfCondition",
-									"dependsOn": [
-										{
-											"activity": "CheckRowCount",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "LogDb_Script",
-												"type": "Script",
-												"dependsOn": [
-													{
-														"activity": "LogDb_Copy data",
-														"dependencyConditions": [
-															"Succeeded"
-														]
-													}
-												],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"linkedServiceName": {
-													"referenceName": "SCCU_Logdb_PROD_DTU",
-													"type": "LinkedServiceReference"
-												},
-												"typeProperties": {
-													"scripts": [
-														{
-															"type": "Query",
-															"text": {
-																"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-																"type": "Expression"
-															}
-														}
-													],
-													"scriptBlockExecutionTimeout": "02:00:00"
-												}
-											},
-											{
-												"name": "LogDb_Copy data",
-												"type": "Copy",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"source": {
-														"type": "AzureSqlSource",
-														"sqlReaderQuery": {
-															"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-															"type": "Expression"
-														},
-														"queryTimeout": "02:00:00",
-														"partitionOption": "None"
-													},
-													"sink": {
-														"type": "AzureSqlSink",
-														"writeBehavior": "insert",
-														"sqlWriterUseTableLock": false
-													},
-													"enableStaging": false,
-													"translator": {
-														"type": "TabularTranslator",
-														"typeConversion": true,
-														"typeConversionSettings": {
-															"allowDataTruncation": true,
-															"treatBooleanAsNumber": false
-														}
-													}
-												},
-												"inputs": [
-													{
-														"referenceName": "SCCUPROD_LogDB_Source",
-														"type": "DatasetReference",
-														"parameters": {
-															"SourceDB": "@item().SourceDBName",
-															"SourceTable": "@item().SourceTableName",
-															"SourceSchema": "@item().SourceSchemaName"
-														}
-													}
-												],
-												"outputs": [
-													{
-														"referenceName": "Archive_Destination",
-														"type": "DatasetReference",
-														"parameters": {
-															"DestinationTable": "@item().DestinationTableName",
-															"DestinationSchema": "@item().DestinationSchemaName"
-														}
-													}
-												]
-											}
-										]
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "LogDB_Purge_LookUp",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='LogDb' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LogDB_Purge_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LogDB_Purge_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "LogDb_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Rebuild Index",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_RebuildIndex]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Update Statistics",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Rebuild Index",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_UpdateStatistics]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_MetaDB_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "MetaDB_Archive_LookUp",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='MetaDb' AND IsArchiveEnabled=1 AND ArchiveDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Archive_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "MetaDB_Archive_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('MetaDB_Archive_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "CheckRowCount",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlMISource",
-											"sqlReaderQuery": {
-												"value": "SELECT count(1) as 'RecordCount' FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-												"type": "Expression"
-											},
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "SCCUPROD_MetaDB_Source",
-											"type": "DatasetReference",
-											"parameters": {
-												"SourceDB": "@item().SourceDBName",
-												"SourceTable": "@item().SourceTableName",
-												"SourceSchema": "@item().SourceSchemaName"
-											}
-										}
-									}
-								},
-								{
-									"name": "If Record exists",
-									"type": "IfCondition",
-									"dependsOn": [
-										{
-											"activity": "CheckRowCount",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@greater(activity('CheckRowCount').output.firstRow['RecordCount'],0)",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "MetaDB_Script",
-												"type": "Script",
-												"dependsOn": [
-													{
-														"activity": "MetaDB_Copy data",
-														"dependencyConditions": [
-															"Succeeded"
-														]
-													}
-												],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"linkedServiceName": {
-													"referenceName": "SCCU_Metadb_PROD",
-													"type": "LinkedServiceReference"
-												},
-												"typeProperties": {
-													"scripts": [
-														{
-															"type": "Query",
-															"text": {
-																"value": "DELETE  FROM @{item().SourceSchemaName}.@{item().SourceTableName}  WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))\n\n",
-																"type": "Expression"
-															}
-														}
-													],
-													"scriptBlockExecutionTimeout": "02:00:00"
-												}
-											},
-											{
-												"name": "MetaDB_Copy data",
-												"type": "Copy",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 3,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"source": {
-														"type": "AzureSqlSource",
-														"sqlReaderQuery": {
-															"value": "SELECT * FROM @{item().SourceSchemaName}.@{item().SourceTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().ArchiveDays}, CAST(GETDATE() AS DATE))",
-															"type": "Expression"
-														},
-														"queryTimeout": "02:00:00",
-														"partitionOption": "None"
-													},
-													"sink": {
-														"type": "AzureSqlSink",
-														"writeBehavior": "insert",
-														"sqlWriterUseTableLock": false
-													},
-													"enableStaging": false,
-													"translator": {
-														"type": "TabularTranslator",
-														"typeConversion": true,
-														"typeConversionSettings": {
-															"allowDataTruncation": true,
-															"treatBooleanAsNumber": false
-														}
-													}
-												},
-												"inputs": [
-													{
-														"referenceName": "SCCUPROD_MetaDB_Source",
-														"type": "DatasetReference",
-														"parameters": {
-															"SourceDB": "@item().SourceDBName",
-															"SourceTable": "@item().SourceTableName",
-															"SourceSchema": "@item().SourceSchemaName"
-														}
-													}
-												],
-												"outputs": [
-													{
-														"referenceName": "Archive_Destination",
-														"type": "DatasetReference",
-														"parameters": {
-															"DestinationTable": "@item().DestinationTableName",
-															"DestinationSchema": "@item().DestinationSchemaName"
-														}
-													}
-												]
-											}
-										]
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "METADB_Purge_LookUp",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT * FROM MasterConfig WHERE DestinationSchemaName='MetaDb' AND IsPurgeEnabled=1 AND PurgeDays > 0",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "SCCUPROD_ArchiveSqlDataset",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Purge_ForEach",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "METADB_Purge_LookUp",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('METADB_Purge_LookUp').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 1,
-							"activities": [
-								{
-									"name": "MetaDb_Purge_Script",
-									"type": "Script",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"linkedServiceName": {
-										"referenceName": "SCCU_Archivedb_PROD_DTU",
-										"type": "LinkedServiceReference"
-									},
-									"typeProperties": {
-										"scripts": [
-											{
-												"type": "Query",
-												"text": {
-													"value": "DELETE  FROM @{item().DestinationSchemaName}.@{item().DestinationTableName} WHERE CAST(@{item().KeyColumn} AS DATE) < DATEADD(DAY, -@{item().PurgeDays}, CAST(GETDATE() AS DATE))",
-													"type": "Expression"
-												}
-											}
-										],
-										"scriptBlockExecutionTimeout": "02:00:00"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "MetaDB_DeleteTokens",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Archive_ForEach",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Metadb_PROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "Declare @userAPI varchar(36)\nset @userAPI=(select objectguid from userobjects with (readpast) where sAMAccountName='APIPUSHUSER');\n \nDeclare @startDate datetime=getDate();\nprint @startDate\nDECLARE @done bit = 0;  \nWHILE (@done = 0)  \nBEGIN  \n    DELETE TOP(5000)\n\tFROM RefreshTokens with (ROWLOCK)\n\tWHERE ExpiresUtc < GETUTCDATE() or UserId=@userAPI\n    IF @@rowcount < 1 SET @done = 1;  \n\tWAITFOR DELAY '00:00:02';\nEND; ",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "MetaDB_DeleteOther",
-						"description": "Token, TempUserLoginValidations, NF_UserConnections",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "MetaDB_DeleteTokens",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Metadb_PROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "\nDELETE\tFROM RefreshTokens with (ROWLOCK)\n\tWHERE ExpiresUtc < GETUTCDATE()\n\nDELETE FROM [dbo].[NF_UserConnections] with (ROWLOCK)\n\tWHERE CreatedDate <= DATEADD(DAY, -2, CAST(GETDATE() AS DATE))\n \nDELETE\tFROM TempUserLoginValidations with (ROWLOCK)\n\t\tWHERE [IsDeleted]=1",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "RebuildIndex",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "MetaDB_DeleteOther",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_RebuildIndex]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Metadb_PROD",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Update Statistics",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "RebuildIndex",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_UpdateStatistics]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Metadb_PROD",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCUPROD_Static_BusinessData_DynamicRetention')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "EmulationActivityDynamicDescriptionValue_copy",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM EmulationActivityDynamicDescriptionValue t1 WITH (NOLOCK) LEFT JOIN EmulationActivityLogs t2 WITH (NOLOCK) on t1.emulationactivitylogid=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ID"
-									]
-								},
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ID",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "ID",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "EmulationActivityLogID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										},
-										"sink": {
-											"name": "EmulationActivityLogID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "ActivityDynamicDescriptionValue",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "ActivityDynamicDescriptionValue",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "PROD_EmulationActivityDynamicDescriptionValue_Souce",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "PROD_emulation_Destination",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "EmulationActivityDynamicDescriptionValue",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "EmulationActivityDynamicDescriptionValue_copy",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Businessdata_PROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DELETE t1\nFROM EmulationActivityDynamicDescriptionValue t1\nLEFT JOIN EmulationActivityLogs t2\n    ON t1.EmulationActivityLogId = t2.Id\nWHERE CAST(t2.CreatedDate AS DATE) < DATEADD(DAY, -10, CAST(GETDATE() AS DATE))"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "EmulationActivityDynamicDescriptionValue_Purge",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "EmulationActivityDynamicDescriptionValue",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Archivedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DECLARE @BatchSize INT = 10000;  -- Define the batch size for deletion\nDECLARE @RowsAffected INT = 1;    -- Initialize with a non-zero value\nDECLARE @TotalRowsDeleted INT = 0; -- Variable to accumulate total rows deleted\nDECLARE @LoopCount INT = 0;       -- Variable to count the number of loop executions\n \n-- Start the batch-wise deletion process\nWHILE @RowsAffected > 0\nBEGIN\n    -- Increment the loop execution count\n    SET @LoopCount = @LoopCount + 1;\n \n    -- Delete top (@BatchSize) rows based on the purge condition\n    DELETE TOP (@BatchSize)\n    FROM businessdata.EmulationActivityDynamicDescriptionValue\n   WHERE CAST(createddate AS DATE) < DATEADD(DAY,-47,CAST(GETDATE() AS DATE))\n\n    -- Get the number of rows deleted in the last batch\n    SET @RowsAffected = @@ROWCOUNT;\n \n    -- Accumulate the total number of rows deleted\n    SET @TotalRowsDeleted = @TotalRowsDeleted + @RowsAffected;\nEND\n \n-- Optionally, you can output the total rows deleted and loop execution count for logging purposes\nSELECT @TotalRowsDeleted AS TotalRowsDeleted, @LoopCount AS LoopExecutionCount;"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "MemberActivityDynamicDescriptionValue_Copy",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate \nFROM MemberActivityDynamicDescriptionValue t1 with (Nolock) LEFT JOIN memberactivitylog t2 with (Nolock) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ID"
-									]
-								},
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										},
-										"sink": {
-											"name": "ID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "MemberActivityLogID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										},
-										"sink": {
-											"name": "MemberActivityLogID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "ActivityDynamicDescriptionValue",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "ActivityDynamicDescriptionValue",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "PROD_MemberActivityDynamicDescriptionValue_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "PROD_MemberActivityDynamicDescriptionValue_Destination",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "MemberActivityDynamicDescriptionValue",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "MemberActivityDynamicDescriptionValue_Copy",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Businessdata_PROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DELETE t1 FROM MemberActivityDynamicDescriptionValue t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "MemberActivityDynamicDescriptionValue_Purge",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "MemberActivityDynamicDescriptionValue",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Archivedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DECLARE @BatchSize INT = 10000;  -- Define the batch size for deletion\nDECLARE @RowsAffected INT = 1;    -- Initialize with a non-zero value\nDECLARE @TotalRowsDeleted INT = 0; -- Variable to accumulate total rows deleted\nDECLARE @LoopCount INT = 0;       -- Variable to count the number of loop executions\n \n-- Start the batch-wise deletion process\nWHILE @RowsAffected > 0\nBEGIN\n    -- Increment the loop execution count\n    SET @LoopCount = @LoopCount + 1;\n \n    -- Delete top (@BatchSize) rows based on the purge condition\n    DELETE TOP (@BatchSize)\n    FROM businessdata.MemberActivityDynamicDescriptionValue\n   WHERE CAST(createddate AS DATE) < DATEADD(DAY,-47,CAST(GETDATE() AS DATE))\n\n\n    -- Get the number of rows deleted in the last batch\n    SET @RowsAffected = @@ROWCOUNT;\n \n    -- Accumulate the total number of rows deleted\n    SET @TotalRowsDeleted = @TotalRowsDeleted + @RowsAffected;\nEND\n \n-- Optionally, you can output the total rows deleted and loop execution count for logging purposes\nSELECT @TotalRowsDeleted AS TotalRowsDeleted, @LoopCount AS LoopExecutionCount;"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "TransferMemberActivityLog_Copy",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlMISource",
-								"sqlReaderQuery": "SELECT t1.*,ISNULL(t2.createddate,DATEADD(DAY,-11,CAST(GETDATE() AS DATE))) as  CreatedDate FROM TransferMemberActivityLog t1 with (NOLOCK) LEFT JOIN memberactivitylog t2 WITH (NOLOCK) on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE)) ",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ID"
-									]
-								},
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ID",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "ID",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "MemberActivityLogID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										},
-										"sink": {
-											"name": "MemberActivityLogID",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "PayeeOrDestination",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "PayeeOrDestination",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TransactionAmount",
-											"type": "Double",
-											"physicalType": "float"
-										},
-										"sink": {
-											"name": "TransactionAmount",
-											"type": "Double",
-											"physicalType": "float"
-										}
-									},
-									{
-										"source": {
-											"name": "SourceAccountNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "SourceAccountNumber",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "PROD_TransferMemberActivityLog_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "PROD_TransferMemberActivityLog_Destination",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "TransferMemberActivityLog",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "TransferMemberActivityLog_Copy",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Businessdata_PROD",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DELETE t1 FROM TransferMemberActivityLog t1 LEFT JOIN memberactivitylog t2 on t1.MemberActivityLogID=t2.id\nWHERE CAST(t2.createddate AS DATE) < DATEADD(DAY,-10,CAST(GETDATE() AS DATE))\n"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "TransferMemberActivityLog_Purge",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "TransferMemberActivityLog",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_Archivedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DECLARE @BatchSize INT = 10000;  -- Define the batch size for deletion\nDECLARE @RowsAffected INT = 1;    -- Initialize with a non-zero value\nDECLARE @TotalRowsDeleted INT = 0; -- Variable to accumulate total rows deleted\nDECLARE @LoopCount INT = 0;       -- Variable to count the number of loop executions\n \n-- Start the batch-wise deletion process\nWHILE @RowsAffected > 0\nBEGIN\n    -- Increment the loop execution count\n    SET @LoopCount = @LoopCount + 1;\n \n    -- Delete top (@BatchSize) rows based on the purge condition\n    DELETE TOP (@BatchSize)\n    FROM businessdata.TransferMemberActivityLog\n   WHERE CAST(createddate AS DATE) < DATEADD(DAY,-47,CAST(GETDATE() AS DATE))\n    -- Get the number of rows deleted in the last batch\n    SET @RowsAffected = @@ROWCOUNT;\n \n    -- Accumulate the total number of rows deleted\n    SET @TotalRowsDeleted = @TotalRowsDeleted + @RowsAffected;\nEND\n \n-- Optionally, you can output the total rows deleted and loop execution count for logging purposes\nSELECT @TotalRowsDeleted AS TotalRowsDeleted, @LoopCount AS LoopExecutionCount;"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "SendMainl-BusinessDataFailure_copy1",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "TransferMemberActivityLog_Copy",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SendEmail",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"Subject": {
-									"value": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
-									"type": "Expression"
-								},
-								"Content": {
-									"value": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
-									"type": "Expression"
-								},
-								"Importance": "High"
-							}
-						}
-					},
-					{
-						"name": "SendMainl-BusinessDataFailure_copy1_copy1",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "MemberActivityDynamicDescriptionValue_Copy",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SendEmail",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"Subject": {
-									"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
-									"type": "Expression"
-								},
-								"Content": {
-									"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
-									"type": "Expression"
-								},
-								"Importance": "High"
-							}
-						}
-					},
-					{
-						"name": "SendMainl-BusinessDataFailure_copy1_copy2",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "EmulationActivityDynamicDescriptionValue_copy",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SendEmail",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"Subject": {
-									"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
-									"type": "Expression"
-								},
-								"Content": {
-									"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
-									"type": "Expression"
-								},
-								"Importance": "High"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SCCU_LoanDueAlerts_PROD')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Count_LoanDueAlerts",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 3,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "SqlMISource",
-								"sqlReaderStoredProcedureName": "[[dbo].[sps_LoanDueAlertSubscriptionToFile]",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "PROD_SQLDataSet",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Set_RowCount_LoanDueAlerts",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Count_LoanDueAlerts",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "RowCount_LoanDueAlerts",
-							"value": {
-								"value": "@length(activity('Count_LoanDueAlerts').output.value)",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Check_RowCount_LoanDueAlerts",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Set_RowCount_LoanDueAlerts",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@greater(variables('RowCount_LoanDueAlerts'), 0)\n",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "LoanDueAlerts_Copy data",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 3,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlMISource",
-											"sqlReaderQuery": "EXEC sps_LoanDueAlertSubscriptionToFile",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "DelimitedTextSink",
-											"storeSettings": {
-												"type": "AzureBlobStorageWriteSettings"
-											},
-											"formatSettings": {
-												"type": "DelimitedTextWriteSettings",
-												"quoteAllText": true,
-												"fileExtension": ".txt"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"name": "SubscriptionID",
-														"type": "Int32",
-														"physicalType": "int"
-													},
-													"sink": {
-														"name": "SubscriptionID",
-														"type": "String",
-														"physicalType": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "AccountID",
-														"type": "String",
-														"physicalType": "varchar"
-													},
-													"sink": {
-														"name": "AccountID",
-														"type": "String",
-														"physicalType": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "NumOfDaysBeforeDue",
-														"type": "Int32",
-														"physicalType": "int"
-													},
-													"sink": {
-														"name": "NumOfDaysBeforeDue",
-														"type": "String",
-														"physicalType": "String"
-													}
-												},
-												{
-													"source": {
-														"name": "NumOfDaysAfterPastDue",
-														"type": "Int32",
-														"physicalType": "int"
-													},
-													"sink": {
-														"name": "NumOfDaysAfterPastDue",
-														"type": "String",
-														"physicalType": "String"
-													}
-												}
-											],
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "PROD_SQLDataSet",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "PROD_LoanDue_DataSet",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"RowCount_LoanDueAlerts": {
-						"type": "Integer"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/UserCreditCards')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "UserCreditCards_CopyData",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCards_StagingTruncate",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/UserCreditCards",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "MEMBERTYPE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "MEMBERTYPE",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DNAACCTNBR",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DNAACCTNBR",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "CCMACCTNBR",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "CCMACCTNBR",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "NEXTLYPERSONNUMBER",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "NEXTLYPERSONNUMBER",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "DNABUSINESSORGNBR",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DNABUSINESSORGNBR",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DNAMEMBERNUMBER",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DNAMEMBERNUMBER",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "NEXTLYSIGNUPDATE",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "NEXTLYSIGNUPDATE",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DNACREDITCARDAGREEMENTNBR",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "DNACREDITCARDAGREEMENTNBR",
-											"type": "Int64",
-											"physicalType": "bigint"
-										}
-									},
-									{
-										"source": {
-											"name": "Textbox6",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Textbox6",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Textbox14",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Textbox14",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Textbox12",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Textbox12",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Textbox10",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Textbox10",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Textbox8",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "Textbox8",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "OfflinSource_UserCreditCards",
-								"type": "DatasetReference",
-								"parameters": {
-									"UserCreditCards": "@pipeline().parameters.FileName"
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "OfflineDestination_UserCreditCards",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "UserCreditCards_StagingTruncate",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE UserCreditCards_Staging"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Stored procedure1",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCards_CopyData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[Spi_InsertInToMemberCreditCardDetails]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_OfflineModedb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "completed copy",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Stored procedure1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFolderPath": "PROD/UserCreditCards",
-									"wildcardFileName": {
-										"value": "@pipeline().parameters.FileName",
-										"type": "Expression"
-									},
-									"deleteFilesAfterCompletion": true
-								},
-								"formatSettings": {
-									"type": "BinaryReadSettings"
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "Completed_UserCreditCards_Source",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Completed_UserCreditCards_Sink",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"FileName": {
-						"type": "string",
-						"defaultValue": "Nextly User Credit Cards DNA_CCM*.csv"
-					},
-					"FilePath": {
-						"type": "string",
-						"defaultValue": "offline-services/PROD/UserCreditCards"
-					}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/00_Offline_Main')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "MemberData",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "MemberDataDetails",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "AccountDetails",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "MemberData",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "NextlyAccountDetails",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "UserCreditCard",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "AccountDetails",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "UserCreditCards",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "CCMCreditCard",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "CCM_CreditCard_AccountDetails",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "SavingsAccount",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "CK_SAV_Accounttransactions",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "DebitCards",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "DebitCardDetails",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "AccountLockOut",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "NextlyAccountlockout",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "AccountRoles",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "NextlyAccountRoles",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "CrossAccounts",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "NextlyCrossAccounts",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "LoanTransaction",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "UserCreditCard",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "NextlyLoanTransactions",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "OfflineServices"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/UserCreditCards')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BacPac Tables ACISeri_CheckFree_Vsofts_WeeklyTwice')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-				"activities": [
-					{
-						"name": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "BacPac_ACISeri_Notification",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "BacPac_Emails",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "DataRetention/BacPac"
 				},
 				"annotations": []
 			},

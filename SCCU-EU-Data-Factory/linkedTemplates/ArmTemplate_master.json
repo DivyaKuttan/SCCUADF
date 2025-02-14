@@ -405,18 +405,6 @@
 					},
 					"SCCU_BBAlertsDev_properties_typeProperties_database": {
 						"value": "[parameters('SCCU_BBAlertsDev_properties_typeProperties_database')]"
-					},
-					"SCCU_BBAlertsPROD_properties_typeProperties_server": {
-						"value": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_server')]"
-					},
-					"SCCU_BBAlertsPROD_properties_typeProperties_database": {
-						"value": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_database')]"
-					},
-					"SCCU_BBAlertsUAT_properties_typeProperties_server": {
-						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]"
-					},
-					"SCCU_BBAlertsUAT_properties_typeProperties_database": {
-						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]"
 					}
 				}
 			},
@@ -443,6 +431,18 @@
 					},
 					"SCCU_OfflineModedb_PROD_DTU_connectionString": {
 						"value": "[parameters('SCCU_OfflineModedb_PROD_DTU_connectionString')]"
+					},
+					"SCCU_BBAlertsPROD_properties_typeProperties_server": {
+						"value": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_server')]"
+					},
+					"SCCU_BBAlertsPROD_properties_typeProperties_database": {
+						"value": "[parameters('SCCU_BBAlertsPROD_properties_typeProperties_database')]"
+					},
+					"SCCU_BBAlertsUAT_properties_typeProperties_server": {
+						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_server')]"
+					},
+					"SCCU_BBAlertsUAT_properties_typeProperties_database": {
+						"value": "[parameters('SCCU_BBAlertsUAT_properties_typeProperties_database')]"
 					},
 					"SCCU_BusinessDataDev_properties_typeProperties_server": {
 						"value": "[parameters('SCCU_BusinessDataDev_properties_typeProperties_server')]"
@@ -689,6 +689,26 @@
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'SCCU-EU-Data-Factory_ArmTemplate_9')]"
+			]
+		},
+		{
+			"name": "SCCU-EU-Data-Factory_ArmTemplate_11",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_11.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'SCCU-EU-Data-Factory_ArmTemplate_10')]"
 			]
 		}
 	]

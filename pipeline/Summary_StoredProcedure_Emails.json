@@ -1,0 +1,78 @@
+{
+	"name": "Summary_StoredProcedure_Emails",
+	"properties": {
+		"activities": [
+			{
+				"name": "Send Email",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Getemail",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail_Success",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@activity('Getemail').output.firstRow.Subject",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('Getemail').output.firstRow.EmailBody",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "Getemail",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "EXEC @{pipeline().parameters.procName}",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "BacPac_Email_Proc",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"procName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "DataRetention/BacPac"
+		},
+		"annotations": []
+	}
+}

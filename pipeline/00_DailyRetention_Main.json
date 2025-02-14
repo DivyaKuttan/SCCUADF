@@ -218,7 +218,7 @@
 							}
 						},
 						{
-							"name": "Execute Pipeline2",
+							"name": "Summary Email",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{

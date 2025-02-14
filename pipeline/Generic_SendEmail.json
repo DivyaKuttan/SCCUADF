@@ -1,5 +1,5 @@
 {
-	"name": "SendEmail",
+	"name": "Generic_SendEmail",
 	"properties": {
 		"description": "Pipeline email notification on job completion",
 		"activities": [
@@ -77,11 +77,11 @@
 		"parameters": {
 			"Subject": {
 				"type": "string",
-				"defaultValue": "Test Email from ADF pipeline"
+				"defaultValue": "test sub"
 			},
 			"Content": {
 				"type": "string",
-				"defaultValue": "Test Email from ADF pipeline"
+				"defaultValue": "Teest ema"
 			},
 			"Importance": {
 				"type": "string",

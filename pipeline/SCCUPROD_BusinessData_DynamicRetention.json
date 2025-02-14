@@ -120,7 +120,7 @@
 										],
 										"policy": {
 											"timeout": "0.12:00:00",
-											"retry": 0,
+											"retry": 3,
 											"retryIntervalInSeconds": 30,
 											"secureOutput": false,
 											"secureInput": false
@@ -201,6 +201,74 @@
 												}
 											}
 										]
+									},
+									{
+										"name": "SendMail-BusinessDataFailure",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "BusinessData_Copy data",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail_Failure",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('BusinessData_Copy data').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('BusinessData_Copy data').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
+									},
+									{
+										"name": "SendMail-BusinessDataFailure_Delete",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "BusinessData_Script",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail_Failure",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('BusinessData_Script').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('BusinessData_Script').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
 									}
 								]
 							}
@@ -355,46 +423,6 @@
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
-				}
-			},
-			{
-				"name": "SendEmailSuccess",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Purge_ForEach",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "BusinessData_Rebuild_Stat",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "SendEmail",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"Subject": {
-							"value": "SCCU Daily maintenance has been completed",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "SCCU Daily DB maintenance has been completed.",
-							"type": "Expression"
-						},
-						"Importance": "Normal"
-					}
 				}
 			}
 		],

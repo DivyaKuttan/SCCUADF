@@ -115,6 +115,40 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "SendMainl-BusinessDataFailure_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "BusinessData_Copy data",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail_Failure",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "@concat('Pipeline -', activity('BusinessData_Copy data').name, ' has been failed')",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "@activity('BusinessData_Copy data').output.errors.message",
+										"type": "Expression"
+									},
+									"Importance": "High"
+								}
+							}
 						}
 					]
 				}

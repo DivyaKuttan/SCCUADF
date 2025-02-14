@@ -113,7 +113,7 @@
 										],
 										"policy": {
 											"timeout": "0.12:00:00",
-											"retry": 0,
+											"retry": 3,
 											"retryIntervalInSeconds": 30,
 											"secureOutput": false,
 											"secureInput": false
@@ -194,6 +194,74 @@
 												}
 											}
 										]
+									},
+									{
+										"name": "SendMail-BusinessDataFailure",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "MetaDB_Copy data",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail_Failure",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('MetaDB_Copy data').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('MetaDB_Copy data').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
+									},
+									{
+										"name": "SendMail-BusinessDataFailure_Delete",
+										"type": "ExecutePipeline",
+										"dependsOn": [
+											{
+												"activity": "MetaDB_Script",
+												"dependencyConditions": [
+													"Failed"
+												]
+											}
+										],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "SendEmail_Failure",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"Subject": {
+													"value": "@concat('Pipeline -', activity('MetaDB_Script').name, ' has been failed')",
+													"type": "Expression"
+												},
+												"Content": {
+													"value": "@activity('MetaDB_Copy data').output.errors.message",
+													"type": "Expression"
+												},
+												"Importance": "High"
+											}
+										}
 									}
 								]
 							}

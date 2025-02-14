@@ -54,6 +54,52 @@
 							}
 						},
 						{
+							"name": "SendEmailSuccess",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "PROD_DynamicRetention_Main",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "SCCUPROD_ActivityLogs_Main",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "AdminLoginHistory",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail_Success",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "SCCU Daily maintenance has been completed",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "SCCU Daily DB maintenance has been completed.",
+										"type": "Expression"
+									},
+									"Importance": "Normal"
+								}
+							}
+						},
+						{
 							"name": "SendMainl-ActivityLogFailure",
 							"type": "ExecutePipeline",
 							"dependsOn": [
@@ -70,7 +116,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "SendEmail",
+									"referenceName": "SendEmail_Failure",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -104,7 +150,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "SendEmail",
+									"referenceName": "SendEmail_Failure",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -120,6 +166,82 @@
 									"Importance": "High"
 								}
 							}
+						},
+						{
+							"name": "AdminLoginHistory",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SCCUPROD_AdminLoginHistory",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
+							}
+						},
+						{
+							"name": "SendMainl-ActivityLogFailure_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "AdminLoginHistory",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail_Failure",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "@concat('Pipeline -', activity('AdminLoginHistory').name, ' has been failed')",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "@activity('AdminLoginHistory').output.errors.message",
+										"type": "Expression"
+									},
+									"Importance": "High"
+								}
+							}
+						},
+						{
+							"name": "Summary Email",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "SendEmailSuccess",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Summary_StoredProcedure_Emails",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"procName": "sp_GetEmailData_BacpacRetention_Summary"
+								}
+							}
 						}
 					]
 				}
@@ -129,9 +251,9 @@
 				"type": "Lookup",
 				"dependsOn": [
 					{
-						"activity": "SendEmail",
+						"activity": "Start Maintenance Notification",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -157,30 +279,7 @@
 				}
 			},
 			{
-				"name": "AdminLoginHistory",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "SendEmail",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "SCCUPROD_AdminLoginHistory",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
-				}
-			},
-			{
-				"name": "SendEmail",
+				"name": "Start Maintenance Notification",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"policy": {
@@ -189,16 +288,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "SendEmail",
+						"referenceName": "SendEmail_Success",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('SCCU DATA Retention/Maintenance Pipeline - ',pipeline().Pipeline,'Started')",
-							"type": "Expression"
-						},
-						"Content": "@concat('SCCU DATA Retention/Maintenance Pipeline - ',pipeline().Pipeline,'Started')",
+						"Subject": "SCCU DB daily maintenance started",
+						"Content": "SCCU DB daily maintenance started",
 						"Importance": "Normal"
 					}
 				}

@@ -20,11 +20,41 @@
 						"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
 						"type": "Expression"
 					},
+					"ifFalseActivities": [
+						{
+							"name": "Start Maintenance Notification_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail_Success",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": "SCCU DB daily maintenance Disabled",
+									"Content": "SCCU DB daily maintenance Disabled",
+									"Importance": "High"
+								}
+							}
+						}
+					],
 					"ifTrueActivities": [
 						{
 							"name": "PROD_DynamicRetention_Main",
 							"type": "ExecutePipeline",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Start Maintenance Notification",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
 							"policy": {
 								"secureInput": false
 							},
@@ -40,7 +70,14 @@
 						{
 							"name": "SCCUPROD_ActivityLogs_Main",
 							"type": "ExecutePipeline",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Start Maintenance Notification",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
 							"policy": {
 								"secureInput": false
 							},
@@ -170,7 +207,14 @@
 						{
 							"name": "AdminLoginHistory",
 							"type": "ExecutePipeline",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Start Maintenance Notification",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
 							"policy": {
 								"secureInput": false
 							},
@@ -242,6 +286,27 @@
 									"procName": "sp_GetEmailData_BacpacRetention_Summary"
 								}
 							}
+						},
+						{
+							"name": "Start Maintenance Notification",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail_Success",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": "SCCU DB daily maintenance started",
+									"Content": "SCCU DB daily maintenance started",
+									"Importance": "Normal"
+								}
+							}
 						}
 					]
 				}
@@ -249,14 +314,7 @@
 			{
 				"name": "IsRetentionEnabled",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "Start Maintenance Notification",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -275,27 +333,6 @@
 					"dataset": {
 						"referenceName": "SCCUPROD_ArchiveSqlDataset",
 						"type": "DatasetReference"
-					}
-				}
-			},
-			{
-				"name": "Start Maintenance Notification",
-				"type": "ExecutePipeline",
-				"dependsOn": [],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "SendEmail_Success",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"Subject": "SCCU DB daily maintenance started",
-						"Content": "SCCU DB daily maintenance started",
-						"Importance": "Normal"
 					}
 				}
 			}

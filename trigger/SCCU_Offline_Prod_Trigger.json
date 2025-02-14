@@ -1,0 +1,24 @@
+{
+	"name": "SCCU_Offline_Prod_Trigger",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "00_Offline_Main",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2025-02-14T13:30:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}

@@ -1,5 +1,5 @@
 {
-	"name": "MondayBackUp",
+	"name": "BacPac ActivityLog_Weekly",
 	"properties": {
 		"activities": [
 			{
@@ -12,7 +12,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "StoredProcedure_Emails",
+						"referenceName": "Generic_StoredProcedure_Emails",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

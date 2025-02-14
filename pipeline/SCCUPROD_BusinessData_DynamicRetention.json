@@ -203,7 +203,7 @@
 										]
 									},
 									{
-										"name": "SendMainl-BusinessDataFailure_copy1",
+										"name": "SendMail-BusinessDataFailure",
 										"type": "ExecutePipeline",
 										"dependsOn": [
 											{
@@ -237,7 +237,7 @@
 										}
 									},
 									{
-										"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+										"name": "SendMail-BusinessDataFailure_Delete",
 										"type": "ExecutePipeline",
 										"dependsOn": [
 											{

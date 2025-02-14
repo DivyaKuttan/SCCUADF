@@ -8,7 +8,7 @@
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
-					"retry": 3,
+					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
@@ -118,7 +118,7 @@
 				],
 				"policy": {
 					"timeout": "0.12:00:00",
-					"retry": 3,
+					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
@@ -534,7 +534,7 @@
 				}
 			},
 			{
-				"name": "SendMainl-BusinessDataFailure_copy1",
+				"name": "SendMail-BusinessDataFailure_TranferMember",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -555,20 +555,14 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
-							"type": "Expression"
-						},
+						"Subject": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+						"Content": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
 						"Importance": "High"
 					}
 				}
 			},
 			{
-				"name": "SendMainl-BusinessDataFailure_copy1_copy1",
+				"name": "SendMail-BusinessDataFailure_MemberActivityDymnamic1",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -589,20 +583,14 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
-							"type": "Expression"
-						},
+						"Subject": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
+						"Content": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
 						"Importance": "High"
 					}
 				}
 			},
 			{
-				"name": "SendMainl-BusinessDataFailure_copy1_copy2",
+				"name": "SendMail-BusinessDataFailure",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
@@ -623,14 +611,8 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": {
-							"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
-							"type": "Expression"
-						},
-						"Content": {
-							"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
-							"type": "Expression"
-						},
+						"Subject": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
+						"Content": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
 						"Importance": "High"
 					}
 				}

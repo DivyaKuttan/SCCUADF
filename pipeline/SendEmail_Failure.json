@@ -1,5 +1,5 @@
 {
-	"name": "SendEmail",
+	"name": "SendEmail_Failure",
 	"properties": {
 		"description": "Pipeline email notification on job completion",
 		"activities": [

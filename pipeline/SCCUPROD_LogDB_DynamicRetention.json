@@ -213,7 +213,7 @@
 										"userProperties": [],
 										"typeProperties": {
 											"pipeline": {
-												"referenceName": "SendEmail",
+												"referenceName": "SendEmail_Failure",
 												"type": "PipelineReference"
 											},
 											"waitOnCompletion": true,
@@ -247,7 +247,7 @@
 										"userProperties": [],
 										"typeProperties": {
 											"pipeline": {
-												"referenceName": "SendEmail",
+												"referenceName": "SendEmail_Failure",
 												"type": "PipelineReference"
 											},
 											"waitOnCompletion": true,

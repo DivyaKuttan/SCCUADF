@@ -68,6 +68,12 @@
 									"dependencyConditions": [
 										"Succeeded"
 									]
+								},
+								{
+									"activity": "AdminLoginHistory",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
 							],
 							"policy": {
@@ -160,6 +166,56 @@
 									"Importance": "High"
 								}
 							}
+						},
+						{
+							"name": "AdminLoginHistory",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SCCUPROD_AdminLoginHistory",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
+							}
+						},
+						{
+							"name": "SendMainl-ActivityLogFailure_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "AdminLoginHistory",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "SendEmail",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "@concat('Pipeline -', activity('AdminLoginHistory').name, ' has been failed')",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "@activity('AdminLoginHistory').output.errors.message",
+										"type": "Expression"
+									},
+									"Importance": "High"
+								}
+							}
 						}
 					]
 				}
@@ -194,29 +250,6 @@
 						"referenceName": "SCCUPROD_ArchiveSqlDataset",
 						"type": "DatasetReference"
 					}
-				}
-			},
-			{
-				"name": "AdminLoginHistory",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Execute Pipeline1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "SCCUPROD_AdminLoginHistory",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true
 				}
 			},
 			{

@@ -19,7 +19,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Generic_SendEmail",
+						"referenceName": "SendEmail_Success",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

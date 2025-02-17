@@ -14727,6 +14727,9 @@
 											},
 											{
 												"email": "dbcusoitsupport@cunextgen.com"
+											},
+											{
+												"email": "SCCUADF_PMONotifications@claysys.com"
 											}
 										]
 									}
@@ -14847,7 +14850,7 @@
 								"type": "IntegrationRuntimeReference"
 							},
 							"body": {
-								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"},{\"email\":\"SCCUADF_PMONotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"},{\"email\":\"SCCUADF_PMONotifications@claysys.com\"},{\"email\":\"dbcusoitsupport@cunextgen.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
 								"type": "Expression"
 							}
 						}
@@ -23307,7 +23310,7 @@
 					"recurrence": {
 						"frequency": "Week",
 						"interval": 1,
-						"startTime": "2025-02-17T12:00:00",
+						"startTime": "2025-02-17T13:00:00",
 						"timeZone": "India Standard Time",
 						"schedule": {
 							"weekDays": [

@@ -5,7 +5,14 @@
 			{
 				"name": "MemberData",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Send Email on Starting",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -223,6 +230,91 @@
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Send Email on Starting",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail_Success",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": "Offline Service Data Ingestion Started",
+						"Content": "Offline Service Data Ingestion Started",
+						"Importance": "Normal"
+					}
+				}
+			},
+			{
+				"name": "Send Email On Completion",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "CCMCreditCard",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "SavingsAccount",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "DebitCards",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "AccountLockOut",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "AccountRoles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "CrossAccounts",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "LoanTransaction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "SendEmail_Success",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": "Offline Service Data Ingestion Completed",
+						"Content": "Offline Service Data Ingestion Completed",
+						"Importance": "Normal"
+					}
 				}
 			}
 		],

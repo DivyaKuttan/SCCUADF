@@ -88,9 +88,6 @@
 				"defaultValue": "Normal"
 			}
 		},
-		"folder": {
-			"name": "DataRetention/MISC"
-		},
 		"annotations": []
 	}
 }

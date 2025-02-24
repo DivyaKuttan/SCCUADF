@@ -22,7 +22,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Start Maintenance Notification_copy1",
+							"name": "Maintanance Disable",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"policy": {

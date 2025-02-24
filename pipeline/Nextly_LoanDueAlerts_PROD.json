@@ -250,6 +250,74 @@
 					"referenceName": "SCCU_BusinessDataPROD",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "SendMainl-Transaction Alert_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExternalAlert_LoanDueStaging_Copy data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('ExternalAlert_LoanDueStaging_Copy data').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('ExternalAlert_LoanDueStaging_Copy data').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "SendMainl-Transaction Alert_copy1_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "External_LoanAlertQueue_Stored procedure",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('External_LoanAlertQueue_Stored procedure').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('External_LoanAlertQueue_Stored procedure').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
 			}
 		],
 		"concurrency": 1,

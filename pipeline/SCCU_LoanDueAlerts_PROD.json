@@ -170,6 +170,40 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "SendMainl-Transaction Alert_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "LoanDueAlerts_Copy data",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Alerts_SendEmail_Failure",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"Subject": {
+										"value": "@concat('Pipeline -', activity('LoanDueAlerts_Copy data').name, ' has been failed')",
+										"type": "Expression"
+									},
+									"Content": {
+										"value": "@activity('LoanDueAlerts_Copy data').output.errors.message",
+										"type": "Expression"
+									},
+									"Importance": "High"
+								}
+							}
 						}
 					]
 				}

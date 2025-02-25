@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "BBAlerts_Copy data1_copy1",
+				"name": "BBAlerts_Copy data",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -199,7 +199,7 @@
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "BBAlerts_Copy data1_copy1",
+						"activity": "BBAlerts_Copy data",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -228,6 +228,74 @@
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "SendMainl- BBAlerts FromNextly Alert",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "BBAlerts_Copy data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('BBAlerts_Copy data').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('BBAlerts_Copy data').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "SendMainl- UpdateLastProcessedDateTime FromNextly Alert",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "UpdateLastProcessedDateTime",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('UpdateLastProcessedDateTime').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('UpdateLastProcessedDateTime').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
 				}
 			}
 		],

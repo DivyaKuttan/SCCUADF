@@ -207,6 +207,108 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "SendMainl-ExternalAlerts FromNextly Alert",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExternalAlerts_Copy data1",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('ExternalAlerts_Copy data1').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('ExternalAlerts_Copy data1').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "SendMainl- GetThresholdAlert FromNextly Alert",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "GetThresholdAlertSubscriptions_Copy data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('GetThresholdAlertSubscriptions_Copy data').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('GetThresholdAlertSubscriptions_Copy data').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "SendMainl- GetTransactionAlert FromNextly Alert",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "GetTransactionAlertSubscription_Copy data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('GetTransactionAlertSubscription_Copy data').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('GetTransactionAlertSubscription_Copy data').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
 			}
 		],
 		"concurrency": 1,

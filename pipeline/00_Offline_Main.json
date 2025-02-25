@@ -5,7 +5,14 @@
 			{
 				"name": "MemberData",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Data Ingestion Started",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -223,6 +230,461 @@
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Data Ingestion Started",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Success",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": "Production Offline Data Ingestion started",
+						"Content": "Production Offline Data Ingestion started",
+						"Importance": "Normal"
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Started_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "CCMCreditCard",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "SavingsAccount",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "DebitCards",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "AccountLockOut",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "AccountRoles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "CrossAccounts",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "LoanTransaction",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Success",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": "Production Offline Data Ingestion has been Completed ",
+						"Content": "Production Offline Data Ingestion has been Completed",
+						"Importance": "Normal"
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "MemberData",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('MemberData').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "AccountDetails",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('AccountDetails').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('AccountDetails').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy2",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "UserCreditCard",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('UserCreditCard').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('UserCreditCard').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy3",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "CCMCreditCard",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('CCMCreditCard').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('CCMCreditCard').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy4",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "SavingsAccount",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('SavingsAccount').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('SavingsAccount').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy5",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "DebitCards",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('DebitCards').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('DebitCards').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy6",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "AccountLockOut",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('AccountLockOut').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('AccountLockOut').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy7",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "AccountRoles",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('AccountRoles').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('AccountRoles').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy8",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "CrossAccounts",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('CrossAccounts').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('CrossAccounts').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Data Ingestion Failure_copy9",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "LoanTransaction",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Offline_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('LoanTransaction').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('LoanTransaction').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": {
+							"value": "High",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],

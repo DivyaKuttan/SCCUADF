@@ -111,7 +111,7 @@
 				]
 			},
 			{
-				"name": "Stored procedure1",
+				"name": "Transaction Alert SP",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
@@ -182,7 +182,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Stored procedure1",
+						"activity": "Transaction Alert SP",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -252,6 +252,74 @@
 				"linkedServiceName": {
 					"referenceName": "SCCU_BusinessDataPROD",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "SendMainl-Transaction Alert",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ExternalAlert_ThresholdStaging_Copy data",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('ExternalAlert_ThresholdStaging_Copy data').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('ExternalAlert_ThresholdStaging_Copy data').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
+				}
+			},
+			{
+				"name": "SendMainl-Transaction Alert_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Transaction Alert SP",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Alerts_SendEmail_Failure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('Transaction Alert SP').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('Transaction Alert SP').output.errors.message",
+							"type": "Expression"
+						},
+						"Importance": "High"
+					}
 				}
 			}
 		],

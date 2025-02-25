@@ -172,7 +172,7 @@
 							]
 						},
 						{
-							"name": "SendMainl-Transaction Alert_copy1",
+							"name": "SendMainl-LoanDue FromNextly Alert",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{

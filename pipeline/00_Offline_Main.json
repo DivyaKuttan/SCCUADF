@@ -377,11 +377,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('AccountDetails').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('AccountDetails').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -414,11 +414,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('UserCreditCard').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('UserCreditCard').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -451,11 +451,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('CCMCreditCard').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('CCMCreditCard').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -488,11 +488,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('SavingsAccount').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('SavingsAccount').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -525,11 +525,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('DebitCards').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('DebitCards').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -562,11 +562,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('AccountLockOut').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('AccountLockOut').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -599,11 +599,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('AccountRoles').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('AccountRoles').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -636,11 +636,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('CrossAccounts').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('CrossAccounts').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {
@@ -673,11 +673,11 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"Subject": {
-							"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+							"value": "@concat('Pipeline -', activity('LoanTransaction').name, ' has been failed')",
 							"type": "Expression"
 						},
 						"Content": {
-							"value": "@activity('MemberData').output.errors.message",
+							"value": "@activity('LoanTransaction').output.errors.message",
 							"type": "Expression"
 						},
 						"Importance": {

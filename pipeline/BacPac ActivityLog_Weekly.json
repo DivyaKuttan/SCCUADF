@@ -12,7 +12,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Generic_StoredProcedure_Emails",
+						"referenceName": "Weekly_StoredProcedure_Emails",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

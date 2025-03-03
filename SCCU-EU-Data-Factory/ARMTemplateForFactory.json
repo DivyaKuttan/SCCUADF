@@ -299,6 +299,369 @@
 							},
 							"ifFalseActivities": [
 								{
+									"name": "Maintanance Disable",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Success",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": "SCCU DB daily maintenance Disabled",
+											"Content": "SCCU DB daily maintenance Disabled",
+											"Importance": "High"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "PROD_DynamicRetention_Main",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Start Maintenance Notification",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PROD_DynamicRetention_Main",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "SCCUPROD_ActivityLogs_Main",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Start Maintenance Notification",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SCCUPROD_ActivityLogs_Main",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "SendEmailSuccess",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "AdminLoginHistory",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Success",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "SCCU Daily maintenance has been completed",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "SCCU Daily DB maintenance has been completed.",
+												"type": "Expression"
+											},
+											"Importance": "Normal"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-ActivityLogFailure",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SCCUPROD_ActivityLogs_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('SCCUPROD_ActivityLogs_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('SCCUPROD_ActivityLogs_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "SendMainl-BusinessDataFailure_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "PROD_DynamicRetention_Main",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('PROD_DynamicRetention_Main').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('PROD_DynamicRetention_Main').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "AdminLoginHistory",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Start Maintenance Notification",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SCCUPROD_AdminLoginHistory",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								},
+								{
+									"name": "SendMainl-ActivityLogFailure_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "AdminLoginHistory",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('AdminLoginHistory').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('AdminLoginHistory').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
+								},
+								{
+									"name": "Summary Email",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "SendEmailSuccess",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Summary_StoredProcedure_Emails",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"procName": "sp_GetEmailData_BacpacRetention_Summary"
+										}
+									}
+								},
+								{
+									"name": "Start Maintenance Notification",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "SendEmail_Success",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": "SCCU DB daily maintenance started",
+											"Content": "SCCU DB daily maintenance started",
+											"Importance": "Normal"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "IsRetentionEnabled",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT count(1) as 'RecordCount' FROM [dbo].[DailyRetentionConfig] where PipelineRun=1",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_ArchiveSqlDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SCCUPROD_ArchiveSqlDataset')]",
+				"[concat(variables('factoryId'), '/pipelines/SendEmail_Success')]",
+				"[concat(variables('factoryId'), '/pipelines/PROD_DynamicRetention_Main')]",
+				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_ActivityLogs_Main')]",
+				"[concat(variables('factoryId'), '/pipelines/SendEmail_Failure')]",
+				"[concat(variables('factoryId'), '/pipelines/SCCUPROD_AdminLoginHistory')]",
+				"[concat(variables('factoryId'), '/pipelines/Summary_StoredProcedure_Emails')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/00_DailyRetention_Main_Debug')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "PROD_DailyRetention_Main for debug version",
+				"activities": [
+					{
+						"name": "If Retention Enabled",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "IsRetentionEnabled",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(1,0)",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
 									"name": "Start Maintenance Notification_copy1",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
@@ -645,7 +1008,14 @@
 					{
 						"name": "MemberData",
 						"type": "ExecutePipeline",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Data Ingestion Started",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"secureInput": false
 						},
@@ -874,6 +1244,461 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "Data Ingestion Started",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Success",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": "Production Offline Data Ingestion started",
+								"Content": "Production Offline Data Ingestion started",
+								"Importance": "Normal"
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Started_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "CCMCreditCard",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "SavingsAccount",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DebitCards",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "AccountLockOut",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "AccountRoles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "CrossAccounts",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "LoanTransaction",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Success",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": "Production Offline Data Ingestion has been Completed ",
+								"Content": "Production Offline Data Ingestion has been Completed",
+								"Importance": "Normal"
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "MemberData",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('MemberData').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AccountDetails",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('AccountDetails').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('AccountDetails').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy2",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UserCreditCard",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('UserCreditCard').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('UserCreditCard').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy3",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "CCMCreditCard",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('CCMCreditCard').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('CCMCreditCard').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy4",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "SavingsAccount",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('SavingsAccount').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('SavingsAccount').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy5",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "DebitCards",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('DebitCards').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('DebitCards').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy6",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AccountLockOut",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('AccountLockOut').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('AccountLockOut').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy7",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "AccountRoles",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('AccountRoles').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('AccountRoles').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy8",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "CrossAccounts",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('CrossAccounts').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('CrossAccounts').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Data Ingestion Failure_copy9",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "LoanTransaction",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Offline_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('LoanTransaction').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('LoanTransaction').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": {
+									"value": "High",
+									"type": "Expression"
+								}
+							}
+						}
 					}
 				],
 				"policy": {
@@ -894,7 +1719,9 @@
 				"[concat(variables('factoryId'), '/pipelines/NextlyAccountlockout')]",
 				"[concat(variables('factoryId'), '/pipelines/NextlyAccountRoles')]",
 				"[concat(variables('factoryId'), '/pipelines/NextlyCrossAccounts')]",
-				"[concat(variables('factoryId'), '/pipelines/NextlyLoanTransactions')]"
+				"[concat(variables('factoryId'), '/pipelines/NextlyLoanTransactions')]",
+				"[concat(variables('factoryId'), '/pipelines/Offline_SendEmail_Success')]",
+				"[concat(variables('factoryId'), '/pipelines/Offline_SendEmail_Failure')]"
 			]
 		},
 		{
@@ -1249,6 +2076,208 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Alerts_SendEmail_Failure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"BBAlertsMonitoring@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string",
+						"defaultValue": "Test Email from ADF pipeline"
+					},
+					"Content": {
+						"type": "string",
+						"defaultValue": "Test Email from ADF pipeline"
+					},
+					"Importance": {
+						"type": "string",
+						"defaultValue": "Normal"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Alerts_SendEmail_Success')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"BBAlertsMonitoring@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string",
+						"defaultValue": "test sub"
+					},
+					"Content": {
+						"type": "string",
+						"defaultValue": "Teest ema"
+					},
+					"Importance": {
+						"type": "string",
+						"defaultValue": "Normal"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/BacPac ActivityLog_Weekly')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1264,7 +2293,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "Generic_StoredProcedure_Emails",
+								"referenceName": "Weekly_StoredProcedure_Emails",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -1286,7 +2315,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/Generic_StoredProcedure_Emails')]"
+				"[concat(variables('factoryId'), '/pipelines/Weekly_StoredProcedure_Emails')]"
 			]
 		},
 		{
@@ -2822,6 +3851,102 @@
 				"[concat(variables('factoryId'), '/datasets/Completed_CK_SAV_Accounttransactions_Source')]",
 				"[concat(variables('factoryId'), '/datasets/Completed_CK_SAV_Accounttransactions_Sink')]",
 				"[concat(variables('factoryId'), '/pipelines/DepositTransaction_Archival')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataRetention_Disable')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DataRetention_Disable",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_Archivedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "Update  [dbo].[DailyRetentionConfig] Set [PipelineRun]=0",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/Settings"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Archivedb_PROD_DTU')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataRetention_Enable')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DataRetention_Enable",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_Archivedb_PROD_DTU",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "Update  [dbo].[DailyRetentionConfig] Set [PipelineRun]=1",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/Settings"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Archivedb_PROD_DTU')]"
 			]
 		},
 		{
@@ -7559,6 +8684,74 @@
 							"referenceName": "SCCU_BusinessDataPROD",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "SendMainl-Transaction Alert_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExternalAlert_LoanDueStaging_Copy data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('ExternalAlert_LoanDueStaging_Copy data').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('ExternalAlert_LoanDueStaging_Copy data').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-Transaction Alert_copy1_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "External_LoanAlertQueue_Stored procedure",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('External_LoanAlertQueue_Stored procedure').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('External_LoanAlertQueue_Stored procedure').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
 					}
 				],
 				"concurrency": 1,
@@ -7582,7 +8775,8 @@
 				"[concat(variables('factoryId'), '/datasets/Prod_LoanDueAlertsSinkDataSet')]",
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_CompletedLoanDueAlertsSource')]",
-				"[concat(variables('factoryId'), '/datasets/PROD_CompletedLoanDueAlertsSink')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_CompletedLoanDueAlertsSink')]",
+				"[concat(variables('factoryId'), '/pipelines/Alerts_SendEmail_Failure')]"
 			]
 		},
 		{
@@ -7692,7 +8886,7 @@
 						]
 					},
 					{
-						"name": "Stored procedure1",
+						"name": "ThresholdAlert SP",
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
@@ -7763,7 +8957,7 @@
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Stored procedure1",
+								"activity": "ThresholdAlert SP",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -7836,6 +9030,74 @@
 							"referenceName": "SCCU_BusinessDataPROD",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "SendMainl-Transaction Alert_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExternalAlert_ThresholdStaging_Copy data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('ExternalAlert_ThresholdStaging_Copy data').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('ExternalAlert_ThresholdStaging_Copy data').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-Transaction Alert_copy1_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ThresholdAlert SP",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('ThresholdAlert SP').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('ThresholdAlert SP').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
 					}
 				],
 				"concurrency": 1,
@@ -7858,7 +9120,8 @@
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
 				"[concat(variables('factoryId'), '/datasets/UAT_ThresholdSourceDataSet')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_CompletedThresholdSource')]",
-				"[concat(variables('factoryId'), '/datasets/PROD_CompletedThresholdSink')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_CompletedThresholdSink')]",
+				"[concat(variables('factoryId'), '/pipelines/Alerts_SendEmail_Failure')]"
 			]
 		},
 		{
@@ -7977,7 +9240,7 @@
 						]
 					},
 					{
-						"name": "Stored procedure1",
+						"name": "Transaction Alert SP",
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
@@ -8048,7 +9311,7 @@
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "Stored procedure1",
+								"activity": "Transaction Alert SP",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -8121,6 +9384,74 @@
 							"referenceName": "SCCU_BusinessDataPROD",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "SendMainl-Transaction Alert",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExternalAlert_ThresholdStaging_Copy data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('ExternalAlert_ThresholdStaging_Copy data').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('ExternalAlert_ThresholdStaging_Copy data').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl-Transaction Alert_copy1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Transaction Alert SP",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('Transaction Alert SP').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('Transaction Alert SP').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
 					}
 				],
 				"concurrency": 1,
@@ -8142,7 +9473,216 @@
 				"[concat(variables('factoryId'), '/datasets/PRODTransactionSinkDataSet')]",
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_CompletedTransactionSource')]",
-				"[concat(variables('factoryId'), '/datasets/PROD_CompletedTransactionSink')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_CompletedTransactionSink')]",
+				"[concat(variables('factoryId'), '/pipelines/Alerts_SendEmail_Failure')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Offline_SendEmail_Failure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUADFNotifications@claysys.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string",
+						"defaultValue": "Test Email from ADF pipeline"
+					},
+					"Content": {
+						"type": "string",
+						"defaultValue": "Test Email from ADF pipeline"
+					},
+					"Importance": {
+						"type": "string",
+						"defaultValue": "Normal"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Offline_SendEmail_Success')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Pipeline email notification on job completion",
+				"activities": [
+					{
+						"name": "GetSendGridAPIKey",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "@concat('https://sccu-keyvault.vault.azure.net/secrets/SCCUSendGridAPI-PROD?api-version=7.0')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "SendEmailNotification",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetSendGridAPIKey",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', activity('GetSendGridAPIKey').output.value)",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": "https://api.sendgrid.com/v3/mail/send",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"body": {
+								"value": "{\"personalizations\":[{\"to\":[{\"email\":\"SCCUDBProdOfflineData@claysys.com\"}{\"email\":\"dbcusoitsupport@cunextgen.com\"}]}],\"from\":{\"email\":\"@{pipeline().globalParameters.FromEmail}\"},\"subject\":\"@{pipeline().parameters.Subject}\",\"content\":[{\"type\":\"text/html\",\"value\":\"@{pipeline().parameters.Content}\"}],\"headers\": {\n    \"Priority\": \"@{pipeline().parameters.Importance}\",\n    \"Importance\": \"@{pipeline().parameters.Importance}\",\n    \"X-Priority\": \"@{if(equals(pipeline().parameters.Importance, 'High'), '1', '2')}\"\n  }}}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Subject": {
+						"type": "string",
+						"defaultValue": "test sub"
+					},
+					"Content": {
+						"type": "string",
+						"defaultValue": "Teest ema"
+					},
+					"Importance": {
+						"type": "string",
+						"defaultValue": "Normal"
+					}
+				},
+				"folder": {
+					"name": "OfflineServices"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -8858,6 +10398,108 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "SendMainl-ExternalAlerts FromNextly Alert",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ExternalAlerts_Copy data1",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('ExternalAlerts_Copy data1').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('ExternalAlerts_Copy data1').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl- GetThresholdAlert FromNextly Alert",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "GetThresholdAlertSubscriptions_Copy data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('GetThresholdAlertSubscriptions_Copy data').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('GetThresholdAlertSubscriptions_Copy data').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl- GetTransactionAlert FromNextly Alert",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "GetTransactionAlertSubscription_Copy data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('GetTransactionAlertSubscription_Copy data').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('GetTransactionAlertSubscription_Copy data').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
 					}
 				],
 				"concurrency": 1,
@@ -8881,7 +10523,8 @@
 				"[concat(variables('factoryId'), '/datasets/PROD_SQLDataSet')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_GetExternalAlertRecipientsDataSet')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_GetThresholdAlertSubscriptionsDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/PROD_GetTransactionAlertSubscriptionsDataSet')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_GetTransactionAlertSubscriptionsDataSet')]",
+				"[concat(variables('factoryId'), '/pipelines/Alerts_SendEmail_Failure')]"
 			]
 		},
 		{
@@ -8891,7 +10534,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "BBAlerts_Copy data1_copy1",
+						"name": "BBAlerts_Copy data",
 						"type": "Copy",
 						"dependsOn": [
 							{
@@ -9090,7 +10733,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "BBAlerts_Copy data1_copy1",
+								"activity": "BBAlerts_Copy data",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -9120,6 +10763,74 @@
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
 						}
+					},
+					{
+						"name": "SendMainl- BBAlerts FromNextly Alert",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "BBAlerts_Copy data",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('BBAlerts_Copy data').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('BBAlerts_Copy data').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "SendMainl- UpdateLastProcessedDateTime FromNextly Alert",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "UpdateLastProcessedDateTime",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Alerts_SendEmail_Failure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@concat('Pipeline -', activity('UpdateLastProcessedDateTime').name, ' has been failed')",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('UpdateLastProcessedDateTime').output.errors.message",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
 					}
 				],
 				"concurrency": 1,
@@ -9140,7 +10851,8 @@
 				"[concat(variables('factoryId'), '/datasets/PROD_BBAlertsDataset')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_DoneProcessingDataSet')]",
 				"[concat(variables('factoryId'), '/datasets/PROD_SQLDataSet')]",
-				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]"
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_BusinessDataPROD')]",
+				"[concat(variables('factoryId'), '/pipelines/Alerts_SendEmail_Failure')]"
 			]
 		},
 		{
@@ -14416,6 +16128,40 @@
 											"parameters": {}
 										}
 									]
+								},
+								{
+									"name": "SendMainl-LoanDue FromNextly Alert",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "LoanDueAlerts_Copy data",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Alerts_SendEmail_Failure",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Subject": {
+												"value": "@concat('Pipeline -', activity('LoanDueAlerts_Copy data').name, ' has been failed')",
+												"type": "Expression"
+											},
+											"Content": {
+												"value": "@activity('LoanDueAlerts_Copy data').output.errors.message",
+												"type": "Expression"
+											},
+											"Importance": "High"
+										}
+									}
 								}
 							]
 						}
@@ -14433,7 +16179,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/PROD_SQLDataSet')]",
-				"[concat(variables('factoryId'), '/datasets/PROD_LoanDue_DataSet')]"
+				"[concat(variables('factoryId'), '/datasets/PROD_LoanDue_DataSet')]",
+				"[concat(variables('factoryId'), '/pipelines/Alerts_SendEmail_Failure')]"
 			]
 		},
 		{
@@ -14971,6 +16718,55 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Update Token Expiry')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Update Refresh Tokens expiry Dates from 30 to 60",
+				"activities": [
+					{
+						"name": "Update Token Expiry",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "SCCU_Metadb_PROD",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "Update [RefreshTokens] with (ROWLOCK)\nSet ExpiresUtc =IssuedUtc+60\nwhere CAST([IssuedUtc] as date) >= CAST( GetUTCdate()-1 as date)\n  and CAST(ExpiresUtc as date) < CAST( GetUTCdate() +32 as date)\n ",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "DataRetention/MISC"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SCCU_Metadb_PROD')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/UserCreditCards')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -15339,6 +17135,94 @@
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_OfflineModedb_PROD_DTU')]",
 				"[concat(variables('factoryId'), '/datasets/Completed_UserCreditCards_Source')]",
 				"[concat(variables('factoryId'), '/datasets/Completed_UserCreditCards_Sink')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Weekly_StoredProcedure_Emails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Send Email",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Getemail",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SendEmail_Success",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"Subject": {
+									"value": "@activity('Getemail').output.firstRow.Subject",
+									"type": "Expression"
+								},
+								"Content": {
+									"value": "@activity('Getemail').output.firstRow.EmailBody",
+									"type": "Expression"
+								},
+								"Importance": "High"
+							}
+						}
+					},
+					{
+						"name": "Getemail",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "EXEC @{pipeline().parameters.procName}",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "BacPac_Email_Proc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"procName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "DataRetention/BacPac"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SendEmail_Success')]",
+				"[concat(variables('factoryId'), '/datasets/BacPac_Email_Proc')]"
 			]
 		},
 		{

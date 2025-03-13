@@ -139,11 +139,11 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"Subject": {
-										"value": "@concat('Pipeline -', activity('BusinessData_Copy data').name, ' has been failed')",
+										"value": "@concat('Pipeline -', activity('BusinessData_Copy data').PipelineName, ' has been failed')",
 										"type": "Expression"
 									},
 									"Content": {
-										"value": "@activity('BusinessData_Copy data').output.errors.message",
+										"value": "@activity('BusinessData_Copy data').error.message",
 										"type": "Expression"
 									},
 									"Importance": "High"

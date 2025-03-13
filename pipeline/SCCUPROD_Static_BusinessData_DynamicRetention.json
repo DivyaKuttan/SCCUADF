@@ -555,8 +555,14 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
-						"Content": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('TransferMemberActivityLog_Copy').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('TransferMemberActivityLog_Copy').output.errors.message",
+							"type": "Expression"
+						},
 						"Importance": "High"
 					}
 				}
@@ -583,8 +589,14 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
-						"Content": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('MemberActivityDynamicDescriptionValue_Copy').name, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('MemberActivityDynamicDescriptionValue_Copy').output.errors.message",
+							"type": "Expression"
+						},
 						"Importance": "High"
 					}
 				}
@@ -611,8 +623,14 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"Subject": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
-						"Content": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
+						"Subject": {
+							"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').PipelineName, ' has been failed')",
+							"type": "Expression"
+						},
+						"Content": {
+							"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').error.message",
+							"type": "Expression"
+						},
 						"Importance": "High"
 					}
 				}

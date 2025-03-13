@@ -1353,11 +1353,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('MemberData').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('MemberData').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('MemberData').output.errors.message",
+									"value": "@activity('MemberData').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1390,11 +1390,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('AccountDetails').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('AccountDetails').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('AccountDetails').output.errors.message",
+									"value": "@activity('AccountDetails').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1427,11 +1427,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('UserCreditCard').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('UserCreditCard').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('UserCreditCard').output.errors.message",
+									"value": "@activity('UserCreditCard').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1464,11 +1464,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('CCMCreditCard').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('CCMCreditCard').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('CCMCreditCard').output.errors.message",
+									"value": "@activity('CCMCreditCard').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1501,11 +1501,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('SavingsAccount').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('SavingsAccount').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('SavingsAccount').output.errors.message",
+									"value": "@activity('SavingsAccount').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1538,11 +1538,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('DebitCards').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('DebitCards').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('DebitCards').output.errors.message",
+									"value": "@activity('DebitCards').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1575,11 +1575,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('AccountLockOut').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('AccountLockOut').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('AccountLockOut').output.errors.message",
+									"value": "@activity('AccountLockOut').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1612,11 +1612,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('AccountRoles').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('AccountRoles').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('AccountRoles').output.errors.message",
+									"value": "@activity('AccountRoles').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1649,11 +1649,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('CrossAccounts').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('CrossAccounts').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('CrossAccounts').output.errors.message",
+									"value": "@activity('CrossAccounts').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -1686,11 +1686,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('LoanTransaction').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('LoanTransaction').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('LoanTransaction').output.errors.message",
+									"value": "@activity('LoanTransaction').error.message",
 									"type": "Expression"
 								},
 								"Importance": {
@@ -2284,25 +2284,72 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "ActivityLog Weekly Notification",
-						"type": "ExecutePipeline",
+						"name": "IsRetentionEnabled",
+						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"pipeline": {
-								"referenceName": "Weekly_StoredProcedure_Emails",
-								"type": "PipelineReference"
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT count(1) as 'RecordCount' FROM [dbo].[DailyRetentionConfig] where PipelineRun=1",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"procName": {
-									"value": "sp_Bacpac_GetEmailData_WeeklyActivityLogs",
-									"type": "Expression"
-								}
+							"dataset": {
+								"referenceName": "SCCUPROD_ArchiveSqlDataset",
+								"type": "DatasetReference",
+								"parameters": {}
 							}
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "IsRetentionEnabled",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "ActivityLog Weekly Notification",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Weekly_StoredProcedure_Emails",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"procName": {
+												"value": "sp_Bacpac_GetEmailData_WeeklyActivityLogs",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -2315,6 +2362,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SCCUPROD_ArchiveSqlDataset')]",
 				"[concat(variables('factoryId'), '/pipelines/Weekly_StoredProcedure_Emails')]"
 			]
 		},
@@ -2326,8 +2374,8 @@
 				"description": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
 				"activities": [
 					{
-						"name": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-						"type": "SqlServerStoredProcedure",
+						"name": "IsRetentionEnabled",
+						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -2338,63 +2386,110 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT count(1) as 'RecordCount' FROM [dbo].[DailyRetentionConfig] where PipelineRun=1",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_ArchiveSqlDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
 						}
 					},
 					{
-						"name": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "BacPac_ACISeri_Notification",
-						"type": "ExecutePipeline",
+						"name": "If Condition1",
+						"type": "IfCondition",
 						"dependsOn": [
 							{
-								"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+								"activity": "IsRetentionEnabled",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							}
 						],
-						"policy": {
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"pipeline": {
-								"referenceName": "BacPac_Emails",
-								"type": "PipelineReference"
+							"expression": {
+								"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
+								"type": "Expression"
 							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
-							}
+							"ifTrueActivities": [
+								{
+									"name": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft]"
+									},
+									"linkedServiceName": {
+										"referenceName": "SCCU_Logdb_PROD_DTU",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
+									},
+									"linkedServiceName": {
+										"referenceName": "SCCU_Logdb_PROD_DTU",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "BacPac_ACISeri_Notification",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "BacPac_Emails",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -2407,6 +2502,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SCCUPROD_ArchiveSqlDataset')]",
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]",
 				"[concat(variables('factoryId'), '/pipelines/BacPac_Emails')]"
 			]
@@ -2567,8 +2663,8 @@
 				"description": "[[dbo].[sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice]",
 				"activities": [
 					{
-						"name": "sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice",
-						"type": "SqlServerStoredProcedure",
+						"name": "IsRetentionEnabled",
+						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -2579,63 +2675,110 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT count(1) as 'RecordCount' FROM [dbo].[DailyRetentionConfig] where PipelineRun=1",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SCCUPROD_ArchiveSqlDataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
 						}
 					},
 					{
-						"name": "sp_Bacpac_Delete_Log_LogTables_WeeklyTwice",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_Bacpac_Delete_Log_LogTables_WeeklyTwice]"
-						},
-						"linkedServiceName": {
-							"referenceName": "SCCU_Logdb_PROD_DTU",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "BacPacLog_Notification",
-						"type": "ExecutePipeline",
+						"name": "If Condition1",
+						"type": "IfCondition",
 						"dependsOn": [
 							{
-								"activity": "sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "sp_Bacpac_Delete_Log_LogTables_WeeklyTwice",
+								"activity": "IsRetentionEnabled",
 								"dependencyConditions": [
 									"Succeeded"
 								]
 							}
 						],
-						"policy": {
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"pipeline": {
-								"referenceName": "BacPac_Emails",
-								"type": "PipelineReference"
+							"expression": {
+								"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
+								"type": "Expression"
 							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_Log"
-							}
+							"ifTrueActivities": [
+								{
+									"name": "sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice]"
+									},
+									"linkedServiceName": {
+										"referenceName": "SCCU_Logdb_PROD_DTU",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "sp_Bacpac_Delete_Log_LogTables_WeeklyTwice",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[sp_Bacpac_Delete_Log_LogTables_WeeklyTwice]"
+									},
+									"linkedServiceName": {
+										"referenceName": "SCCU_Logdb_PROD_DTU",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "BacPacLog_Notification",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "sp_Bacpac_BackUp_Log_LogTables_WeeklyTwice",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "sp_Bacpac_Delete_Log_LogTables_WeeklyTwice",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "BacPac_Emails",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_Log"
+										}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -2648,6 +2791,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SCCUPROD_ArchiveSqlDataset')]",
 				"[concat(variables('factoryId'), '/linkedServices/SCCU_Logdb_PROD_DTU')]",
 				"[concat(variables('factoryId'), '/pipelines/BacPac_Emails')]"
 			]
@@ -11154,11 +11298,11 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"Subject": {
-												"value": "@concat('Pipeline -', activity('BusinessData_Copy data').name, ' has been failed')",
+												"value": "@concat('Pipeline -', activity('BusinessData_Copy data').PipelineName, ' has been failed')",
 												"type": "Expression"
 											},
 											"Content": {
-												"value": "@activity('BusinessData_Copy data').output.errors.message",
+												"value": "@activity('BusinessData_Copy data').error.message",
 												"type": "Expression"
 											},
 											"Importance": "High"
@@ -11558,11 +11702,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('Admin_LogDb_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('Admin_LogDb_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('Admin_LogDb_Copy data').output.errors.message",
+															"value": "@activity('Admin_LogDb_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -11592,11 +11736,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('LogDb_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('LogDb_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('LogDb_Script').output.errors.message",
+															"value": "@activity('LogDb_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -11991,11 +12135,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('AdminMetaDB_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('AdminMetaDB_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('AdminMetaDB_Copy data').output.errors.message",
+															"value": "@activity('AdminMetaDB_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -12025,11 +12169,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('AdminMetaDB_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('AdminMetaDB_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('AdminMetaDB_Script').output.errors.message",
+															"value": "@activity('AdminMetaDB_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -12425,11 +12569,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('Anonymous_LogDb_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('Anonymous_LogDb_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('Anonymous_LogDb_Copy data').output.errors.message",
+															"value": "@activity('Anonymous_LogDb_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -12459,11 +12603,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('Anonymous_LogDb_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('Anonymous_LogDb_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('Anonymous_LogDb_Script').output.errors.message",
+															"value": "@activity('Anonymous_LogDb_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -12862,11 +13006,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('Anonymous_MetaDB_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('Anonymous_MetaDB_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('Anonymous_MetaDB_Copy data').output.errors.message",
+															"value": "@activity('Anonymous_MetaDB_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -12896,11 +13040,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('Anonymous_MetaDB_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('Anonymous_MetaDB_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('Anonymous_MetaDB_Script').output.errors.message",
+															"value": "@activity('Anonymous_MetaDB_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -13246,11 +13390,11 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"Subject": {
-												"value": "@concat('Pipeline -', activity('BBAlerts_Copy data').name, ' has been failed')",
+												"value": "@concat('Pipeline -', activity('BBAlerts_Copy data').PipelineName, ' has been failed')",
 												"type": "Expression"
 											},
 											"Content": {
-												"value": "@activity('BBAlerts_Copy data').output.errors.message",
+												"value": "@activity('BBAlerts_Copy data').error.message",
 												"type": "Expression"
 											},
 											"Importance": "High"
@@ -13280,11 +13424,11 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"Subject": {
-												"value": "@concat('Pipeline -', activity('BBAlerts_Script').name, ' has been failed')",
+												"value": "@concat('Pipeline -', activity('BBAlerts_Script').PipelineName, ' has been failed')",
 												"type": "Expression"
 											},
 											"Content": {
-												"value": "@activity('BBAlerts_Script').output.errors.message",
+												"value": "@activity('BBAlerts_Script').error.message",
 												"type": "Expression"
 											},
 											"Importance": "High"
@@ -13685,11 +13829,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('BusinessData_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('BusinessData_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('BusinessData_Copy data').output.errors.message",
+															"value": "@activity('BusinessData_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -13719,11 +13863,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('BusinessData_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('BusinessData_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('BusinessData_Script').output.errors.message",
+															"value": "@activity('BusinessData_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -14132,11 +14276,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('LogDbMI_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('LogDbMI_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('LogDbMI_Copy data').output.errors.message",
+															"value": "@activity('LogDbMI_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -14166,11 +14310,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('LogDBMI_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('LogDBMI_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('LogDBMI_Script').output.errors.message",
+															"value": "@activity('LogDBMI_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -14567,11 +14711,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('LogDb_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('LogDb_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('LogDb_Copy data').output.errors.message",
+															"value": "@activity('LogDb_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -14601,11 +14745,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('LogDb_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('LogDb_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('LogDb_Script').output.errors.message",
+															"value": "@activity('LogDb_Script').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -15001,11 +15145,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('MetaDB_Copy data').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('MetaDB_Copy data').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('MetaDB_Copy data').output.errors.message",
+															"value": "@activity('MetaDB_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -15035,11 +15179,11 @@
 													"waitOnCompletion": true,
 													"parameters": {
 														"Subject": {
-															"value": "@concat('Pipeline -', activity('MetaDB_Script').name, ' has been failed')",
+															"value": "@concat('Pipeline -', activity('MetaDB_Script').PipelineName, ' has been failed')",
 															"type": "Expression"
 														},
 														"Content": {
-															"value": "@activity('MetaDB_Copy data').output.errors.message",
+															"value": "@activity('MetaDB_Copy data').error.message",
 															"type": "Expression"
 														},
 														"Importance": "High"
@@ -15919,11 +16063,11 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"Subject": {
-									"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').name, ' has been failed')",
+									"value": "@concat('Pipeline -', activity('EmulationActivityDynamicDescriptionValue_copy').PipelineName, ' has been failed')",
 									"type": "Expression"
 								},
 								"Content": {
-									"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').output.errors.message",
+									"value": "@activity('EmulationActivityDynamicDescriptionValue_copy').error.message",
 									"type": "Expression"
 								},
 								"Importance": "High"

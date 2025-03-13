@@ -4,8 +4,8 @@
 		"description": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
 		"activities": [
 			{
-				"name": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-				"type": "SqlServerStoredProcedure",
+				"name": "IsRetentionEnabled",
+				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -16,63 +16,109 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft]"
-				},
-				"linkedServiceName": {
-					"referenceName": "SCCU_Logdb_PROD_DTU",
-					"type": "LinkedServiceReference"
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT count(1) as 'RecordCount' FROM [dbo].[DailyRetentionConfig] where PipelineRun=1",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SCCUPROD_ArchiveSqlDataset",
+						"type": "DatasetReference"
+					}
 				}
 			},
 			{
-				"name": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
-				},
-				"linkedServiceName": {
-					"referenceName": "SCCU_Logdb_PROD_DTU",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "BacPac_ACISeri_Notification",
-				"type": "ExecutePipeline",
+				"name": "If Condition1",
+				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+						"activity": "IsRetentionEnabled",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					}
 				],
-				"policy": {
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"pipeline": {
-						"referenceName": "BacPac_Emails",
-						"type": "PipelineReference"
+					"expression": {
+						"value": "@greater(activity('IsRetentionEnabled').output.firstRow['RecordCount'],0)",
+						"type": "Expression"
 					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
-					}
+					"ifTrueActivities": [
+						{
+							"name": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft]"
+							},
+							"linkedServiceName": {
+								"referenceName": "SCCU_Logdb_PROD_DTU",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[sp_Bacpac_DeleteTable_ACISeri_CheckFree_Vsoft]"
+							},
+							"linkedServiceName": {
+								"referenceName": "SCCU_Logdb_PROD_DTU",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "BacPac_ACISeri_Notification",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "sp_Bacpac_Delete_ACISeri_CheckFree_Vsoft",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "sp_Bacpac_BackUp_ACISeri_CheckFree_Vsoft",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "BacPac_Emails",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"procName": "sp_Bacpac_GetEmailData_WeeklyTwice_AscSeri"
+								}
+							}
+						}
+					]
 				}
 			}
 		],
